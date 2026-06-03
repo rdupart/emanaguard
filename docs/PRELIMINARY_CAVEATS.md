@@ -1,16 +1,19 @@
 # Preliminary results caveats (carry forward to all gates)
 
-**Status:** Phase 1 v1.2 **approved** to proceed to Phase 2. All inference and detector numbers below are **PRELIMINARY**.
+**Status:** Phase 1 methodology v1.3 is acceptable; **Phase 3 is NOT approved** until corpus scale, labeling audit, held-out-model, and hard-case detector gates pass.
 
-**Do NOT use for:** external writeups, product/security claims, or Azure Phase 4 runs until the gating items below are satisfied.
+**Do NOT use for:** external writeups, product/security claims, “model fingerprinting,” or Azure Phase 4 runs until the gating items below are satisfied.
 
 ## Gating items (Phase 1 → external / Azure)
 
 | # | Requirement | Status |
 |---|-------------|--------|
-| 1 | Report **single-draw** vs **40-draw-mean** observer accuracy/MI (label which is generous vs realistic) | Pipeline + report (re-run evaluate) |
-| 2 | **Held-out-model** `model_class` / architecture generalization (not config memorization) | Extended corpus + `evaluate --held-out-model` |
-| 3 | **Scale physical base captures** (`--repetitions-per-config`, `noise.py`); prominent real capture count; do not call augmented draws "runs" | Collect + terminology in stats |
+| 1 | Report **single-draw** vs **40-draw-mean** observer accuracy/MI (label which is generous vs realistic) | In pipeline + report |
+| 2 | **Labeling audit:** explain `architecture_id` vs `model_class`; **retract** `model_class`; do not cite `architecture_id` as positive until **≥8 physical architectures** | `docs/architecture_labeling_audit.md` + JSON `architecture_labeling_audit` |
+| 3 | **Held-out-model:** single-draw, hold out entire unseen `architecture_id`s; honest negative if no generalization | `held_out_model_evaluation` in evaluate output |
+| 4 | **≥8–10 distinct architectures** in physical captures (corpus spec has 10; re-collect required) | Collect on `cursor/phase-2-detector-c1b3` corpus |
+| 5 | **Scale physical base captures** (`--repetitions-per-config`, `noise.py`); do not call augmented draws “runs” | Collect + terminology in stats |
+| 6 | **Detector D2 hard case:** ROC for (a) wrong arch same volume, (b) covert modulator — **separate** from trivial mode-change AUC | `detect` → `suites` in phase2 JSON |
 
 ## Terminology
 
@@ -22,4 +25,6 @@
 
 ## Phase 2
 
-Detector (D2) metrics inherit the same **preliminary until scaled** caveat.
+- **Headline:** `hard_unauthorized_architecture` + `hard_covert_modulator` ROC AUC.
+- **Not a result:** `trivial_mode_change` (mode/volume only).
+- Detector metrics inherit the same **preliminary until scaled** caveat as Phase 1.

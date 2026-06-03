@@ -1,17 +1,38 @@
-"""Labeled workload corpus — configs, architectures, collection specs."""
+"""Labeled workload corpus — 10+ architectures, volume-matched train blocks for D2 hard case."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Iterator
 
+MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM = 8
+
+# Volume-matched train profile for cross-architecture detector hard case (same bs/seq/steps)
+HARD_CASE_TRAIN_BS = 4
+HARD_CASE_TRAIN_SL = 128
+HARD_CASE_TRAIN_STEPS = 6
+
+# (architecture_id, hidden, num_layers) — 10 distinct transfer signatures
+ARCHITECTURE_SPECS: list[tuple[str, int, int]] = [
+    ("arch_mlp_128x3", 128, 3),
+    ("arch_mlp_256x4", 256, 4),
+    ("arch_mlp_384x12", 384, 12),
+    ("arch_mlp_512x6", 512, 6),
+    ("arch_mlp_768x6", 768, 6),
+    ("arch_mlp_1024x8", 1024, 8),
+    ("arch_mlp_1280x8", 1280, 8),
+    ("arch_mlp_1536x10", 1536, 10),
+    ("arch_mlp_1920x10", 1920, 10),
+    ("arch_mlp_2048x12", 2048, 12),
+]
+
 
 @dataclass(frozen=True)
 class WorkloadSpec:
     workload_id: str
     mode: str
-    model_class: str  # legacy bucket: small | large | medium | wide
-    architecture_id: str  # held-out-model split key
+    model_class: str  # legacy — do not use for fingerprint claims
+    architecture_id: str
     batch_size: int
     seq_length: int
     llm_phase: str
@@ -19,45 +40,95 @@ class WorkloadSpec:
     hidden: int
     num_layers: int
     vocab: int
+    volume_profile: str = "standard"  # standard | hard_case_train
+
+
+def _model_class_for_hidden(hidden: int) -> str:
+    if hidden <= 256:
+        return "small"
+    if hidden <= 768:
+        return "medium"
+    return "large"
 
 
 def iter_corpus() -> Iterator[WorkloadSpec]:
-    """12 baseline configs + 4 extra architectures for held-out-model validation."""
-    configs = [
-        # (mode, model_class, arch_id, bs, sl, phase, steps, hidden, layers, vocab)
-        ("train", "small", "arch_mlp_256x4", 4, 128, "n/a", 8, 256, 4, 32000),
-        ("train", "small", "arch_mlp_256x4", 8, 128, "n/a", 8, 256, 4, 32000),
-        ("train", "large", "arch_mlp_1024x8", 2, 128, "n/a", 6, 1024, 8, 32000),
-        ("train", "large", "arch_mlp_1024x8", 4, 256, "n/a", 6, 1024, 8, 32000),
-        ("infer", "small", "arch_mlp_256x4", 1, 128, "n/a", 6, 256, 4, 32000),
-        ("infer", "small", "arch_mlp_256x4", 4, 128, "n/a", 6, 256, 4, 32000),
-        ("infer", "large", "arch_mlp_1024x8", 1, 256, "n/a", 5, 1024, 8, 32000),
-        ("infer", "large", "arch_mlp_1024x8", 2, 512, "n/a", 5, 1024, 8, 32000),
-        ("infer", "small", "arch_mlp_256x4", 1, 512, "prefill", 4, 256, 4, 50257),
-        ("infer", "small", "arch_mlp_256x4", 1, 512, "decode", 12, 256, 4, 50257),
-        ("infer", "large", "arch_mlp_1024x8", 1, 1024, "prefill", 3, 1024, 8, 50257),
-        ("infer", "large", "arch_mlp_1024x8", 1, 1024, "decode", 16, 1024, 8, 50257),
-        # Additional architectures (for held-out-model eval; collect on GPU)
-        ("infer", "medium", "arch_mlp_512x6", 2, 128, "n/a", 5, 512, 6, 32000),
-        ("infer", "wide", "arch_mlp_384x12", 2, 128, "n/a", 5, 384, 12, 32000),
-        ("train", "medium", "arch_mlp_512x6", 4, 128, "n/a", 6, 512, 6, 32000),
-        ("infer", "xlarge", "arch_mlp_1536x10", 1, 128, "n/a", 4, 1536, 10, 32000),
-    ]
-    for i, row in enumerate(configs):
-        mode, mclass, arch, bs, sl, phase, steps, hidden, layers, vocab = row
+    """
+    Per architecture: volume-matched train + infer, plus optional LLM phases on subset.
+    """
+    idx = 0
+    for arch_id, hidden, layers in ARCHITECTURE_SPECS:
+        mclass = _model_class_for_hidden(hidden)
+        # Hard-case train block (same volume knobs across architectures)
         yield WorkloadSpec(
-            workload_id=f"w{i:02d}_{mode}_{mclass}_{phase}".replace("n/a", "n_a"),
-            mode=mode,
+            workload_id=f"w{idx:02d}_train_{mclass}_n_a",
+            mode="train",
             model_class=mclass,
-            architecture_id=arch,
-            batch_size=bs,
-            seq_length=sl,
-            llm_phase=phase,
-            steps=steps,
+            architecture_id=arch_id,
+            batch_size=HARD_CASE_TRAIN_BS,
+            seq_length=HARD_CASE_TRAIN_SL,
+            llm_phase="n/a",
+            steps=HARD_CASE_TRAIN_STEPS,
             hidden=hidden,
             num_layers=layers,
-            vocab=vocab,
+            vocab=32000,
+            volume_profile="hard_case_train",
         )
+        idx += 1
+        # Infer (trivial mode violation for detector)
+        yield WorkloadSpec(
+            workload_id=f"w{idx:02d}_infer_{mclass}_n_a",
+            mode="infer",
+            model_class=mclass,
+            architecture_id=arch_id,
+            batch_size=1,
+            seq_length=HARD_CASE_TRAIN_SL,
+            llm_phase="n/a",
+            steps=5,
+            hidden=hidden,
+            num_layers=layers,
+            vocab=32000,
+            volume_profile="standard",
+        )
+        idx += 1
+
+    # Extra batch/seq diversity on first 4 architectures only (fine-axis stress)
+    for arch_id, hidden, layers in ARCHITECTURE_SPECS[:4]:
+        mclass = _model_class_for_hidden(hidden)
+        yield WorkloadSpec(
+            workload_id=f"w{idx:02d}_train_{mclass}_n_a",
+            mode="train",
+            model_class=mclass,
+            architecture_id=arch_id,
+            batch_size=8,
+            seq_length=256,
+            llm_phase="n/a",
+            steps=6,
+            hidden=hidden,
+            num_layers=layers,
+            vocab=32000,
+            volume_profile="standard",
+        )
+        idx += 1
+
+    # LLM prefill/decode on two architectures
+    for arch_id, hidden, layers in ARCHITECTURE_SPECS[:2]:
+        mclass = _model_class_for_hidden(hidden)
+        for phase, steps in [("prefill", 4), ("decode", 10)]:
+            yield WorkloadSpec(
+                workload_id=f"w{idx:02d}_infer_{mclass}_{phase}",
+                mode="infer",
+                model_class=mclass,
+                architecture_id=arch_id,
+                batch_size=1,
+                seq_length=512,
+                llm_phase=phase,
+                steps=steps,
+                hidden=hidden,
+                num_layers=layers,
+                vocab=50257,
+                volume_profile="standard",
+            )
+            idx += 1
 
 
 def corpus_size() -> int:
@@ -69,4 +140,8 @@ def config_id_from_workload(workload_id: str) -> str:
 
 
 def all_architecture_ids() -> list[str]:
-    return sorted({s.architecture_id for s in iter_corpus()})
+    return [a[0] for a in ARCHITECTURE_SPECS]
+
+
+def count_architectures_in_runs(labels_list: list) -> int:
+    return len({lb.architecture_id or lb.model_class for lb in labels_list})

@@ -20,6 +20,11 @@ from pipeline.features.realistic_observer import (
 from pipeline.features.vm_ground_truth import vm_ground_truth_feature_vector
 from pipeline.mitigation.feature_shim import mitigate_constant_rpc, mitigate_size_padding
 from pipeline.trace.events import RunLabels, TransferEvent
+from pipeline.workloads.corpus import (
+    MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+    all_architecture_ids,
+    count_architectures_in_runs,
+)
 
 LABEL_AXES = [
     ("mode", lambda lb: lb.mode),
@@ -139,15 +144,37 @@ def eval_held_out_architecture(
     x, _b, _c, arch_ids, y_dict = _build_matrix(
         expanded, feature_fn, aggregation=aggregation
     )
+    n_arch_corpus = len(set(arch_ids))
     train_m, test_m, held_out = split_holdout_architectures(
-        arch_ids, holdout_fraction=0.25, seed=seed
+        arch_ids, holdout_fraction=0.25, seed=seed, min_train_architectures=2
     )
+    train_archs = sorted(set(arch_ids[train_m]))
+    test_archs = sorted(set(arch_ids[test_m]))
     out: dict = {
         "held_out_architectures": held_out,
-        "split": "entire architecture_id held out of train; test contains only unseen models",
+        "train_architectures": train_archs,
+        "test_architectures": test_archs,
+        "distinct_architectures_in_physical_corpus": n_arch_corpus,
+        "min_architectures_for_valid_fingerprint_claim": MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        "split": (
+            "entire architecture_id held out of train; test rows are only unseen "
+            "architectures (single-draw realistic observer)"
+        ),
         "aggregation": aggregation,
+        "headline_axis": "architecture_id",
+        "model_class_status": "RETRACTED — confounded with volume/mode; not a fingerprint axis",
         "axes": {},
     }
+    if n_arch_corpus < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+        out["gate_status"] = (
+            f"BLOCKED: only {n_arch_corpus} physical architectures; need "
+            f">={MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM} after collect on expanded corpus"
+        )
+    elif len(train_archs) < 2:
+        out["gate_status"] = "NEGATIVE: train fold has fewer than 2 architecture classes"
+    else:
+        out["gate_status"] = "PRELIMINARY — interpret held-out accuracy; no external fingerprint claim until PASS"
+
     for axis in ("architecture_id", "model_class"):
         y = y_dict[axis]
         res = _eval_axis_masked(
@@ -161,8 +188,23 @@ def eval_held_out_architecture(
             make_logreg,
             seed,
         )
-        if len(np.unique(arch_ids[test_m])) < len(set(arch_ids)):
-            res.notes = (res.notes + " held_out_model_split").strip()
+        if axis == "model_class":
+            res.pass_lower_ci_above_chance = False
+            res.notes = (
+                (res.notes or "")
+                + " RETRACTED: model_class not reported as fingerprint result"
+            ).strip()
+        elif n_arch_corpus < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+            res.pass_lower_ci_above_chance = False
+            res.notes = (
+                (res.notes or "")
+                + f" RETRACTED: <{MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM} architectures in corpus"
+            ).strip()
+        elif axis == "architecture_id" and not res.pass_lower_ci_above_chance:
+            res.notes = (
+                (res.notes or "")
+                + " NEGATIVE: held-out-model does not generalize — honest bounding result"
+            ).strip()
         out["axes"][axis] = res.to_dict()
     return out
 
@@ -460,6 +502,71 @@ def run_evaluation(
 
     mitigation = _mitigation_eval(expanded_mean, backend, eval_seed)
 
+    physical_labels = [lb for _, lb in runs]
+    n_arch_physical = count_architectures_in_runs(physical_labels)
+    target_archs = all_architecture_ids()
+
+    def _apply_labeling_gates(results: list[AxisResult]) -> list[dict]:
+        out_rows: list[dict] = []
+        for r in results:
+            d = r.to_dict()
+            if r.label_axis == "model_class":
+                d["pass_lower_ci_above_chance"] = False
+                d["claim_status"] = "RETRACTED"
+                d["notes"] = (
+                    (d.get("notes") or "")
+                    + " model_class confounded with mode/volume — see docs/architecture_labeling_audit.md"
+                ).strip()
+            elif r.label_axis == "architecture_id":
+                if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+                    d["pass_lower_ci_above_chance"] = False
+                    d["claim_status"] = "RETRACTED_INSUFFICIENT_CORPUS"
+                    d["notes"] = (
+                        (d.get("notes") or "")
+                        + f" only {n_arch_physical} physical architectures (need "
+                        f">={MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM}); collect expanded corpus"
+                    ).strip()
+                else:
+                    d["claim_status"] = "PRELIMINARY_PENDING_HELD_OUT"
+            else:
+                d["claim_status"] = "PRELIMINARY"
+            out_rows.append(d)
+        return out_rows
+
+    single_gated = _apply_labeling_gates(headline_single)
+    mean_gated = _apply_labeling_gates(headline_mean)
+
+    architecture_labeling_audit = {
+        "doc": "docs/architecture_labeling_audit.md",
+        "physical_distinct_architecture_ids": n_arch_physical,
+        "target_architecture_ids_in_corpus_spec": target_archs,
+        "min_architectures_for_fingerprint": MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        "explanation": (
+            "architecture_id vs model_class disagreement on legacy 2-arch corpus: "
+            "model_class is a coarse bucket aligned with train/infer volume; "
+            "architecture_id can track config bundles. Only architecture_id is "
+            "canonical for fingerprint claims after >=8 physical architectures."
+        ),
+        "model_class": {"status": "RETRACTED", "report_in_headline": False},
+        "architecture_id": {
+            "status": (
+                "RETRACTED_INSUFFICIENT_CORPUS"
+                if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM
+                else "CANONICAL_PENDING_GATES"
+            ),
+            "report_in_headline": n_arch_physical >= MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        },
+    }
+
+    gate_summary = {
+        "external_fingerprint_claims": "BLOCKED",
+        "architecture_inference_headline": (
+            "BLOCKED until >=8 physical architectures and held-out-model PASS on architecture_id"
+        ),
+        "detector_headline": "Phase 2 hard suites only (not trivial mode-change AUC)",
+        "phase_3": "NOT_APPROVED — re-collect on 10-arch corpus then re-run gates",
+    }
+
     # Interpret ablation: if volume-only ≈ realistic, channel is coarse
     ablation_notes = {}
     for h, v in zip(headline_mean, ablation_volume):
@@ -491,9 +598,11 @@ def run_evaluation(
                 "REALISTIC: one stochastic observer draw per physical base capture (observation_idx=0)"
             ),
         },
-        "host_observer_realistic_mean_draw": [r.to_dict() for r in headline_mean],
-        "host_observer_realistic_single_draw": [r.to_dict() for r in headline_single],
-        "host_observer_realistic": [r.to_dict() for r in headline_mean],
+        "architecture_labeling_audit": architecture_labeling_audit,
+        "gate_summary": gate_summary,
+        "host_observer_realistic_mean_draw": mean_gated,
+        "host_observer_realistic_single_draw": single_gated,
+        "host_observer_realistic": mean_gated,
         "held_out_model_evaluation": held_out_model,
         "host_observer_idealized": [r.to_dict() for r in idealized],
         "ablation_volume_only": [r.to_dict() for r in ablation_volume],

@@ -1,57 +1,56 @@
-# PHASE 2 Report — Policy-Deviation Detector (Gate)
+# PHASE 2 Report — Policy-Deviation Detector (Gate D2)
 
 **Date:** 2026-06-03  
 **Status:** Gate document (preliminary metrics)  
 **Backend:** `local-gpu`  
-**Policy:** `train_only_arch_256x4_1024x8`
+**Headline metric:** `hard_unauthorized_architecture + hard_covert_modulator`  
+**Not headline:** `trivial_mode_change (volume/mode only)`
 
-> **PRELIMINARY** — inherits Phase 1 caveats (`docs/PRELIMINARY_CAVEATS.md`). Not for external writeup or Azure until physical corpus scale gate passes.
+> **PRELIMINARY** — inherits Phase 1 caveats (`docs/PRELIMINARY_CAVEATS.md`). Headline metrics are **hard** violation suites only. Trivial mode-change ROC is **not** a result.
 
+## 0. Corpus scale (detector inherits Phase 1 gate)
+
+| Item | Value |
+|------|--------|
+| Physical base captures | 96 |
+| Distinct `architecture_id` in traces | 2 |
+| Target architectures (corpus spec) | 10 listed in JSON |
+| Min for fingerprint claim | 8 |
 
 ## 1. Detector definition (D2)
 
 | Item | Value |
 |------|--------|
-| Signal | `host_observer_realistic_single_draw` (same as Phase 1 realistic headline) |
-| Policy | Benign = attested `(mode, architecture_id)` in CVM |
-| Violations | Cross-mode / cross-architecture traces (Tier-Red modulator **not** in repo) |
-| Model | Logistic regression on policy label |
+| Signal | `host_observer_realistic_single_draw` |
+| Attested policy | `train_volume_matched_arch_mlp_256x4_only` |
+| Hard (a) | Unauthorized architecture at **same** train mode/volume profile |
+| Hard (b) | Covert modulator on attested benign trace (Tier-Red transform in repo for measurement) |
+| Not a result | Mode change alone (`trivial_mode_change`) |
 
-## 2. Results (test fold)
+*covert_modulator.py implements measurement transform; not published as exploit*
 
-| Metric | Value |
-|--------|--------|
-| ROC AUC | **1.000** |
-| TPR @ op. point | 1.000 |
-| FPR @ op. point | 0.046 |
-| Threshold (95th %ile benign train score) | 0.0000 |
-| TP / FP / TN / FN | 273 / 6 / 124 / 0 |
-| Test samples | 403 |
-| Physical base captures (corpus) | 2016 |
+## 2. ROC by suite (test fold)
 
-*Notes:* PRELIMINARY; see docs/PRELIMINARY_CAVEATS.md
+| Suite | ROC AUC | n_test | TPR | FPR | Notes |
+|-------|---------|--------|-----|-----|-------|
+| hard_unauthorized_architecture **HEADLINE** | 0.000 | 0 | 0.000 | 0.000 | NEGATIVE: insufficient classes or samples for suite (attested_arch=arch_legacy_small) |
+| hard_covert_modulator **HEADLINE** | 0.000 | 3 | 0.000 | 0.000 | NEGATIVE: test fold lacks both classes |
+| trivial_mode_change (not headline) | 1.000 | 19 | 1.000 | 0.143 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
 
-## 3. Violation types seen in test
 
-```json
-{
-  "infer:arch_legacy_small": 140,
-  "infer:arch_legacy_large": 133
-}
-```
-
-## 4. Phase 1 gating (unchanged)
+## 3. Phase 1 gating (unchanged)
 
 | Gate | Status |
 |------|--------|
-| Single-draw vs mean-draw reporting | See `report/phase1_results.json` → `observer_aggregation_labels` |
-| Held-out-model validation | `held_out_model_evaluation` in phase1_results |
-| Physical capture scale | Collect with `--repetitions-per-config`; report `physical_base_captures` |
+| Labeling audit (`architecture_id` vs `model_class`) | `docs/architecture_labeling_audit.md` + `architecture_labeling_audit` in phase1 JSON |
+| ≥8 physical architectures | Re-collect on expanded corpus |
+| Held-out-model (single-draw) | `held_out_model_evaluation` in phase1_results |
+| Single-draw headline | `host_observer_realistic_single_draw` |
 
-## 5. Azure
+## 4. Azure
 
 **Not run** (Phase 4 only).
 
 ---
 
-**STOP — Phase 2 gate.** Await human approval before Phase 3.
+**STOP — Phase 2 gate.** Phase 3 **not approved** until hard-case detector + Phase 1 gates pass on scaled corpus.

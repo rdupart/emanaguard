@@ -83,14 +83,31 @@ def split_holdout_architectures(
     architecture_ids: np.ndarray,
     holdout_fraction: float = 0.25,
     seed: int = 42,
+    *,
+    min_train_architectures: int = 2,
 ) -> tuple[np.ndarray, np.ndarray, list[str]]:
-    """Hold out entire architecture_id values (unseen models in test)."""
+    """
+    Hold out entire architecture_id values (unseen models in test).
+
+    Train must retain at least ``min_train_architectures`` distinct architectures when
+    the corpus has enough classes; otherwise holdout count is reduced (honest negative).
+    """
     architecture_ids = np.asarray(architecture_ids)
     uniq = sorted(set(architecture_ids))
+    n_uniq = len(uniq)
+    if n_uniq < min_train_architectures + 1:
+        held_out = list(uniq[-1:]) if n_uniq else []
+        test_set = set(held_out)
+        train_m = np.array([a not in test_set for a in architecture_ids])
+        test_m = ~train_m
+        return train_m, test_m, held_out
+
     rng = np.random.default_rng(seed)
-    rng.shuffle(uniq)
-    n_test = max(1, int(len(uniq) * holdout_fraction))
-    held_out = list(uniq[:n_test])
+    shuffled = list(uniq)
+    rng.shuffle(shuffled)
+    n_test = max(1, int(n_uniq * holdout_fraction))
+    n_test = min(n_test, n_uniq - min_train_architectures)
+    held_out = shuffled[:n_test]
     test_set = set(held_out)
     train_m = np.array([a not in test_set for a in architecture_ids])
     test_m = ~train_m

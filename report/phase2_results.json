@@ -1,46 +1,81 @@
 {
   "preliminary": true,
   "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
-  "policy": "train_only_arch_256x4_1024x8",
   "backend": "local-gpu",
-  "physical_base_captures": 2016,
-  "detector": {
-    "policy_name": "train_only_arch_256x4_1024x8",
-    "signal_set": "host_observer_realistic_single_draw",
-    "backend": "local-gpu",
-    "roc_auc": 1.0,
-    "fpr_at_threshold": 0.046153846153846156,
-    "tpr_at_threshold": 1.0,
-    "threshold": 5.205186554860219e-204,
-    "false_positives": 6,
-    "true_positives": 273,
-    "false_negatives": 0,
-    "true_negatives": 124,
-    "n_test": 403,
-    "mean_score_violation": 1.0,
-    "mean_score_benign": 1.2888704063391458e-132,
-    "notes": "PRELIMINARY; see docs/PRELIMINARY_CAVEATS.md"
+  "physical_base_captures": 96,
+  "attested_architecture_resolved": "arch_legacy_small",
+  "volume_matched_train_profile": {
+    "batch_size": 4,
+    "seq_length": 128
   },
-  "roc": {
-    "fpr": [
-      0.0,
-      0.0,
-      0.0,
-      0.4461538461538462,
-      1.0
-    ],
-    "tpr": [
-      0.0,
-      0.989010989010989,
-      1.0,
-      1.0,
-      1.0
-    ]
+  "distinct_architecture_ids_in_corpus": 2,
+  "target_architectures": [
+    "arch_mlp_128x3",
+    "arch_mlp_256x4",
+    "arch_mlp_384x12",
+    "arch_mlp_512x6",
+    "arch_mlp_768x6",
+    "arch_mlp_1024x8",
+    "arch_mlp_1280x8",
+    "arch_mlp_1536x10",
+    "arch_mlp_1920x10",
+    "arch_mlp_2048x12"
+  ],
+  "min_architectures_for_fingerprint": 8,
+  "headline_detector_metric": "hard_unauthorized_architecture + hard_covert_modulator",
+  "not_headline": "trivial_mode_change (volume/mode only)",
+  "suites": {
+    "trivial_mode_change": {
+      "suite": "trivial_mode_change",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "fpr_at_threshold": 0.14285714285714285,
+      "tpr_at_threshold": 1.0,
+      "threshold": 1.0975396868850789e-12,
+      "false_positives": 1,
+      "true_positives": 12,
+      "false_negatives": 0,
+      "true_negatives": 6,
+      "n_test": 19,
+      "headline": false,
+      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+    },
+    "hard_unauthorized_architecture": {
+      "suite": "hard_unauthorized_architecture",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 0.0,
+      "fpr_at_threshold": 0.0,
+      "tpr_at_threshold": 0.0,
+      "threshold": 0.5,
+      "false_positives": 0,
+      "true_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 0,
+      "n_test": 0,
+      "headline": true,
+      "notes": "NEGATIVE: insufficient classes or samples for suite (attested_arch=arch_legacy_small)"
+    },
+    "hard_covert_modulator": {
+      "suite": "hard_covert_modulator",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 0.0,
+      "fpr_at_threshold": 0.0,
+      "tpr_at_threshold": 0.0,
+      "threshold": 0.5,
+      "false_positives": 0,
+      "true_positives": 0,
+      "false_negatives": 0,
+      "true_negatives": 0,
+      "n_test": 3,
+      "headline": true,
+      "notes": "NEGATIVE: test fold lacks both classes"
+    }
   },
-  "false_positives_per_test_window": 6.0,
-  "violation_types_in_test": {
-    "infer:arch_legacy_small": 140,
-    "infer:arch_legacy_large": 133
-  },
-  "tier_red_modulator": "not_in_repo (private); violations from cross-mode/architecture traces"
+  "tier_red_note": "covert_modulator.py implements measurement transform; not published as exploit"
 }

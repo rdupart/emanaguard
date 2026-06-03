@@ -24,7 +24,14 @@ CPU PyTorch is enough for **evaluate** on committed traces in `data/traces/`. **
 
 ### Preliminary caveat
 
-All metrics are **PRELIMINARY** until gates in `docs/PRELIMINARY_CAVEATS.md` pass. Do not use for external claims or Azure.
+All metrics are **PRELIMINARY** until gates in `docs/PRELIMINARY_CAVEATS.md` pass. Do not use for external claims or Azure. **Phase 3 blocked** until ≥8 physical `architecture_id`s are collected on the 10-arch corpus (`pipeline/workloads/corpus.py`) and gates re-run.
+
+### Gate v1.3 (current branch)
+
+- Labeling: `docs/architecture_labeling_audit.md` — `model_class` **retracted**; `architecture_id` positive only with ≥8 physical architectures.
+- Phase 1 headline: `host_observer_realistic_single_draw` in `report/phase1_results.json`.
+- Phase 2 headline: `suites.hard_unauthorized_architecture` + `suites.hard_covert_modulator` (not `trivial_mode_change`).
+- Legacy traces (2 arch) will show **NEGATIVE** hard-detector / held-out-model until re-collect.
 
 ### Gotchas
 
