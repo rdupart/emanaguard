@@ -54,8 +54,19 @@ Hard-case detection is strong **when violations are defined at fixed train volum
 
 ## Traces on GitHub
 
-- **`report/*.json`** — on `main` / branch (from your upload).
-- **`data/traces/*.jsonl`** — **not** in GitHub yet unless you push from `C:\Users\rsocc\Downloads\traces` (see **`docs/TRACES_WINDOWS_UPLOAD.md`**).
+| Artifact | Status (check branch `cursor/phase-2-detector-c1b3`) |
+|----------|--------------------------------------------------------|
+| `report/phase1_results.json` / `phase2_results.json` | **Synced** (Colab metrics) |
+| `data/traces/*.jsonl` | **You must push from PC** — repo still has ~100–150 legacy files, not ~4500+ |
+
+**Cloud agents cannot read** `C:\Users\rsocc\Downloads\traces`. On your PC run:
+
+```powershell
+cd C:\path\to\emanaguard   # after clone
+.\scripts\push_traces_windows.ps1
+```
+
+Or follow **`docs/TRACES_WINDOWS_UPLOAD.md`**. After push, `git ls-tree -r HEAD data/traces | wc -l` should be **thousands**, not ~133.
 
 ## Next decision
 

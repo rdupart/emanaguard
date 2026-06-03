@@ -5,7 +5,15 @@ Your Colab **`report/phase1_results.json`** / **`phase2_results.json`** can be c
 **Target branch:** `cursor/phase-2-detector-c1b3`  
 **Local folder:** `C:\Users\rsocc\Downloads\traces` (should contain `*.jsonl` and `manifest*.json`)
 
-## Option A — Git Bash or PowerShell (recommended)
+## Quick path (script in repo)
+
+```powershell
+git clone -b cursor/phase-2-detector-c1b3 https://github.com/rdupart/emanaguard.git
+cd emanaguard
+.\scripts\push_traces_windows.ps1 -TracesDir "C:\Users\rsocc\Downloads\traces"
+```
+
+## Option A — Git Bash or PowerShell (manual)
 
 ```powershell
 cd C:\Users\rsocc\Downloads\traces
