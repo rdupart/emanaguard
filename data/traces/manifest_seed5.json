@@ -1,0 +1,25 @@
+{
+  "backend": "local-gpu",
+  "command": [
+    "/content/emanaguard/pipeline/cli.py",
+    "collect",
+    "--backend",
+    "local-gpu",
+    "--out-dir",
+    "data/traces/local-gpu",
+    "--seeds",
+    "0,1,2,3,4,5,6,7"
+  ],
+  "extra": {
+    "extra": {
+      "out_dir": "data/traces/local-gpu"
+    }
+  },
+  "git_commit": "b8e11d55f5b6115abe14e61c37a8c56f5c45db21",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+  "python_version": "3.12.13 (main, Mar  4 2026, 09:23:07) [GCC 11.4.0]",
+  "run_id": "865b56d3e0df3ad7",
+  "seed": 5,
+  "started_at": "2026-06-03T02:03:14.747575+00:00",
+  "torch_cuda": true
+}

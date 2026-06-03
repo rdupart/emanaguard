@@ -1,0 +1,6 @@
+{"type": "labels", "workload_id": "w10_infer_large_prefill", "mode": "infer", "model_class": "large", "batch_size": 1, "seq_length": 1024, "llm_phase": "prefill", "seed": 3, "run_id": "w10_infer_large_prefill_s3"}
+{"type": "event", "t_ns": 2972119064487, "size_bytes": 33554432, "direction": "H2D", "duration_ns": 7181056, "op_name": "load_embedding", "stream_id": 0, "phase": "prefill", "run_id": "w10_infer_large_prefill_s3"}
+{"type": "event", "t_ns": 2972132435677, "size_bytes": 4194304, "direction": "H2D", "duration_ns": 1057609, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w10_infer_large_prefill_s3"}
+{"type": "event", "t_ns": 2972139706328, "size_bytes": 4194304, "direction": "H2D", "duration_ns": 1037026, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w10_infer_large_prefill_s3"}
+{"type": "event", "t_ns": 2972146554717, "size_bytes": 4194304, "direction": "H2D", "duration_ns": 1005976, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w10_infer_large_prefill_s3"}
+{"type": "event", "t_ns": 2972147819835, "size_bytes": 4194304, "direction": "D2H", "duration_ns": 992085, "op_name": "prefill_out", "stream_id": 0, "phase": "prefill", "run_id": "w10_infer_large_prefill_s3"}
