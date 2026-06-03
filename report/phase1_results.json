@@ -2,24 +2,24 @@
   "backend": "local-gpu",
   "methodology_version": "phase1.2",
   "corpus_statistics": {
-    "total_runs": 3840,
-    "unique_base_captures": 96,
+    "total_runs": 34920,
+    "unique_base_captures": 873,
     "num_configs": 12,
     "runs_per_config": {
-      "w00_train": 320,
-      "w01_train": 320,
-      "w02_train_large_n_a": 320,
-      "w03_train_large_n_a": 320,
-      "w04_infer": 320,
-      "w05_infer": 320,
-      "w06_infer_large_n_a": 320,
-      "w07_infer_large_n_a": 320,
-      "w08_infer": 320,
-      "w09_infer": 320,
-      "w10_infer_large_prefill": 320,
-      "w11_infer_large_decode": 320
+      "w00_train": 3120,
+      "w01_train": 3120,
+      "w02_train_large_n_a": 3120,
+      "w03_train_large_n_a": 3120,
+      "w04_infer": 3120,
+      "w05_infer": 3000,
+      "w06_infer_large_n_a": 2720,
+      "w07_infer_large_n_a": 2720,
+      "w08_infer": 2720,
+      "w09_infer": 2720,
+      "w10_infer_large_prefill": 2720,
+      "w11_infer_large_decode": 2720
     },
-    "mean_runs_per_config": 320.0
+    "mean_runs_per_config": 2910.0
   },
   "observations_per_base_capture": 40,
   "headline_signal_set": "host_observer_realistic",
@@ -28,22 +28,22 @@
       "label_axis": "mode",
       "signal_set": "host_observer_realistic",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9583333333333334,
-      "mi_bits": 0.47804719774818016,
-      "ci_lower": 0.875,
+      "accuracy": 0.9906542056074766,
+      "mi_bits": 0.6071068436556707,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
-          1,
-          7
+          2,
+          76
         ]
       ],
       "class_names": [
@@ -56,22 +56,22 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_realistic",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9583333333333334,
-      "mi_bits": 0.47804719774818016,
-      "ci_lower": 0.875,
+      "accuracy": 0.9906542056074766,
+      "mi_bits": 0.6071068436556707,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
-          1,
-          7
+          2,
+          76
         ]
       ],
       "class_names": [
@@ -84,27 +84,27 @@
       "label_axis": "batch_size",
       "signal_set": "host_observer_realistic",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.3333333333333333,
-      "mi_bits": 0.9678002527269727,
-      "ci_lower": 0.16666666666666666,
-      "ci_upper": 0.5416666666666666,
+      "accuracy": 0.04672897196261682,
+      "mi_bits": 0.6649368907024442,
+      "ci_lower": 0.018691588785046728,
+      "ci_upper": 0.07476635514018691,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          10,
           0,
-          0
+          58
         ],
         [
           0,
           0,
-          8
+          68
         ],
         [
-          1,
+          2,
           0,
           0
         ]
@@ -120,28 +120,28 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_realistic",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.2916666666666667,
-      "mi_bits": 0.9678002527269727,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.5747663551401869,
+      "mi_bits": 0.7012322237684717,
+      "ci_lower": 0.5093457943925234,
+      "ci_upper": 0.6355140186915887,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          7,
+          76,
           0,
           0
         ],
         [
           0,
-          0,
+          47,
           0
         ],
         [
           0,
-          8,
+          68,
           0
         ]
       ],
@@ -156,17 +156,17 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_realistic",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 1,
       "chance_accuracy": 1.0,
-      "accuracy": 0.2916666666666667,
+      "accuracy": 0.35514018691588783,
       "mi_bits": 0.0,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          7
+          76
         ]
       ],
       "class_names": [
@@ -180,22 +180,22 @@
       "label_axis": "mode",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9583333333333334,
-      "mi_bits": 0.47804719774818016,
-      "ci_lower": 0.875,
+      "accuracy": 0.9906542056074766,
+      "mi_bits": 0.6071068436556707,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
-          1,
-          7
+          2,
+          76
         ]
       ],
       "class_names": [
@@ -208,22 +208,22 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9583333333333334,
-      "mi_bits": 0.47804719774818016,
-      "ci_lower": 0.875,
+      "accuracy": 0.9906542056074766,
+      "mi_bits": 0.6071068436556707,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
-          1,
-          7
+          2,
+          76
         ]
       ],
       "class_names": [
@@ -236,11 +236,11 @@
       "label_axis": "batch_size",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
       "accuracy": 0.0,
-      "mi_bits": 0.6365141682948128,
+      "mi_bits": 0.6559556741718915,
       "ci_lower": 0.0,
       "ci_upper": 0.0,
       "pass_lower_ci_above_chance": false,
@@ -248,15 +248,15 @@
         [
           0,
           0,
-          8
+          68
         ],
         [
           0,
           0,
-          8
+          68
         ],
         [
-          1,
+          2,
           0,
           0
         ]
@@ -272,28 +272,28 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.2916666666666667,
-      "mi_bits": 0.9678002527269727,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.6682242990654206,
+      "mi_bits": 0.6502888910562379,
+      "ci_lower": 0.6074766355140186,
+      "ci_upper": 0.7242990654205608,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          7,
+          76,
           0,
           0
         ],
         [
           0,
-          0,
+          67,
           0
         ],
         [
           0,
-          8,
+          68,
           0
         ]
       ],
@@ -308,17 +308,17 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 1,
       "chance_accuracy": 1.0,
-      "accuracy": 0.9583333333333334,
+      "accuracy": 0.9439252336448598,
       "mi_bits": 0.0,
-      "ci_lower": 0.875,
-      "ci_upper": 1.0,
+      "ci_lower": 0.9112149532710281,
+      "ci_upper": 0.9719626168224299,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          23
+          202
         ]
       ],
       "class_names": [
@@ -332,22 +332,22 @@
       "label_axis": "mode",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6559556741718919,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
           0,
-          8
+          78
         ]
       ],
       "class_names": [
@@ -360,22 +360,22 @@
       "label_axis": "model_class",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6559556741718919,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
           0,
-          8
+          78
         ]
       ],
       "class_names": [
@@ -388,22 +388,22 @@
       "label_axis": "batch_size",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.3333333333333333,
-      "mi_bits": 0.636514168294813,
-      "ci_lower": 0.16666666666666666,
-      "ci_upper": 0.5416666666666666,
+      "accuracy": 0.3177570093457944,
+      "mi_bits": 0.6559556741718918,
+      "ci_lower": 0.2570093457943925,
+      "ci_upper": 0.38317757009345793,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          68,
           0,
           0
         ],
         [
-          8,
+          68,
           0,
           0
         ],
@@ -424,17 +424,17 @@
       "label_axis": "seq_length",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.3333333333333333,
-      "mi_bits": 0.636514168294813,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5416666666666666,
+      "accuracy": 0.3644859813084112,
+      "mi_bits": 0.6559556741718918,
+      "ci_lower": 0.29906542056074764,
+      "ci_upper": 0.4300233644859812,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          78,
           0,
           0
         ],
@@ -460,17 +460,17 @@
       "label_axis": "llm_phase",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 1,
       "chance_accuracy": 1.0,
-      "accuracy": 0.3333333333333333,
+      "accuracy": 0.0,
       "mi_bits": 0.0,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5416666666666666,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8
+          0
         ]
       ],
       "class_names": [
@@ -488,22 +488,22 @@
       "label_axis": "mode",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6559556741718919,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
           0,
-          8
+          78
         ]
       ],
       "class_names": [
@@ -516,22 +516,22 @@
       "label_axis": "model_class",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6559556741718919,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          136,
           0
         ],
         [
           0,
-          8
+          78
         ]
       ],
       "class_names": [
@@ -544,24 +544,24 @@
       "label_axis": "batch_size",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.3333333333333333,
-      "mi_bits": 1.09861228866811,
-      "ci_lower": 0.16666666666666666,
-      "ci_upper": 0.5416666666666666,
+      "accuracy": 0.0,
+      "mi_bits": 0.6559556741718918,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
           0,
-          0
+          0,
+          68
         ],
         [
           0,
           0,
-          8
+          68
         ],
         [
           0,
@@ -580,28 +580,28 @@
       "label_axis": "seq_length",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.4166666666666667,
-      "mi_bits": 0.4917482177852567,
-      "ci_lower": 0.20833333333333334,
-      "ci_upper": 0.625,
+      "accuracy": 0.3644859813084112,
+      "mi_bits": 0.6251671798751577,
+      "ci_lower": 0.29906542056074764,
+      "ci_upper": 0.4300233644859812,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          78,
           0,
           0
         ],
         [
-          6,
-          2,
+          68,
+          0,
           0
         ],
         [
           0,
-          8,
+          68,
           0
         ]
       ],
@@ -616,7 +616,7 @@
       "label_axis": "llm_phase",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 214,
       "n_classes": 1,
       "chance_accuracy": 1.0,
       "accuracy": 1.0,
@@ -626,7 +626,7 @@
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          24
+          214
         ]
       ],
       "class_names": [
@@ -638,8 +638,8 @@
   "learning_curves": [
     {
       "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
+      "n_train_base_runs": 4,
+      "n_train_samples": 292,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
@@ -647,209 +647,173 @@
     },
     {
       "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.4166666666666667,
-      "ci_lower": 0.20833333333333334,
-      "ci_upper": 0.625,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
       "n_train_base_runs": 5,
-      "n_train_samples": 40,
-      "accuracy": 0.3333333333333333,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5416666666666666,
+      "n_train_samples": 360,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
+      "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "mode",
       "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_train_samples": 428,
+      "accuracy": 0.9579439252336449,
+      "ci_lower": 0.9299065420560748,
+      "ci_upper": 0.9813084112149533,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "mode",
       "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 581,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "mode",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 659,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 292,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 5,
-      "n_train_samples": 40,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 360,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 435,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 581,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
-      "accuracy": 0.9583333333333334,
-      "ci_lower": 0.875,
+      "n_train_samples": 659,
+      "accuracy": 0.9906542056074766,
+      "ci_lower": 0.9766355140186916,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "batch_size",
       "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.625,
-      "ci_lower": 0.4166666666666667,
-      "ci_upper": 0.8333333333333334,
+      "n_train_samples": 279,
+      "accuracy": 0.4158878504672897,
+      "ci_lower": 0.35046728971962615,
+      "ci_upper": 0.48130841121495327,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "batch_size",
       "n_train_base_runs": 5,
-      "n_train_samples": 40,
-      "accuracy": 0.625,
-      "ci_lower": 0.4166666666666667,
-      "ci_upper": 0.8333333333333334,
+      "n_train_samples": 347,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "batch_size",
       "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.625,
-      "ci_lower": 0.4166666666666667,
-      "ci_upper": 0.8333333333333334,
+      "n_train_samples": 425,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "batch_size",
       "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.3333333333333333,
-      "ci_lower": 0.16666666666666666,
-      "ci_upper": 0.5416666666666666,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 9,
-      "n_train_samples": 72,
-      "accuracy": 0.3333333333333333,
-      "ci_lower": 0.16666666666666666,
-      "ci_upper": 0.5416666666666666,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
+      "n_train_samples": 581,
       "accuracy": 0.0,
       "ci_lower": 0.0,
       "ci_upper": 0.0,
       "chance_accuracy": 0.3333333333333333
     },
     {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 9,
+      "n_train_samples": 659,
+      "accuracy": 0.04672897196261682,
+      "ci_lower": 0.018691588785046728,
+      "ci_upper": 0.07476635514018691,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 4,
+      "n_train_samples": 299,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
       "label_axis": "seq_length",
       "n_train_base_runs": 5,
-      "n_train_samples": 40,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
+      "n_train_samples": 367,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "seq_length",
       "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
+      "n_train_samples": 435,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "seq_length",
       "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
+      "n_train_samples": 591,
+      "accuracy": 0.35514018691588783,
+      "ci_lower": 0.2897196261682243,
+      "ci_upper": 0.42067757009345785,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "seq_length",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
-      "accuracy": 0.2916666666666667,
-      "ci_lower": 0.125,
-      "ci_upper": 0.5,
+      "n_train_samples": 659,
+      "accuracy": 0.5747663551401869,
+      "ci_lower": 0.5093457943925234,
+      "ci_upper": 0.6355140186915887,
       "chance_accuracy": 0.3333333333333333
     }
   ],
@@ -859,22 +823,22 @@
         "label_axis": "mode",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.9583333333333334,
-        "mi_bits": 0.47804719774818016,
-        "ci_lower": 0.875,
+        "accuracy": 0.9906542056074766,
+        "mi_bits": 0.6071068436556707,
+        "ci_lower": 0.9766355140186916,
         "ci_upper": 1.0,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            16,
+            136,
             0
           ],
           [
-            1,
-            7
+            2,
+            76
           ]
         ],
         "class_names": [
@@ -887,22 +851,22 @@
         "label_axis": "model_class",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.9583333333333334,
-        "mi_bits": 0.47804719774818016,
-        "ci_lower": 0.875,
-        "ci_upper": 1.0,
-        "pass_lower_ci_above_chance": true,
+        "accuracy": 0.45794392523364486,
+        "mi_bits": 0.0262534296620484,
+        "ci_lower": 0.3925233644859813,
+        "ci_upper": 0.5280373831775701,
+        "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            16,
-            0
+            22,
+            114
           ],
           [
-            1,
-            7
+            2,
+            76
           ]
         ],
         "class_names": [
@@ -915,11 +879,11 @@
         "label_axis": "batch_size",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
         "accuracy": 0.0,
-        "mi_bits": 0.6365141682948128,
+        "mi_bits": 0.6559556741718915,
         "ci_lower": 0.0,
         "ci_upper": 0.0,
         "pass_lower_ci_above_chance": false,
@@ -927,15 +891,15 @@
           [
             0,
             0,
-            8
+            68
           ],
           [
             0,
             0,
-            8
+            68
           ],
           [
-            1,
+            2,
             0,
             0
           ]
@@ -951,28 +915,28 @@
         "label_axis": "seq_length",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
-        "accuracy": 0.2916666666666667,
-        "mi_bits": 0.04761515299703131,
-        "ci_lower": 0.125,
-        "ci_upper": 0.5,
+        "accuracy": 0.35514018691588783,
+        "mi_bits": 0.12655759690148904,
+        "ci_lower": 0.2897196261682243,
+        "ci_upper": 0.42067757009345785,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            7,
+            76,
             0,
             0
           ],
           [
-            8,
+            68,
             0,
             0
           ],
           [
-            8,
-            0,
+            48,
+            20,
             0
           ]
         ],
@@ -987,17 +951,17 @@
         "label_axis": "llm_phase",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 1,
         "chance_accuracy": 1.0,
-        "accuracy": 0.9583333333333334,
+        "accuracy": 0.9579439252336449,
         "mi_bits": 0.0,
-        "ci_lower": 0.875,
-        "ci_upper": 1.0,
+        "ci_lower": 0.9252336448598131,
+        "ci_upper": 0.9813084112149533,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            23
+            205
           ]
         ],
         "class_names": [
@@ -1011,22 +975,22 @@
         "label_axis": "mode",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.9583333333333334,
-        "mi_bits": 0.47804719774818016,
-        "ci_lower": 0.875,
+        "accuracy": 0.9906542056074766,
+        "mi_bits": 0.6071068436556707,
+        "ci_lower": 0.9766355140186916,
         "ci_upper": 1.0,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            16,
+            136,
             0
           ],
           [
-            1,
-            7
+            2,
+            76
           ]
         ],
         "class_names": [
@@ -1039,22 +1003,22 @@
         "label_axis": "model_class",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.2916666666666667,
-        "mi_bits": 0.04761515299703137,
-        "ci_lower": 0.125,
-        "ci_upper": 0.5,
+        "accuracy": 0.37850467289719625,
+        "mi_bits": 0.00046925302742390623,
+        "ci_lower": 0.3130841121495327,
+        "ci_upper": 0.4439252336448598,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            0,
-            16
+            5,
+            131
           ],
           [
-            1,
-            7
+            2,
+            76
           ]
         ],
         "class_names": [
@@ -1067,11 +1031,11 @@
         "label_axis": "batch_size",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
         "accuracy": 0.0,
-        "mi_bits": 0.6365141682948128,
+        "mi_bits": 0.6559556741718915,
         "ci_lower": 0.0,
         "ci_upper": 0.0,
         "pass_lower_ci_above_chance": false,
@@ -1079,15 +1043,15 @@
           [
             0,
             0,
-            8
+            68
           ],
           [
             0,
             0,
-            8
+            68
           ],
           [
-            1,
+            2,
             0,
             0
           ]
@@ -1103,27 +1067,27 @@
         "label_axis": "seq_length",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
-        "accuracy": 0.2916666666666667,
-        "mi_bits": 0.6667852203469736,
-        "ci_lower": 0.125,
-        "ci_upper": 0.5,
+        "accuracy": 0.35514018691588783,
+        "mi_bits": 0.4963139835927633,
+        "ci_lower": 0.2897196261682243,
+        "ci_upper": 0.42067757009345785,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            7,
+            76,
             0,
             0
           ],
           [
             0,
             0,
-            8
+            31
           ],
           [
-            8,
+            48,
             0,
             0
           ]
@@ -1139,17 +1103,17 @@
         "label_axis": "llm_phase",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 214,
         "n_classes": 1,
         "chance_accuracy": 1.0,
-        "accuracy": 0.9583333333333334,
+        "accuracy": 0.9672897196261683,
         "mi_bits": 0.0,
-        "ci_lower": 0.875,
-        "ci_upper": 1.0,
+        "ci_lower": 0.9392523364485982,
+        "ci_upper": 0.985981308411215,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
-            23
+            207
           ]
         ],
         "class_names": [
@@ -1161,5 +1125,5 @@
   },
   "observer_transform_doc": "pipeline/features/realistic_observer.py",
   "split_policy": "hold out 25% of config_id groups; ML uses one mean feature vector per base capture (40 obs averaged)",
-  "classifier_samples": 96
+  "classifier_samples": 873
 }
