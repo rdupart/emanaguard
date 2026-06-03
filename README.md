@@ -15,7 +15,13 @@ pip install -r requirements.txt
 # On GPU host, install CUDA-matched PyTorch: https://pytorch.org/get-started/locally/
 ```
 
+## Google Colab
+
+See **`docs/COLAB.md`**. You must `%cd` into the clone and set `PYTHONPATH` to the repo root (or use `PYTHONPATH=. python3 -m pipeline.cli ...`).
+
 ## Phase 1 commands
+
+Run from the **repository root**:
 
 ```bash
 # Collect real traces (requires CUDA)
