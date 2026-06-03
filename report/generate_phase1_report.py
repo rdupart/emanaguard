@@ -1,10 +1,15 @@
-"""Generate PHASE_1_REPORT.md from phase1_results.json (Phase 1.2 methodology)."""
+"""Generate PHASE_1_REPORT.md from phase1_results.json (Phase 1.3)."""
 
 from __future__ import annotations
 
 import json
 import sys
 from pathlib import Path
+
+PRELIMINARY_BANNER = """
+> **PRELIMINARY** — Do not use in external writeups, applications, or Azure until gates in
+> `docs/PRELIMINARY_CAVEATS.md` are satisfied (single-draw reporting, held-out-model, physical scale).
+"""
 
 
 def _fmt_axis_table(results: list[dict], title: str) -> str:
@@ -21,140 +26,99 @@ def _fmt_axis_table(results: list[dict], title: str) -> str:
             f"{'YES' if r['pass_lower_ci_above_chance'] else 'NO'} |"
         )
         if r.get("notes"):
-            lines.append(f"\n*{r['label_axis']} notes:* {r['notes']}")
-        cm = r.get("confusion")
-        if cm:
-            lines.append(f"\nConfusion (`{r['label_axis']}`): `{cm}`\n")
+            lines.append(f"\n*{r['label_axis']}:* {r['notes']}")
+        if r.get("confusion"):
+            lines.append(f"\nConfusion: `{r['confusion']}`\n")
     return "\n".join(lines) + "\n"
 
 
-def _fmt_learning_curves(curves: list[dict], axis: str) -> str:
-    pts = [c for c in curves if c["label_axis"] == axis]
-    if not pts:
-        return ""
-    lines = [f"#### Learning curve: `{axis}`", "", "| Train base runs | Train samples | Acc | CI lo–hi |", "|-----------------|---------------|-----|----------|"]
-    for p in sorted(pts, key=lambda x: x["n_train_base_runs"]):
-        lines.append(
-            f"| {p['n_train_base_runs']} | {p['n_train_samples']} | {p['accuracy']:.3f} | "
-            f"{p['ci_lower']:.3f}–{p['ci_upper']:.3f} |"
-        )
-    return "\n".join(lines) + "\n"
-
-
-def _fmt_corpus_stats(stats: dict, obs_per_base: int) -> str:
-    rpc = stats.get("runs_per_config", {})
-    rows = "\n".join(f"| `{k}` | {v} |" for k, v in sorted(rpc.items()))
+def _fmt_corpus(stats: dict) -> str:
     return f"""
 | Metric | Value |
-|--------|-------|
-| **Total evaluation runs** | **{stats.get('total_runs', 0)}** |
-| Unique base `local-gpu` captures | {stats.get('unique_base_captures', 0)} |
+|--------|--------|
+| **Physical base captures** | **{stats.get('physical_base_captures', stats.get('unique_base_captures', 0))}** |
+| Stochastic observation draws | {stats.get('stochastic_observation_draws', stats.get('total_runs', 0))} |
 | Workload configs | {stats.get('num_configs', 0)} |
-| Stochastic observations per base capture | {obs_per_base} |
-| Mean runs per config | {stats.get('mean_runs_per_config', 0):.1f} |
 
-**Runs per config:**
-
-| config_id | runs |
-|-----------|------|
-{rows}
+*{stats.get('terminology_note', '')}*
 """
 
 
 def generate(results_path: Path, out_path: Path) -> None:
     if not results_path.exists():
-        out_path.write_text(
-            "# PHASE 1 Report\n\n**BLOCKED** — missing `report/phase1_results.json`.\n"
-        )
+        out_path.write_text("# PHASE 1 Report\n\n**BLOCKED** — missing results JSON.\n")
         return
 
     data = json.loads(results_path.read_text())
     if data.get("backend", "").startswith("simulate"):
-        print("Refusing simulate backend for gate report.", file=sys.stderr)
+        print("Refusing simulate backend.", file=sys.stderr)
         sys.exit(2)
 
-    stats = data.get("corpus_statistics", {})
-    obs = data.get("observations_per_base_capture", 40)
-    ablation = data.get("ablation_interpretation", {})
-    ablation_text = "\n".join(f"- **{k}:** {v}" for k, v in ablation.items()) or "- (no axis flagged as volume-dominated)"
+    labels = data.get("observer_aggregation_labels", {})
+    mean_label = labels.get("host_observer_realistic_mean_draw", "mean draw")
+    single_label = labels.get("host_observer_realistic_single_draw", "single draw")
 
-    curves_md = ""
-    for axis in ["mode", "model_class", "batch_size", "seq_length", "llm_phase"]:
-        curves_md += _fmt_learning_curves(data.get("learning_curves", []), axis)
+    held = data.get("held_out_model_evaluation", {})
+    held_tbl = ""
+    for axis, res in held.get("axes", {}).items():
+        held_tbl += f"\n**{axis}** (held-out architectures `{held.get('held_out_architectures', [])}`): "
+        held_tbl += f"acc={res.get('accuracy', 0):.3f}, PASS={res.get('pass_lower_ci_above_chance')}, {res.get('notes', '')}\n"
 
-    md = f"""# PHASE 1 Report — Workload Inference (Gate, v1.2)
+    md = f"""# PHASE 1 Report — Workload Inference (Gate v1.3)
 
 **Date:** 2026-06-03  
-**Status:** Re-run after methodology fix (realistic observer + scaled corpus)  
-**Backend:** `{data.get('backend', 'local-gpu')}`  
-**Headline signal set:** `{data.get('headline_signal_set', 'host_observer_realistic')}`
+**Backend:** `{data.get('backend')}`  
+**Methodology:** `{data.get('methodology_version', 'phase1.3')}`  
+**External claims:** {data.get('external_claims_status', 'BLOCKED')}
 
-## 0. Corpus scale (requirement #1)
+{PRELIMINARY_BANNER}
 
-{_fmt_corpus_stats(stats, obs)}
+## 0. Corpus (physical vs observation draws)
 
-Base captures are from **`local-gpu`** (Colab). Additional runs are **stochastic host-observation replicas** per base capture (jitter, quantization, aggregation) — not new GPU executions. Re-collect with `--repetitions-per-config` for more physical repetitions across time.
+{_fmt_corpus(data.get('corpus_statistics', {}))}
 
-Collection-time **background GPU load + jitter** is implemented in `pipeline/workloads/noise.py` for future collects.
+## 1. Observer aggregation (requirement #1)
 
-## 1. Realistic host observer (requirement #2) — HEADLINE
+| Report key | Interpretation |
+|------------|----------------|
+| `host_observer_realistic_single_draw` | **REALISTIC** — {single_label} |
+| `host_observer_realistic_mean_draw` | **GENEROUS upper bound** — {mean_label} |
 
-Transforms in `{data.get('observer_transform_doc', 'pipeline/features/realistic_observer.py')}`:
+### REALISTIC — single draw (headline for claims)
 
-| Transform | Rationale |
-|-----------|-----------|
-| Size quantization / 4KiB alignment | Host sees staging-buffer transfer classes, not tensor exact bytes (2507.02770 §CPU–GSP path) |
-| 8–256 B RPC buckets | Small-transfer RPC overhead band (2507.02770) |
-| Timing jitter | Host clock / scheduling noise |
-| Window aggregation (~25 ms) | RPC/command queue batching |
+{_fmt_axis_table(data.get('host_observer_realistic_single_draw', []), 'Single-draw realistic observer')}
 
-**Not headline:** `host_observer_idealized` (exact byte counts) — upper-bound only.
+### GENEROUS — mean of 40 draws (upper bound)
 
-{_fmt_axis_table(data.get('host_observer_realistic', []), 'Headline: realistic observer (logistic regression)')}
+{_fmt_axis_table(data.get('host_observer_realistic_mean_draw', data.get('host_observer_realistic', [])), 'Mean-draw realistic observer')}
 
-## 2. Ablation — total bytes only (requirement #3)
+## 2. Held-out-model validation (requirement #2)
 
-{_fmt_axis_table(data.get('ablation_volume_only', []), 'Ablation: H2D/D2H/total bytes + count only')}
+Split: {held.get('split', '')}  
+Aggregation: `{held.get('aggregation', 'single_draw')}`  
+{held_tbl}
 
-**Interpretation:**
+## 3. Ablation (volume only)
 
-{ablation_text}
+{_fmt_axis_table(data.get('ablation_volume_only', []), 'Total bytes ablation')}
 
-## 3. Idealized vs realistic (sanity)
+{chr(10).join('- **' + k + ':** ' + v for k, v in data.get('ablation_interpretation', {}).items()) or '- (none flagged)'}
 
-{_fmt_axis_table(data.get('host_observer_idealized', []), 'Idealized observer (NOT headline — shows label leakage ceiling)')}
+## 4. D3 mitigation preview
 
-## 4. Learning curves (requirement #4)
+See `mitigation_preview_d3` in JSON.
 
-Holdout: **25% of config_id** groups (entire configs). Classifier uses **one row per base capture** (mean of 40 stochastic observer draws). Curves vary **# training configs**.
+## 5. Idealized observer (not headline)
 
-{curves_md}
+{_fmt_axis_table(data.get('host_observer_idealized', []), 'Idealized')}
 
-## 5. D3 mitigation preview (requirement #5)
+## 6. Azure
 
-Observer-feature shims (2507.02770-style defenses evaluated at feature layer):
-
-{_fmt_axis_table(data.get('mitigation_preview_d3', {}).get('mitigation_size_padding', []), 'After fixed 4KiB size padding')}
-
-{_fmt_axis_table(data.get('mitigation_preview_d3', {}).get('mitigation_constant_rpc', []), 'After constant-RPC cadence + 256B size')}
-
-**Mitigation readout:** Fixed-size padding removes **batch_size** signal (null) but **train vs infer (mode)** and coarse **llm_phase** volume often **persist** — inference is dominated by aggregate transfer volume, not fine timing. **constant-RPC** disrupts **model_class** more than **mode**. Full driver-level mitigations (Phase 3) still required.
-
-## 6. In-VM upper bound (a) — not headline
-
-{_fmt_axis_table(data.get('vm_ground_truth', []), 'vm_ground_truth (random forest)')}
-
-## 7. Proxy disclaimer
-
-**(b)** metrics are from **non-CC `local-gpu`** — proxy until Phase 4 Azure CC. Do not conflate **(a)** and **(b)**.
-
-## 8. Split policy
-
-{data.get('split_policy', '')}
+Not run (Phase 4).
 
 ---
 
-**STOP — Phase 1 gate (v1.2).** Await human approval. **Do not proceed to Phase 2** until approved.
+**STOP — Phase 1 gate (v1.3).** Phase 2 approved in parallel; detector inherits preliminary caveat.
 """
     out_path.write_text(md)
 

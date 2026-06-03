@@ -1,0 +1,44 @@
+{
+  "preliminary": true,
+  "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
+  "policy": "train_only_arch_256x4_1024x8",
+  "backend": "local-gpu",
+  "physical_base_captures": 96,
+  "detector": {
+    "policy_name": "train_only_arch_256x4_1024x8",
+    "signal_set": "host_observer_realistic_single_draw",
+    "backend": "local-gpu",
+    "roc_auc": 1.0,
+    "fpr_at_threshold": 0.14285714285714285,
+    "tpr_at_threshold": 1.0,
+    "threshold": 4.292676707062966e-13,
+    "false_positives": 1,
+    "true_positives": 12,
+    "false_negatives": 0,
+    "true_negatives": 6,
+    "n_test": 19,
+    "mean_score_violation": 1.0,
+    "mean_score_benign": 5.86893130753255e-13,
+    "notes": "PRELIMINARY; see docs/PRELIMINARY_CAVEATS.md"
+  },
+  "roc": {
+    "fpr": [
+      0.0,
+      0.0,
+      0.5714285714285714,
+      1.0
+    ],
+    "tpr": [
+      0.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "false_positives_per_test_window": 1.0,
+  "violation_types_in_test": {
+    "infer:arch_legacy_small": 5,
+    "infer:arch_legacy_large": 7
+  },
+  "tier_red_modulator": "not_in_repo (private); violations from cross-mode/architecture traces"
+}

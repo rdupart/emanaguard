@@ -10,7 +10,7 @@ import numpy as np
 from pipeline.corpus.expand import corpus_statistics, expand_observations
 from pipeline.eval.classifiers import fit_predict, make_logreg, make_rf
 from pipeline.eval.metrics import AxisResult, chance_level, evaluate_predictions
-from pipeline.eval.splits import split_by_config_stratified
+from pipeline.eval.splits import split_by_config_stratified, split_holdout_architectures
 from pipeline.features.host_observer import host_observer_feature_vector, project_host_observer
 from pipeline.features.realistic_observer import (
     apply_realistic_observer,
@@ -24,6 +24,7 @@ from pipeline.trace.events import RunLabels, TransferEvent
 LABEL_AXES = [
     ("mode", lambda lb: lb.mode),
     ("model_class", lambda lb: lb.model_class),
+    ("architecture_id", lambda lb: lb.architecture_id or lb.model_class),
     ("batch_size", lambda lb: str(lb.batch_size)),
     ("seq_length", lambda lb: str(lb.seq_length)),
     ("llm_phase", lambda lb: lb.llm_phase),
@@ -70,13 +71,100 @@ def _collapse_runs_to_base_means(
 def _build_matrix(
     runs: list[tuple[list[TransferEvent], RunLabels]],
     feature_fn: Callable[[list[dict], np.random.Generator], np.ndarray],
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, np.ndarray]]:
-    collapsed = _collapse_runs_to_base_means(runs, feature_fn)
-    xs = np.vstack([c[0] for c in collapsed])
-    base_ids = np.array([c[1].base_run_id for c in collapsed])
-    config_ids = np.array([c[2] for c in collapsed])
-    ys: dict[str, np.ndarray] = {ax: np.array([fn(c[1]) for c in collapsed]) for ax, fn in LABEL_AXES}
-    return xs, base_ids, config_ids, ys
+    *,
+    aggregation: str = "mean_per_base",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict[str, np.ndarray]]:
+    if aggregation == "mean_per_base":
+        collapsed = _collapse_runs_to_base_means(runs, feature_fn)
+        rows = [(c[0], c[1], c[2]) for c in collapsed]
+    elif aggregation == "single_draw":
+        rows = []
+        for events, labels in runs:
+            if labels.observation_idx != 0:
+                continue
+            host = project_host_observer(events)
+            rows.append(
+                (
+                    feature_fn(host, _rng_for(labels)),
+                    labels,
+                    labels.config_id or labels.workload_id,
+                )
+            )
+    else:
+        raise ValueError(aggregation)
+
+    xs = np.vstack([r[0] for r in rows])
+    base_ids = np.array([r[1].base_run_id for r in rows])
+    config_ids = np.array([r[2] for r in rows])
+    arch_ids = np.array([r[1].architecture_id or r[1].model_class for r in rows])
+    ys = {ax: np.array([fn(r[1]) for r in rows]) for ax, fn in LABEL_AXES}
+    return xs, base_ids, config_ids, arch_ids, ys
+
+
+def _eval_all_axes_with_matrix(
+    aggregation: str,
+    runs: list[tuple[list[TransferEvent], RunLabels]],
+    feature_fn: Callable,
+    signal_set: str,
+    backend: str,
+    seed: int,
+) -> tuple[list[AxisResult], list[dict]]:
+    x, base_ids, config_ids, _arch, y_dict = _build_matrix(
+        runs, feature_fn, aggregation=aggregation
+    )
+    results: list[AxisResult] = []
+    curves: list[dict] = []
+    for axis, _ in LABEL_AXES:
+        y = y_dict[axis]
+        train_m, test_m = split_by_config_stratified(
+            config_ids, y, holdout_fraction=0.25, seed=seed + hash(axis) % 997
+        )
+        results.append(
+            _eval_axis_masked(
+                x, y, train_m, test_m, axis, signal_set, backend, make_logreg, seed
+            )
+        )
+    return results, curves
+
+
+def eval_held_out_architecture(
+    runs: list[tuple[list[TransferEvent], RunLabels]],
+    feature_fn: Callable,
+    backend: str,
+    seed: int,
+    aggregation: str = "single_draw",
+) -> dict:
+    """Generalization to entirely unseen architecture_id in test (not unseen runs only)."""
+    expanded = runs  # caller passes already expanded
+    x, _b, _c, arch_ids, y_dict = _build_matrix(
+        expanded, feature_fn, aggregation=aggregation
+    )
+    train_m, test_m, held_out = split_holdout_architectures(
+        arch_ids, holdout_fraction=0.25, seed=seed
+    )
+    out: dict = {
+        "held_out_architectures": held_out,
+        "split": "entire architecture_id held out of train; test contains only unseen models",
+        "aggregation": aggregation,
+        "axes": {},
+    }
+    for axis in ("architecture_id", "model_class"):
+        y = y_dict[axis]
+        res = _eval_axis_masked(
+            x,
+            y,
+            train_m,
+            test_m,
+            axis,
+            "host_observer_realistic_held_out_model",
+            backend,
+            make_logreg,
+            seed,
+        )
+        if len(np.unique(arch_ids[test_m])) < len(set(arch_ids)):
+            res.notes = (res.notes + " held_out_model_split").strip()
+        out["axes"][axis] = res.to_dict()
+    return out
 
 
 def _eval_axis_masked(
@@ -227,7 +315,9 @@ def _eval_all_axes(
     backend: str,
     seed: int,
 ) -> tuple[list[AxisResult], list[dict], list[LearningCurvePoint]]:
-    x, base_ids, config_ids, y_dict = _build_matrix(runs, feature_fn)
+    x, base_ids, config_ids, _arch, y_dict = _build_matrix(
+        runs, feature_fn, aggregation="mean_per_base"
+    )
     results: list[AxisResult] = []
     curves: list[LearningCurvePoint] = []
     for axis, _ in LABEL_AXES:
@@ -284,8 +374,18 @@ def run_evaluation(
     """
     Full Phase 1.2 evaluation on local-gpu captures + scaled stochastic observations.
     """
-    expanded = expand_observations(runs, observations_per_base, global_seed=eval_seed)
-    stats = corpus_statistics(expanded)
+    expanded_mean = expand_observations(
+        runs, observations_per_base, global_seed=eval_seed
+    )
+    expanded_single = expand_observations(
+        runs, observations_per_base, global_seed=eval_seed, single_draw_only=True
+    )
+    stats = corpus_statistics(
+        expanded_mean, observations_per_base=observations_per_base
+    )
+    stats_single = corpus_statistics(
+        expanded_single, observations_per_base=1, single_draw=True
+    )
 
     def realistic_fn(host, rng):
         return realistic_observer_features(host, rng)
@@ -296,16 +396,27 @@ def run_evaluation(
     def volume_fn(host, rng):
         return volume_only_features(host, rng)
 
-    headline, learning_curves, _ = _eval_all_axes(
-        expanded, realistic_fn, "host_observer_realistic", backend, eval_seed
+    headline_mean, learning_curves, _ = _eval_all_axes(
+        expanded_mean, realistic_fn, "host_observer_realistic_mean_draw", backend, eval_seed
+    )
+    headline_single, _ = _eval_all_axes_with_matrix(
+        "single_draw",
+        expanded_single,
+        realistic_fn,
+        "host_observer_realistic_single_draw",
+        backend,
+        eval_seed,
+    )
+    held_out_model = eval_held_out_architecture(
+        expanded_single, realistic_fn, backend, eval_seed, aggregation="single_draw"
     )
 
     idealized, _, _ = _eval_all_axes(
-        expanded, idealized_fn, "host_observer_idealized_upper_bound", backend, eval_seed
+        expanded_mean, idealized_fn, "host_observer_idealized_upper_bound", backend, eval_seed
     )
 
     ablation_volume, _, _ = _eval_all_axes(
-        expanded, volume_fn, "ablation_volume_only", backend, eval_seed
+        expanded_mean, volume_fn, "ablation_volume_only", backend, eval_seed
     )
 
     from collections import defaultdict
@@ -347,11 +458,11 @@ def run_evaluation(
             )
         )
 
-    mitigation = _mitigation_eval(expanded, backend, eval_seed)
+    mitigation = _mitigation_eval(expanded_mean, backend, eval_seed)
 
     # Interpret ablation: if volume-only ≈ realistic, channel is coarse
     ablation_notes = {}
-    for h, v in zip(headline, ablation_volume):
+    for h, v in zip(headline_mean, ablation_volume):
         if h.label_axis != v.label_axis:
             continue
         if v.accuracy >= 0.9 and abs(h.accuracy - v.accuracy) < 0.05:
@@ -365,11 +476,25 @@ def run_evaluation(
 
     return {
         "backend": backend,
-        "methodology_version": "phase1.2",
+        "methodology_version": "phase1.3",
+        "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
+        "external_claims_status": "BLOCKED until scale + held-out-model gates pass",
         "corpus_statistics": stats,
+        "corpus_statistics_single_draw": stats_single,
         "observations_per_base_capture": observations_per_base,
-        "headline_signal_set": "host_observer_realistic",
-        "host_observer_realistic": [r.to_dict() for r in headline],
+        "headline_signal_set": "host_observer_realistic_single_draw",
+        "observer_aggregation_labels": {
+            "host_observer_realistic_mean_draw": (
+                "GENEROUS upper bound: mean of N stochastic observer draws per physical base capture"
+            ),
+            "host_observer_realistic_single_draw": (
+                "REALISTIC: one stochastic observer draw per physical base capture (observation_idx=0)"
+            ),
+        },
+        "host_observer_realistic_mean_draw": [r.to_dict() for r in headline_mean],
+        "host_observer_realistic_single_draw": [r.to_dict() for r in headline_single],
+        "host_observer_realistic": [r.to_dict() for r in headline_mean],
+        "held_out_model_evaluation": held_out_model,
         "host_observer_idealized": [r.to_dict() for r in idealized],
         "ablation_volume_only": [r.to_dict() for r in ablation_volume],
         "ablation_interpretation": ablation_notes,
@@ -377,8 +502,9 @@ def run_evaluation(
         "learning_curves": learning_curves,
         "mitigation_preview_d3": mitigation,
         "observer_transform_doc": "pipeline/features/realistic_observer.py",
-        "split_policy": "hold out 25% of config_id groups (stratified per label axis); ML uses one mean feature vector per base capture (40 obs averaged)",
-        "classifier_samples": stats.get("unique_base_captures", 0),
+        "split_policy": "config stratified (inference); held_out_model uses architecture_id split",
+        "classifier_samples_mean_aggregation": stats.get("physical_base_captures", 0),
+        "classifier_samples_single_draw": stats_single.get("physical_base_captures", 0),
     }
 
 

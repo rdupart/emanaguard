@@ -17,9 +17,14 @@ CPU PyTorch is enough for **evaluate** on committed traces in `data/traces/`. **
 | Task | Command |
 |------|---------|
 | Evaluate traces | `python3 -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces` |
-| Regenerate gate report | `python3 report/generate_phase1_report.py` |
+| Phase 2 detector | `python3 -m pipeline.cli detect --trace-dir data/traces` |
+| Regenerate gate reports | `python3 report/generate_phase1_report.py` / `generate_phase2_report.py` |
 | Tests (no GPU) | `python3 -m pytest tests/ -q` |
-| Plumbing only | `python3 -m pipeline.cli smoke-simulate` |
+| Scale physical collects | `collect --repetitions-per-config N` (see `pipeline/workloads/noise.py`) |
+
+### Preliminary caveat
+
+All metrics are **PRELIMINARY** until gates in `docs/PRELIMINARY_CAVEATS.md` pass. Do not use for external claims or Azure.
 
 ### Gotchas
 

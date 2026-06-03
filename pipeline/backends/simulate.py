@@ -80,5 +80,6 @@ def simulate_run(
         llm_phase=spec.llm_phase,
         seed=seed,
         run_id=run_id,
+        architecture_id=spec.architecture_id,
     )
     return events, labels

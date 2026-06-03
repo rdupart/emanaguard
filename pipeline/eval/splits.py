@@ -79,6 +79,24 @@ def split_by_config_stratified(
     return train_m, test_m
 
 
+def split_holdout_architectures(
+    architecture_ids: np.ndarray,
+    holdout_fraction: float = 0.25,
+    seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray, list[str]]:
+    """Hold out entire architecture_id values (unseen models in test)."""
+    architecture_ids = np.asarray(architecture_ids)
+    uniq = sorted(set(architecture_ids))
+    rng = np.random.default_rng(seed)
+    rng.shuffle(uniq)
+    n_test = max(1, int(len(uniq) * holdout_fraction))
+    held_out = list(uniq[:n_test])
+    test_set = set(held_out)
+    train_m = np.array([a not in test_set for a in architecture_ids])
+    test_m = ~train_m
+    return train_m, test_m, held_out
+
+
 def split_by_base_run(
     base_run_ids: Sequence[str],
     holdout_fraction: float = 0.2,
