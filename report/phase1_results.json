@@ -87,11 +87,11 @@
       "n_samples": 32,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.5,
-      "mi_bits": 1.039720770839918,
-      "ci_lower": 0.3125,
-      "ci_upper": 0.6875,
-      "pass_lower_ci_above_chance": true,
+      "accuracy": 0.25,
+      "mi_bits": 0.5623351446188083,
+      "ci_lower": 0.09375,
+      "ci_upper": 0.40625,
+      "pass_lower_ci_above_chance": false,
       "confusion": [
         [
           8,
@@ -100,14 +100,14 @@
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
@@ -135,7 +135,7 @@
       "chance_accuracy": 0.25,
       "accuracy": 0.25,
       "mi_bits": 0.6931471805599454,
-      "ci_lower": 0.09375,
+      "ci_lower": 0.125,
       "ci_upper": 0.40625,
       "pass_lower_ci_above_chance": false,
       "confusion": [
@@ -181,7 +181,7 @@
       "chance_accuracy": 0.3333333333333333,
       "accuracy": 0.84375,
       "mi_bits": 0.6795219560216404,
-      "ci_lower": 0.6875,
+      "ci_lower": 0.71875,
       "ci_upper": 0.96875,
       "pass_lower_ci_above_chance": true,
       "confusion": [
@@ -245,9 +245,9 @@
       "n_samples": 16,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9375,
-      "mi_bits": 0.4969291266482394,
-      "ci_lower": 0.8125,
+      "accuracy": 1.0,
+      "mi_bits": 0.6931471805599454,
+      "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
@@ -256,8 +256,8 @@
           0
         ],
         [
-          1,
-          7
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -280,20 +280,20 @@
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          0,
           8,
+          0,
           0,
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
@@ -431,15 +431,15 @@
       "n_samples": 16,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "pass_lower_ci_above_chance": true,
+      "accuracy": 0.5,
+      "mi_bits": 0.0,
+      "ci_lower": 0.25,
+      "ci_upper": 0.75,
+      "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
-          0
+          0,
+          8
         ],
         [
           0,
@@ -460,7 +460,7 @@
       "n_classes": 4,
       "chance_accuracy": 0.25,
       "accuracy": 0.25,
-      "mi_bits": 1.039720770839918,
+      "mi_bits": 0.5623351446188083,
       "ci_lower": 0.09375,
       "ci_upper": 0.40625,
       "pass_lower_ci_above_chance": false,
@@ -478,8 +478,8 @@
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
@@ -505,10 +505,10 @@
       "n_samples": 32,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.0,
+      "accuracy": 0.25,
       "mi_bits": 1.039720770839918,
-      "ci_lower": 0.0,
-      "ci_upper": 0.0,
+      "ci_lower": 0.125,
+      "ci_upper": 0.40625,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
@@ -519,9 +519,9 @@
         ],
         [
           0,
+          8,
           0,
-          0,
-          8
+          0
         ],
         [
           0,
@@ -551,21 +551,21 @@
       "n_samples": 32,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.28125,
-      "mi_bits": 0.1533638921307563,
-      "ci_lower": 0.125,
-      "ci_upper": 0.4375,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.75,
+      "mi_bits": 0.5623351446188083,
+      "ci_lower": 0.59375,
+      "ci_upper": 0.90625,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          1,
           0,
-          7
+          8,
+          0
         ],
         [
-          8,
           0,
-          8
+          16,
+          0
         ],
         [
           0,
@@ -582,8 +582,7 @@
     }
   ],
   "ablation_interpretation": {
-    "mode": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features.",
-    "model_class": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
+    "mode": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
   },
   "vm_ground_truth": [
     {
@@ -621,9 +620,9 @@
       "n_samples": 16,
       "n_classes": 2,
       "chance_accuracy": 0.5,
-      "accuracy": 0.9375,
-      "mi_bits": 0.4969291266482394,
-      "ci_lower": 0.8125,
+      "accuracy": 1.0,
+      "mi_bits": 0.6931471805599454,
+      "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
@@ -632,8 +631,8 @@
           0
         ],
         [
-          1,
-          7
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -649,11 +648,11 @@
       "n_samples": 32,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.5,
-      "mi_bits": 1.039720770839918,
-      "ci_lower": 0.3125,
-      "ci_upper": 0.6875,
-      "pass_lower_ci_above_chance": true,
+      "accuracy": 0.25,
+      "mi_bits": 0.5623351446188083,
+      "ci_lower": 0.09375,
+      "ci_upper": 0.40625,
+      "pass_lower_ci_above_chance": false,
       "confusion": [
         [
           8,
@@ -662,14 +661,14 @@
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
         [
-          0,
           8,
+          0,
           0,
           0
         ],
@@ -741,10 +740,10 @@
       "n_samples": 32,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.78125,
-      "mi_bits": 0.5980465093665818,
-      "ci_lower": 0.625,
-      "ci_upper": 0.90625,
+      "accuracy": 1.0,
+      "mi_bits": 1.039720770839918,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
@@ -759,8 +758,8 @@
         ],
         [
           0,
-          7,
-          1
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -774,38 +773,20 @@
   "learning_curves": [
     {
       "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.0,
-      "ci_lower": 0.0,
-      "ci_upper": 0.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.0,
-      "ci_lower": 0.0,
-      "ci_upper": 0.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
       "n_train_base_runs": 4,
       "n_train_samples": 32,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "accuracy": 0.5833333333333334,
+      "ci_lower": 0.375,
+      "ci_upper": 0.7916666666666666,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "mode",
       "n_train_base_runs": 5,
       "n_train_samples": 40,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "accuracy": 0.5833333333333334,
+      "ci_lower": 0.375,
+      "ci_upper": 0.7916666666666666,
       "chance_accuracy": 0.5
     },
     {
@@ -833,6 +814,24 @@
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
+      "chance_accuracy": 0.5
+    },
+    {
+      "label_axis": "model_class",
+      "n_train_base_runs": 2,
+      "n_train_samples": 16,
+      "accuracy": 0.5,
+      "ci_lower": 0.25,
+      "ci_upper": 0.75,
+      "chance_accuracy": 0.5
+    },
+    {
+      "label_axis": "model_class",
+      "n_train_base_runs": 3,
+      "n_train_samples": 24,
+      "accuracy": 0.5,
+      "ci_lower": 0.25,
+      "ci_upper": 0.75,
       "chance_accuracy": 0.5
     },
     {
@@ -882,24 +881,6 @@
     },
     {
       "label_axis": "batch_size",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
       "n_train_base_runs": 3,
       "n_train_samples": 24,
       "accuracy": 0.25,
@@ -929,54 +910,72 @@
       "label_axis": "batch_size",
       "n_train_base_runs": 7,
       "n_train_samples": 56,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
+      "accuracy": 0.28125,
+      "ci_lower": 0.125,
+      "ci_upper": 0.4382812499999993,
       "chance_accuracy": 0.25
     },
     {
       "label_axis": "batch_size",
       "n_train_base_runs": 8,
       "n_train_samples": 64,
+      "accuracy": 0.25,
+      "ci_lower": 0.09375,
+      "ci_upper": 0.40625,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 2,
+      "n_train_samples": 16,
+      "accuracy": 0.34375,
+      "ci_lower": 0.1875,
+      "ci_upper": 0.5,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 2,
+      "n_train_samples": 16,
+      "accuracy": 0.34375,
+      "ci_lower": 0.1875,
+      "ci_upper": 0.5,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 3,
+      "n_train_samples": 24,
       "accuracy": 0.5,
-      "ci_lower": 0.3125,
+      "ci_lower": 0.34375,
+      "ci_upper": 0.65625,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 4,
+      "n_train_samples": 32,
+      "accuracy": 0.5,
+      "ci_lower": 0.34375,
+      "ci_upper": 0.65625,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 6,
+      "n_train_samples": 48,
+      "accuracy": 0.5,
+      "ci_lower": 0.34375,
       "ci_upper": 0.6875,
       "chance_accuracy": 0.25
     },
     {
       "label_axis": "seq_length",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
       "n_train_base_runs": 7,
       "n_train_samples": 56,
-      "accuracy": 0.40625,
-      "ci_lower": 0.21875,
-      "ci_upper": 0.5625,
+      "accuracy": 0.25,
+      "ci_lower": 0.125,
+      "ci_upper": 0.40625,
       "chance_accuracy": 0.25
     },
     {
@@ -984,17 +983,35 @@
       "n_train_base_runs": 8,
       "n_train_samples": 64,
       "accuracy": 0.25,
-      "ci_lower": 0.09375,
+      "ci_lower": 0.125,
       "ci_upper": 0.40625,
       "chance_accuracy": 0.25
     },
     {
       "label_axis": "llm_phase",
+      "n_train_base_runs": 3,
+      "n_train_samples": 24,
+      "accuracy": 0.75,
+      "ci_lower": 0.59375,
+      "ci_upper": 0.90625,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "llm_phase",
+      "n_train_base_runs": 4,
+      "n_train_samples": 32,
+      "accuracy": 0.75,
+      "ci_lower": 0.59375,
+      "ci_upper": 0.90625,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "llm_phase",
       "n_train_base_runs": 6,
       "n_train_samples": 48,
-      "accuracy": 0.65625,
-      "ci_lower": 0.5,
-      "ci_upper": 0.8125,
+      "accuracy": 0.75,
+      "ci_lower": 0.59375,
+      "ci_upper": 0.90625,
       "chance_accuracy": 0.3333333333333333
     },
     {
@@ -1002,7 +1019,7 @@
       "n_train_base_runs": 7,
       "n_train_samples": 56,
       "accuracy": 0.84375,
-      "ci_lower": 0.6875,
+      "ci_lower": 0.71875,
       "ci_upper": 0.96875,
       "chance_accuracy": 0.3333333333333333
     },
@@ -1011,7 +1028,7 @@
       "n_train_base_runs": 8,
       "n_train_samples": 64,
       "accuracy": 0.84375,
-      "ci_lower": 0.6875,
+      "ci_lower": 0.71875,
       "ci_upper": 0.96875,
       "chance_accuracy": 0.3333333333333333
     }
@@ -1053,19 +1070,19 @@
         "n_samples": 16,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.6875,
-        "mi_bits": 0.151795946098021,
-        "ci_lower": 0.4375,
-        "ci_upper": 0.9375,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 1.0,
+        "mi_bits": 0.6931471805599454,
+        "ci_lower": 1.0,
+        "ci_upper": 1.0,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
             8,
             0
           ],
           [
-            5,
-            3
+            0,
+            8
           ]
         ],
         "class_names": [
@@ -1082,7 +1099,7 @@
         "n_classes": 4,
         "chance_accuracy": 0.25,
         "accuracy": 0.25,
-        "mi_bits": 1.039720770839918,
+        "mi_bits": 0.5623351446188083,
         "ci_lower": 0.09375,
         "ci_upper": 0.40625,
         "pass_lower_ci_above_chance": false,
@@ -1100,8 +1117,8 @@
             0
           ],
           [
-            0,
             8,
+            0,
             0,
             0
           ],
@@ -1127,11 +1144,11 @@
         "n_samples": 32,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.25,
-        "mi_bits": 1.2299186037642071,
-        "ci_lower": 0.09375,
-        "ci_upper": 0.40625,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 0.5,
+        "mi_bits": 1.039720770839918,
+        "ci_lower": 0.34375,
+        "ci_upper": 0.65625,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
             8,
@@ -1141,13 +1158,13 @@
           ],
           [
             0,
+            8,
             0,
-            0,
-            8
+            0
           ],
           [
-            2,
-            6,
+            8,
+            0,
             0,
             0
           ],
@@ -1174,19 +1191,19 @@
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
         "accuracy": 0.75,
-        "mi_bits": 0.6348804501601146,
-        "ci_lower": 0.5625,
-        "ci_upper": 0.875,
+        "mi_bits": 0.5623351446188083,
+        "ci_lower": 0.59375,
+        "ci_upper": 0.90625,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            7,
-            1,
+            0,
+            8,
             0
           ],
           [
-            7,
-            9,
+            0,
+            16,
             0
           ],
           [
@@ -1239,19 +1256,19 @@
         "n_samples": 16,
         "n_classes": 2,
         "chance_accuracy": 0.5,
-        "accuracy": 0.5625,
-        "mi_bits": 0.04540657807824089,
-        "ci_lower": 0.3125,
-        "ci_upper": 0.8125,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 1.0,
+        "mi_bits": 0.6931471805599454,
+        "ci_lower": 1.0,
+        "ci_upper": 1.0,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
             8,
             0
           ],
           [
-            7,
-            1
+            0,
+            8
           ]
         ],
         "class_names": [
@@ -1268,7 +1285,7 @@
         "n_classes": 4,
         "chance_accuracy": 0.25,
         "accuracy": 0.25,
-        "mi_bits": 1.039720770839918,
+        "mi_bits": 0.5623351446188083,
         "ci_lower": 0.09375,
         "ci_upper": 0.40625,
         "pass_lower_ci_above_chance": false,
@@ -1286,8 +1303,8 @@
             0
           ],
           [
-            0,
             8,
+            0,
             0,
             0
           ],
@@ -1313,10 +1330,10 @@
         "n_samples": 32,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.0,
+        "accuracy": 0.25,
         "mi_bits": 1.039720770839918,
-        "ci_lower": 0.0,
-        "ci_upper": 0.0,
+        "ci_lower": 0.125,
+        "ci_upper": 0.40625,
         "pass_lower_ci_above_chance": false,
         "confusion": [
           [
@@ -1327,13 +1344,13 @@
           ],
           [
             0,
+            8,
             0,
-            0,
-            8
+            0
           ],
           [
-            0,
             8,
+            0,
             0,
             0
           ],
@@ -1359,20 +1376,20 @@
         "n_samples": 32,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
-        "accuracy": 0.5,
+        "accuracy": 0.75,
         "mi_bits": 0.5623351446188083,
-        "ci_lower": 0.3125,
-        "ci_upper": 0.6875,
-        "pass_lower_ci_above_chance": false,
+        "ci_lower": 0.59375,
+        "ci_upper": 0.90625,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            8,
             0,
+            8,
             0
           ],
           [
-            16,
             0,
+            16,
             0
           ],
           [
