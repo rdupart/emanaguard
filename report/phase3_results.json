@@ -1,0 +1,71 @@
+{
+  "methodology_version": "phase3.0",
+  "backend": "local-gpu",
+  "scope": "local_only \u2014 no Azure",
+  "external_claims": "Azure Phase 4 gated; mitigation numbers PRELIMINARY until independent replay",
+  "target_axes": [
+    "mode",
+    "batch_size"
+  ],
+  "mitigations": [
+    "size_padding",
+    "constant_rpc"
+  ],
+  "results": [
+    {
+      "mitigation": "size_padding",
+      "label_axis": "mode",
+      "baseline_balanced_accuracy": 1.0,
+      "mitigated_balanced_accuracy": 0.9940476190476191,
+      "baseline_mi_bits": 0.6931471805599445,
+      "mitigated_mi_bits": 0.6478407959078061,
+      "leakage_reduction_balanced": 0.005952380952380931,
+      "overhead_bytes_ratio": 0.001087015603173814,
+      "overhead_event_ratio": 1.0
+    },
+    {
+      "mitigation": "size_padding",
+      "label_axis": "batch_size",
+      "baseline_balanced_accuracy": 0.25,
+      "mitigated_balanced_accuracy": 0.25,
+      "baseline_mi_bits": 0.31708531579841936,
+      "mitigated_mi_bits": 0.0,
+      "leakage_reduction_balanced": 0.0,
+      "overhead_bytes_ratio": 0.001087015603173814,
+      "overhead_event_ratio": 1.0
+    },
+    {
+      "mitigation": "constant_rpc",
+      "label_axis": "mode",
+      "baseline_balanced_accuracy": 1.0,
+      "mitigated_balanced_accuracy": 1.0,
+      "baseline_mi_bits": 0.6931471805599445,
+      "mitigated_mi_bits": 0.6931471805599454,
+      "leakage_reduction_balanced": 0.0,
+      "overhead_bytes_ratio": 6.793847519836338e-05,
+      "overhead_event_ratio": 1.0
+    },
+    {
+      "mitigation": "constant_rpc",
+      "label_axis": "batch_size",
+      "baseline_balanced_accuracy": 0.25,
+      "mitigated_balanced_accuracy": 0.03125,
+      "baseline_mi_bits": 0.31708531579841936,
+      "mitigated_mi_bits": 0.2809025102806451,
+      "leakage_reduction_balanced": 0.21875,
+      "overhead_bytes_ratio": 6.793847519836338e-05,
+      "overhead_event_ratio": 1.0
+    }
+  ],
+  "overhead": {
+    "size_padding": {
+      "bytes_ratio": 0.001087015603173814,
+      "event_count_ratio": 1.0
+    },
+    "constant_rpc": {
+      "bytes_ratio": 6.793847519836338e-05,
+      "event_count_ratio": 1.0
+    }
+  },
+  "gate_status": "STOP \u2014 Phase 3 gate (mitigation measured)"
+}

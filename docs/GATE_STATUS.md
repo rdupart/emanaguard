@@ -1,59 +1,50 @@
-# Gate status — Phase 1.4 / Phase 2.1 (June 2026)
+# Gate status — Phase 3 approved (local)
 
 **Branch:** `cursor/phase-2-detector-c1b3`  
-**Phase 3 / Azure:** **NOT approved**
+**Phase 3:** **APPROVED** (mitigation/D3, local only)  
+**Azure / external:** **GATED** — see `docs/EXTERNAL_AZURE_CONDITIONS.md`
 
 ## Reading order
 
 1. **`docs/GATE_STATUS.md`** (this file)  
-2. **`PHASE_1_REPORT.md`** — v1.4 metrics (majority baseline, balanced accuracy, MI)  
-3. **`PHASE_2_REPORT.md`** — detector v2.1 + covert strength sweep  
-4. **`docs/detector_inference_inconsistency.md`** — why binary AUC ≠ 12-way inference  
-5. **`docs/architecture_labeling_audit.md`**  
-6. **`docs/PRELIMINARY_CAVEATS.md`**
+2. **`PHASE_3_REPORT.md`** — mitigation leakage vs overhead  
+3. **`PHASE_2_REPORT.md`** — detector v2.2 (volume-level, bytes-matched, covert capacity)  
+4. **`PHASE_1_REPORT.md`** — inference v1.4  
+5. **`docs/EXTERNAL_AZURE_CONDITIONS.md`**  
+6. **`docs/detector_inference_inconsistency.md`**
 
-## Metric policy (v1.4)
+## llm_phase NULL (correct rationale)
 
-| Item | Policy |
-|------|--------|
-| Baseline | **Majority class** on train (not 1/n_classes) |
-| PASS | Balanced-accuracy CI lower **>** majority **AND** MI ≥ 0.15 bits |
-| Subsample | Equal configs per label value before split |
-| NULL axes | `seq_length`, `llm_phase` |
-| PRELIMINARY_REAL | `mode`, `batch_size` when PASS |
+**NOT** because metrics fail majority (balanced acc can be **1.0**, MI **> 0.15**).
 
-## Phase 1 headline (single-draw, balanced eval)
+**NULL because:**
+- **Volume-confounded** — total-bytes ablation ≈ full realistic observer (~1.0 acc)
+- **Minority-class fragility** — balanced eval with small per-class support on prefill/decode
 
-| Axis | Bal.Acc | Claim | Notes |
-|------|---------|-------|-------|
-| mode | ~1.0 | PRELIMINARY_REAL | Volume/mode channel |
-| batch_size | ~0.5 | PRELIMINARY_REAL | Beats majority under balance |
-| architecture_id | ~0.13 | **NEGATIVE** | Held-out **0.0** — no fingerprinting |
-| model_class | — | RETRACTED | Confounded |
-| seq_length | ~0.25 | **NULL** | Does not beat majority / low MI |
-| llm_phase | — | **NULL** | High bal acc but MI fails gate |
+## Phase 2 detector honesty
 
-## Held-out-model
+| Suite | Role |
+|-------|------|
+| `hard_unauthorized_architecture_volume_level` | Reframed volume-level violation at matched (bs, seq); report **bal vs majority margin** (weak if <0.05) |
+| `hard_unauthorized_architecture_bytes_matched` | ±5% total_bytes pairs, timing-only features — tests non-volume signal |
+| `hard_covert_modulator_adaptive` | Search below 95th-%ile benign threshold; report FPR @ op point |
+| `hard_covert_modulator_heavy` | Not headline (AUC=1 not strong) |
 
-**architecture_id balanced accuracy = 0.0** → honest bounding result stands.
+## Phase 3 commands
 
-## Phase 2 detector (v2.1)
+```bash
+python3 -m pipeline.cli phase3 --trace-dir data/traces
+python3 report/generate_phase3_report.py
+```
 
-| Suite | Headline? | Notes |
-|-------|-----------|-------|
-| hard_unauthorized_architecture | Yes | AUC ~0.99 — **PARTIAL confound**: at matched (bs, seq), **total_bytes still differs by architecture** (compute volume) |
-| hard_covert_modulator_adaptive | Yes | Adaptive adversary; report alongside **light/heavy** |
-| hard_covert_modulator_heavy | No | AUC=1.0 not a strong claim alone |
-| trivial_mode_change | No | Not a result |
+Full gate refresh (long):
 
-See `detector_inference_audit` in `report/phase2_results.json`.
+```bash
+python3 -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces
+python3 -m pipeline.cli detect --trace-dir data/traces
+python3 -m pipeline.cli phase3 --trace-dir data/traces
+```
 
-## Corpus
+## Phase 1 inference (unchanged bounding result)
 
-- **4576** traces in repo  
-- Eval uses **balanced config subsample** on existing traces  
-- Corpus spec updated for **future** balanced collects (70 configs)
-
-## Phase 3
-
-Blocked pending your review of v1.4 gates.
+Held-out **architecture_id** balanced acc **0.0** — no fingerprinting claim.

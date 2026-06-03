@@ -1,57 +1,37 @@
-# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.1)
+# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.2)
 
-**Date:** 2026-06-03  
-**Methodology:** `phase2.1`  
+**Methodology:** `phase2.2`  
 **Backend:** `local-gpu`  
 
-> **PRELIMINARY** — Phase 3 not approved. Headline: **balanced** detector metrics + **adaptive** covert modulator.
-> Heavy covert AUC≈1 alone is **not** a strong claim. See `docs/detector_inference_inconsistency.md`.
+> **PRELIMINARY (local).** External/Azure gated — see `docs/EXTERNAL_AZURE_CONDITIONS.md`.
+> Prominent metric: **balanced accuracy vs majority baseline** (not raw AUC alone).
 
-## 1. ROC / balanced accuracy by suite
+## 1. Suites
 
-| Suite | ROC AUC | Bal.Acc | Maj.base | n_test | Notes |
-|-------|---------|---------|----------|--------|-------|
-| hard_unauthorized_architecture **HEADLINE** | 0.987 | 0.935 | 0.898 | 321 |  |
-| hard_covert_modulator_adaptive **HEADLINE** (adaptive) | 1.000 | 1.000 | 0.500 | 64 | Adaptive adversary: weakest preset that changes features; reports covert capacit |
-| hard_covert_modulator_light (light) | 1.000 | 1.000 | 0.500 | 64 | Low cadence shift (~8% jitter) — subtle timing perturbation |
-| hard_covert_modulator_heavy (heavy) | 1.000 | 1.000 | 0.500 | 64 | Strong cadence quantization (legacy default) — easy to detect |
-| trivial_mode_change | 1.000 | 1.000 | 0.505 | 915 |  |
+| Suite | ROC AUC | Bal.Acc | Maj.base | Margin | n_test | FPR@op | Notes |
+|-------|---------|---------|----------|--------|--------|--------|-------|
+| hard_unauthorized_architecture_volume_level **HEADLINE** | 0.983 | 0.933 | 0.898 | 0.035 **WEAK** | 321 | 0.103 | Reframed: volume-level violation detection at matched (mode, |
+| hard_unauthorized_architecture_bytes_matched **HEADLINE** | 0.000 | 0.000 | 0.000 | 0.000 | 0 | 0.000 | NEGATIVE: insufficient classes or samples |
+| hard_covert_modulator_adaptive **HEADLINE** (adaptive) | 1.000 | 1.000 | 0.500 | 0.500 | 64 | 0.000 | Adaptive search for cadence modulation below operating thres |
+| hard_covert_modulator_light (light) | 1.000 | 0.953 | 0.500 | 0.453 | 64 | 0.094 | Low cadence shift (~8% jitter) — subtle timing perturbation; |
+| hard_covert_modulator_heavy (heavy) | 1.000 | 0.969 | 0.500 | 0.469 | 64 | 0.062 | Strong cadence quantization — legacy default |
+| trivial_mode_change | 1.000 | 0.978 | 0.505 | 0.473 | 915 | 0.044 |  |
 
 
-**Headline:** `hard_unauthorized_architecture (balanced acc) + hard_covert_modulator_adaptive`  
-**Not headline:** `trivial_mode_change; heavy covert AUC alone`
+## 2. Detector honesty
 
-## 2. Detector vs 12-way inference
+**Volume-level** (`hard_unauthorized_architecture_volume_level`): detects wrong architecture at matched (mode, bs=4, seq=128). Margin over majority is often **small (<0.05 = WEAK)** even when AUC is high.
 
-At fixed (mode, bs, seq), wrong-architecture rows still differ in total_bytes because model hidden/layers change transfer volume. Binary detector can separate attested vs other arch using this compute-volume proxy; 12-way inference fails under realistic noise. NOT a pure policy violation at identical byte volume.
+**Bytes-matched** (`hard_unauthorized_architecture_bytes_matched`): ±10% total_bytes pairing, timing/structure features only.
 
-Feature audit (`volume_matched_on_coarse_features`): **False**  
-Mean L2 (benign vs wrong-arch): **n/a**
+**Compute confound:** `True` — `PARTIAL — hard_unauthorized_architecture tracks architecture-correlated transfer volume at matched knobs, not covert policy alone`
 
-## 3. Modulation presets
+## 3. Covert capacity under detector
 
-```json
-{
-  "light": {
-    "name": "light",
-    "cadence_ns": 80000,
-    "jitter_fraction": 0.08,
-    "description": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation"
-  },
-  "medium": {
-    "name": "medium",
-    "cadence_ns": 200000,
-    "jitter_fraction": 0.15,
-    "description": "Moderate cadence replacement"
-  },
-  "heavy": {
-    "name": "heavy",
-    "cadence_ns": 350000,
-    "jitter_fraction": 0.25,
-    "description": "Strong cadence quantization (legacy default) \u2014 easy to detect"
-  }
-}
-```
+Adaptive result: `≈zero covert capacity below the detector operating point`  
+Test FPR @ operating point: `{'threshold_95th_percentile_benign_train': 2.741226552404674e-12, 'test_fpr': 0.0, 'test_tpr': 1.0, 'tp': 32, 'fp': 0, 'tn': 32, 'fn': 0}`
+
+Heavy/light AUC≈1 is **not** a strong security claim.
 
 ## 4. Azure
 
@@ -59,4 +39,4 @@ Not run.
 
 ---
 
-**STOP — Phase 2 gate v2.1.** Phase 3 blocked.
+**STOP — Phase 2 gate v2.2.**

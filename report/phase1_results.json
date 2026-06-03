@@ -292,7 +292,8 @@
       "mode",
       "batch_size"
     ],
-    "phase_3": "NOT_APPROVED \u2014 v1.4 gate re-run complete"
+    "phase_3": "APPROVED (local mitigation) \u2014 external/Azure gated",
+    "llm_phase_null_rationale": "volume-confounded (total-bytes ablation \u2248 1.0) + minority-class fragility; NOT because metrics fail majority"
   },
   "host_observer_realistic_mean_draw": [
     {
@@ -395,7 +396,7 @@
         "small": 320
       },
       "claim_status": "RETRACTED",
-      "notes": "model_class confounded \u2014 see docs/architecture_labeling_audit.md"
+      "notes": " model_class confounded"
     },
     {
       "label_axis": "architecture_id",
@@ -631,7 +632,7 @@
         "arch_mlp_768x6": 160
       },
       "claim_status": "NEGATIVE",
-      "notes": ""
+      "notes": " held-out-model FAIL"
     },
     {
       "label_axis": "batch_size",
@@ -767,7 +768,7 @@
         "512": 160
       },
       "claim_status": "NULL",
-      "notes": "NULL axis: does not beat majority baseline and/or MI < 0.15 bits \u2014 not evaluable for claims"
+      "notes": "minority-class fragility (per-class support {'1024': 8, '128': 8, '256': 160, '512': 160}; classes with n<16: ['1024', '128']); balanced accuracy 0.250 does not beat majority baseline 0.476; MI 0.113 < 0.15 bits"
     },
     {
       "label_axis": "llm_phase",
@@ -823,7 +824,7 @@
         "prefill": 8
       },
       "claim_status": "NULL",
-      "notes": "NULL axis: does not beat majority baseline and/or MI < 0.15 bits \u2014 not evaluable for claims"
+      "notes": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features.; minority-class fragility (per-class support {'decode': 8, 'n/a': 160, 'prefill': 8}; classes with n<16: ['decode', 'prefill']); metrics beat majority and pass MI floor but axis is not claimable (confound / fragility \u2014 not a fine-grained channel)"
     }
   ],
   "host_observer_realistic_single_draw": [
@@ -927,7 +928,7 @@
         "small": 320
       },
       "claim_status": "RETRACTED",
-      "notes": "model_class confounded \u2014 see docs/architecture_labeling_audit.md"
+      "notes": " model_class confounded"
     },
     {
       "label_axis": "architecture_id",
@@ -1163,7 +1164,7 @@
         "arch_mlp_768x6": 160
       },
       "claim_status": "NEGATIVE",
-      "notes": "held-out-model FAIL"
+      "notes": " held-out-model FAIL"
     },
     {
       "label_axis": "batch_size",
@@ -1299,7 +1300,7 @@
         "512": 160
       },
       "claim_status": "NULL",
-      "notes": "NULL axis: does not beat majority baseline and/or MI < 0.15 bits \u2014 not evaluable for claims"
+      "notes": "minority-class fragility (per-class support {'1024': 8, '128': 8, '256': 160, '512': 160}; classes with n<16: ['1024', '128']); balanced accuracy 0.255 does not beat majority baseline 0.476; MI 0.083 < 0.15 bits"
     },
     {
       "label_axis": "llm_phase",
@@ -1355,7 +1356,7 @@
         "prefill": 8
       },
       "claim_status": "NULL",
-      "notes": "NULL axis: does not beat majority baseline and/or MI < 0.15 bits \u2014 not evaluable for claims"
+      "notes": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features.; minority-class fragility (per-class support {'decode': 8, 'n/a': 160, 'prefill': 8}; classes with n<16: ['decode', 'prefill']); metrics beat majority and pass MI floor but axis is not claimable (confound / fragility \u2014 not a fine-grained channel)"
     }
   ],
   "host_observer_realistic": [
@@ -5231,5 +5232,14 @@
   "observer_transform_doc": "pipeline/features/realistic_observer.py",
   "split_policy": "config stratified (inference); held_out_model uses architecture_id split",
   "classifier_samples_mean_aggregation": 4576,
-  "classifier_samples_single_draw": 4576
+  "classifier_samples_single_draw": 4576,
+  "axis_verdict_audit": [
+    {
+      "axis": "llm_phase",
+      "issue": "llm_phase NULL should cite volume-confound (metrics beat majority)",
+      "bal": 1.0,
+      "maj": 0.3333333333333333,
+      "mi": 0.36764947740014214
+    }
+  ]
 }

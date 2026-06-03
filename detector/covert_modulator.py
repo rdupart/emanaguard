@@ -37,7 +37,7 @@ MODULATION_PRESETS: dict[str, ModulationStrength] = {
         name="heavy",
         cadence_ns=350_000,
         jitter_fraction=0.25,
-        description="Strong cadence quantization (legacy default) — easy to detect",
+        description="Strong cadence quantization — legacy default",
     ),
 }
 
@@ -79,36 +79,87 @@ def apply_covert_modulator(
     return out
 
 
-def apply_adaptive_covert_modulator(
+def apply_covert_modulator_scaled(
     host_events: list[dict],
     rng: np.random.Generator,
-    target_feature_vector: np.ndarray,
-    feature_fn,
     *,
-    max_strength_order: tuple[str, ...] = ("light", "medium", "heavy"),
+    cadence_scale: float = 1.0,
+    jitter_fraction: float = 0.08,
+) -> list[dict]:
+    """Fine-grained strength via cadence multiplier (for adaptive search)."""
+    base = MODULATION_PRESETS["light"]
+    return apply_covert_modulator(
+        host_events,
+        rng,
+        cadence_ns=int(base.cadence_ns * cadence_scale),
+        jitter_fraction=jitter_fraction,
+        strength=None,
+    )
+
+
+def search_adaptive_covert_below_threshold(
+    host_events: list[dict],
+    rng: np.random.Generator,
+    benign_feature_vector: np.ndarray,
+    feature_fn,
+    violation_score_fn,
+    *,
+    threshold: float,
+    cadence_scales: tuple[float, ...] = (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0, 3.0),
 ) -> tuple[list[dict], dict]:
     """
-    Choose the weakest preset that still changes the host feature vector vs benign,
-    minimizing L2 distance to benign (adaptive adversary vs detector).
+  Search for weakest modulation that still changes features but scores below detector threshold.
+
+    Models covert capacity under the detector operating point (bit-encoding style cadence tweaks).
     """
-    best_events = apply_covert_modulator(host_events, rng, strength="light")
-    best_dist = float(np.linalg.norm(feature_fn(best_events) - target_feature_vector))
-    chosen = "light"
-    for name in max_strength_order:
-        cand = apply_covert_modulator(host_events, rng, strength=name)
-        dist = float(np.linalg.norm(feature_fn(cand) - target_feature_vector))
-        changed = dist > 1e-6
-        if changed and dist < best_dist:
-            best_dist = dist
-            best_events = cand
-            chosen = name
-        elif changed:
-            best_events = cand
-            best_dist = dist
-            chosen = name
-    meta = {
-        "chosen_strength": chosen,
-        "l2_distance_to_benign_features": best_dist,
-        "adaptive_goal": "minimize signature subject to feature change",
+    base_feat = benign_feature_vector
+    best_events = host_events
+    best_meta: dict = {
+        "evades_detector": True,
+        "chosen_cadence_scale": 0.0,
+        "l2_distance": 0.0,
+        "score": 0.0,
+        "threshold": threshold,
     }
-    return best_events, meta
+
+    # No modulation — should not evade if benign
+    score0 = float(violation_score_fn(host_events))
+    if score0 < threshold:
+        best_meta["warning"] = "benign scores below threshold without modulation"
+
+    found_subtle = False
+    for scale in cadence_scales:
+        mod = apply_covert_modulator_scaled(host_events, rng, cadence_scale=scale)
+        feat = feature_fn(mod)
+        dist = float(np.linalg.norm(feat - base_feat))
+        if dist < 1e-9:
+            continue
+        score = float(violation_score_fn(mod))
+        if score < threshold:
+            best_events = mod
+            best_meta = {
+                "evades_detector": True,
+                "chosen_cadence_scale": scale,
+                "l2_distance": dist,
+                "score": score,
+                "threshold": threshold,
+                "modulation_subtle": scale <= 1.0,
+            }
+            found_subtle = True
+            break
+        if not found_subtle or dist < best_meta.get("l2_distance", 1e18):
+            best_events = mod
+            best_meta = {
+                "evades_detector": score < threshold,
+                "chosen_cadence_scale": scale,
+                "l2_distance": dist,
+                "score": score,
+                "threshold": threshold,
+                "modulation_subtle": scale <= 1.0,
+            }
+
+    if not best_meta.get("evades_detector"):
+        best_meta["covert_capacity_below_op_point"] = (
+            "≈zero — no cadence-scale modulation found that evades detector at this threshold"
+        )
+    return best_events, best_meta

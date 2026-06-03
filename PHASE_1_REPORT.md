@@ -19,7 +19,8 @@
 - **detector_headline:** hard_unauthorized_architecture + adaptive covert (not heavy AUC alone)
 - **null_axes:** ['llm_phase', 'seq_length']
 - **preliminary_real_axes:** ['mode', 'batch_size']
-- **phase_3:** NOT_APPROVED — v1.4 gate re-run complete
+- **phase_3:** APPROVED (local mitigation) — external/Azure gated
+- **llm_phase_null_rationale:** volume-confounded (total-bytes ablation ≈ 1.0) + minority-class fragility; NOT because metrics fail majority
 
 ## 0. Corpus (physical vs observation draws)
 
@@ -73,7 +74,7 @@ Confusion: `[[488, 0], [0, 488]]`
 Per-class recall: `{'large': 0.9940476190476191, 'medium': 0.525, 'small': 1.0}`
 
 
-*model_class:* model_class confounded — see docs/architecture_labeling_audit.md
+*model_class:*  model_class confounded
 
 Confusion: `[[167, 0, 1], [126, 168, 26], [0, 0, 320]]`
 
@@ -82,7 +83,7 @@ Confusion: `[[167, 0, 1], [126, 168, 26], [0, 0, 320]]`
 Per-class recall: `{'arch_legacy_large': 0.5, 'arch_legacy_small': 0.0, 'arch_mlp_1024x8': 0.0, 'arch_mlp_1280x8': 0.0, 'arch_mlp_128x3': 0.0625, 'arch_mlp_1536x10': 0.0, 'arch_mlp_1920x10': 0.0, 'arch_mlp_2048x12': 1.0, 'arch_mlp_256x4': 0.0, 'arch_mlp_384x12': 0.0, 'arch_mlp_512x6': 0.0, 'arch_mlp_768x6': 0.0}`
 
 
-*architecture_id:* held-out-model FAIL
+*architecture_id:*  held-out-model FAIL
 
 Confusion: `[[4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0], [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 159], [10, 6, 129, 0, 10, 0, 0, 0, 0, 0, 5, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 0, 0], [0, 0, 0, 0, 0, 0, 0, 157, 0, 3, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [21, 2, 132, 0, 2, 0, 0, 0, 0, 0, 3, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 149, 0]]`
 
@@ -98,7 +99,7 @@ Confusion: `[[160, 0, 0, 0], [0, 0, 0, 8], [0, 0, 0, 160], [0, 0, 0, 160]]`
 Per-class recall: `{'1024': 0.0, '128': 0.0, '256': 0.01875, '512': 1.0}`
 
 
-*seq_length:* NULL axis: does not beat majority baseline and/or MI < 0.15 bits — not evaluable for claims
+*seq_length:* minority-class fragility (per-class support {'1024': 8, '128': 8, '256': 160, '512': 160}; classes with n<16: ['1024', '128']); balanced accuracy 0.255 does not beat majority baseline 0.476; MI 0.083 < 0.15 bits
 
 Confusion: `[[0, 6, 0, 2], [0, 0, 0, 8], [0, 0, 3, 157], [0, 0, 0, 160]]`
 
@@ -107,7 +108,7 @@ Confusion: `[[0, 6, 0, 2], [0, 0, 0, 8], [0, 0, 3, 157], [0, 0, 0, 160]]`
 Per-class recall: `{'decode': 1.0, 'n/a': 1.0, 'prefill': 1.0}`
 
 
-*llm_phase:* NULL axis: does not beat majority baseline and/or MI < 0.15 bits — not evaluable for claims
+*llm_phase:* Coarse volume leakage: total-bytes ablation within 5% of full realistic features.; minority-class fragility (per-class support {'decode': 8, 'n/a': 160, 'prefill': 8}; classes with n<16: ['decode', 'prefill']); metrics beat majority and pass MI floor but axis is not claimable (confound / fragility — not a fine-grained channel)
 
 Confusion: `[[8, 0, 0], [0, 160, 0], [0, 0, 8]]`
 
@@ -131,7 +132,7 @@ Confusion: `[[488, 0], [0, 488]]`
 Per-class recall: `{'large': 1.0, 'medium': 0.5, 'small': 1.0}`
 
 
-*model_class:* model_class confounded — see docs/architecture_labeling_audit.md
+*model_class:*  model_class confounded
 
 Confusion: `[[168, 0, 0], [156, 160, 4], [0, 0, 320]]`
 
@@ -139,6 +140,8 @@ Confusion: `[[168, 0, 0], [156, 160, 4], [0, 0, 320]]`
 
 Per-class recall: `{'arch_legacy_large': 0.0, 'arch_legacy_small': 0.0, 'arch_mlp_1024x8': 0.0, 'arch_mlp_1280x8': 0.0, 'arch_mlp_128x3': 0.0, 'arch_mlp_1536x10': 0.0, 'arch_mlp_1920x10': 0.0, 'arch_mlp_2048x12': 1.0, 'arch_mlp_256x4': 0.0, 'arch_mlp_384x12': 0.0, 'arch_mlp_512x6': 0.0, 'arch_mlp_768x6': 0.0}`
 
+
+*architecture_id:*  held-out-model FAIL
 
 Confusion: `[[0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0], [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [156, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [153, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 156, 0]]`
 
@@ -154,7 +157,7 @@ Confusion: `[[160, 0, 0, 0], [0, 0, 0, 8], [0, 0, 0, 160], [0, 0, 0, 160]]`
 Per-class recall: `{'1024': 0.0, '128': 0.0, '256': 0.0, '512': 1.0}`
 
 
-*seq_length:* NULL axis: does not beat majority baseline and/or MI < 0.15 bits — not evaluable for claims
+*seq_length:* minority-class fragility (per-class support {'1024': 8, '128': 8, '256': 160, '512': 160}; classes with n<16: ['1024', '128']); balanced accuracy 0.250 does not beat majority baseline 0.476; MI 0.113 < 0.15 bits
 
 Confusion: `[[0, 8, 0, 0], [0, 0, 0, 8], [0, 0, 0, 160], [0, 0, 0, 160]]`
 
@@ -163,7 +166,7 @@ Confusion: `[[0, 8, 0, 0], [0, 0, 0, 8], [0, 0, 0, 160], [0, 0, 0, 160]]`
 Per-class recall: `{'decode': 1.0, 'n/a': 1.0, 'prefill': 1.0}`
 
 
-*llm_phase:* NULL axis: does not beat majority baseline and/or MI < 0.15 bits — not evaluable for claims
+*llm_phase:* Coarse volume leakage: total-bytes ablation within 5% of full realistic features.; minority-class fragility (per-class support {'decode': 8, 'n/a': 160, 'prefill': 8}; classes with n<16: ['decode', 'prefill']); metrics beat majority and pass MI floor but axis is not claimable (confound / fragility — not a fine-grained channel)
 
 Confusion: `[[8, 0, 0], [0, 160, 0], [0, 0, 8]]`
 

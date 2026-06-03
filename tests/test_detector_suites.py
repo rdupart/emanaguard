@@ -14,10 +14,11 @@ def test_detector_returns_three_suites():
     out = run_detector_evaluation(runs, backend="local-gpu-plumbing-test")
     assert "suites" in out
     assert "trivial_mode_change" in out["suites"]
-    assert "hard_unauthorized_architecture" in out["suites"]
+    assert "hard_unauthorized_architecture_volume_level" in out["suites"]
+    assert "hard_unauthorized_architecture_bytes_matched" in out["suites"]
     assert "hard_covert_modulator_adaptive" in out["suites"]
     assert out["suites"]["trivial_mode_change"]["headline"] is False
-    assert out["suites"]["hard_unauthorized_architecture"]["headline"] is True
+    assert out["suites"]["hard_unauthorized_architecture_volume_level"]["headline"] is True
     assert "detector_inference_audit" in out
 
 

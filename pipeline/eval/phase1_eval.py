@@ -10,6 +10,7 @@ import numpy as np
 from pipeline.corpus.expand import corpus_statistics, expand_observations
 from pipeline.eval.classifiers import fit_predict, make_logreg, make_rf
 from pipeline.corpus.balance import label_counts_physical, subsample_indices_balanced
+from pipeline.eval.axis_claims import assign_claim_status, audit_verdicts_vs_numbers
 from pipeline.eval.metrics import (
     MI_PASS_FLOOR_BITS,
     AxisResult,
@@ -18,7 +19,7 @@ from pipeline.eval.metrics import (
     majority_baseline,
 )
 
-NULL_CLAIM_AXES = frozenset({"seq_length", "llm_phase"})
+VOLUME_NULL_AXES = frozenset({"llm_phase"})
 PRELIMINARY_REAL_AXES = frozenset({"mode", "batch_size"})
 from pipeline.eval.splits import split_by_config_stratified, split_holdout_architectures
 from pipeline.features.host_observer import host_observer_feature_vector, project_host_observer
@@ -500,54 +501,59 @@ def run_evaluation(
             "physical_counts_before": label_counts_physical(runs, fn),
         }
 
-    def _apply_labeling_gates(results: list[AxisResult]) -> list[dict]:
+    ablation_notes: dict[str, str] = {}
+    for h, v in zip(headline_mean, ablation_volume):
+        if h.label_axis != v.label_axis:
+            continue
+        if v.accuracy >= 0.9 and abs(h.accuracy - v.accuracy) < 0.05:
+            ablation_notes[h.label_axis] = (
+                "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
+            )
+        elif v.accuracy >= 0.85 and h.accuracy < v.accuracy + 0.1:
+            ablation_notes[h.label_axis] = (
+                "Volume channel dominates; fine-grained claim not supported."
+            )
+
+    def _apply_labeling_gates(
+        results: list[AxisResult],
+        ablation_notes_map: dict[str, str],
+        held_out_pass: bool | None,
+    ) -> list[dict]:
         out_rows: list[dict] = []
         for r in results:
-            d = r.to_dict()
-            if r.label_axis in NULL_CLAIM_AXES:
-                d["claim_status"] = "NULL"
-                d["pass_gate"] = False
-                d["notes"] = (
-                    (d.get("notes") or "")
-                    + " NULL axis: does not beat majority baseline and/or MI "
-                    f"< {MI_PASS_FLOOR_BITS} bits — not evaluable for claims"
-                ).strip()
-            elif r.label_axis == "model_class":
-                d["pass_gate"] = False
-                d["claim_status"] = "RETRACTED"
-                d["notes"] = (
-                    (d.get("notes") or "")
-                    + " model_class confounded — see docs/architecture_labeling_audit.md"
-                ).strip()
-            elif r.label_axis == "architecture_id":
-                if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
-                    d["pass_gate"] = False
-                    d["claim_status"] = "RETRACTED_INSUFFICIENT_CORPUS"
-                else:
-                    d["claim_status"] = (
-                        "PRELIMINARY_PENDING_HELD_OUT" if r.pass_gate else "NEGATIVE"
-                    )
-            elif r.label_axis in PRELIMINARY_REAL_AXES:
-                d["claim_status"] = (
-                    "PRELIMINARY_REAL" if r.pass_gate else "PRELIMINARY"
+            status, pass_gate, notes = assign_claim_status(
+                r,
+                axis=r.label_axis,
+                null_axes_volume=VOLUME_NULL_AXES,
+                ablation_interpretation=ablation_notes_map,
+                n_arch_physical=n_arch_physical,
+                min_arch_for_fingerprint=MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+                held_out_arch_pass=held_out_pass if r.label_axis == "architecture_id" else None,
+            )
+            if r.label_axis == "seq_length" and (
+                not r.pass_gate or r.label_axis in ablation_notes_map
+            ):
+                status = "NULL"
+                pass_gate = False
+                from pipeline.eval.axis_claims import null_rationale
+
+                notes = null_rationale(
+                    r.label_axis, r, ablation_notes_map
                 )
-            else:
-                d["claim_status"] = "PRELIMINARY" if r.pass_gate else "NEGATIVE"
+            d = r.to_dict()
+            d["claim_status"] = status
+            d["pass_gate"] = pass_gate
+            d["notes"] = notes
             out_rows.append(d)
         return out_rows
 
-    single_gated = _apply_labeling_gates(headline_single)
-    mean_gated = _apply_labeling_gates(headline_mean)
     held_arch = held_out_model.get("axes", {}).get("architecture_id", {})
-    if held_arch.get("pass_gate") is False or held_arch.get("pass_lower_ci_above_chance") is False:
-        for d in single_gated:
-            if d["label_axis"] == "architecture_id":
-                d["claim_status"] = "NEGATIVE"
-                d["pass_gate"] = False
-                d["notes"] = (
-                    (d.get("notes") or "")
-                    + " held-out-model FAIL — no fingerprint claim"
-                ).strip()
+    held_pass = held_arch.get("pass_gate", held_arch.get("pass_lower_ci_above_chance"))
+    single_gated = _apply_labeling_gates(
+        headline_single, ablation_notes, held_pass if held_pass is not None else False
+    )
+    mean_gated = _apply_labeling_gates(headline_mean, ablation_notes, held_pass)
+    axis_verdict_audit = audit_verdicts_vs_numbers(single_gated)
 
     architecture_labeling_audit = {
         "doc": "docs/architecture_labeling_audit.md",
@@ -578,24 +584,14 @@ def run_evaluation(
             "BLOCKED — held-out-model and balanced multiclass inference fail"
         ),
         "detector_headline": "hard_unauthorized_architecture + adaptive covert (not heavy AUC alone)",
-        "null_axes": list(NULL_CLAIM_AXES),
+        "null_axes": list(VOLUME_NULL_AXES) + ["seq_length"],
         "preliminary_real_axes": list(PRELIMINARY_REAL_AXES),
-        "phase_3": "NOT_APPROVED — gate re-run v1.4 complete; await human review",
+        "phase_3": "APPROVED (local mitigation) — external/Azure gated on conditions",
+        "llm_phase_null_rationale": (
+            "volume-confounded (total-bytes ablation ≈ 1.0) + minority-class fragility; "
+            "NOT because metrics fail majority (bal acc can be 1.0, MI > 0.15)"
+        ),
     }
-
-    # Interpret ablation: if volume-only ≈ realistic, channel is coarse
-    ablation_notes = {}
-    for h, v in zip(headline_mean, ablation_volume):
-        if h.label_axis != v.label_axis:
-            continue
-        if v.accuracy >= 0.9 and abs(h.accuracy - v.accuracy) < 0.05:
-            ablation_notes[h.label_axis] = (
-                "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
-            )
-        elif v.accuracy >= 0.85 and h.accuracy < v.accuracy + 0.1:
-            ablation_notes[h.label_axis] = (
-                "Volume channel dominates; fine-grained claim not supported."
-            )
 
     return {
         "backend": backend,
@@ -608,6 +604,7 @@ def run_evaluation(
             "eval_subsample": "balanced_equal_configs_per_label_value",
         },
         "label_balance_report": balance_report,
+        "axis_verdict_audit": axis_verdict_audit,
         "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
         "external_claims_status": "BLOCKED until scale + held-out-model gates pass",
         "corpus_statistics": stats,

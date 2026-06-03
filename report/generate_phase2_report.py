@@ -1,4 +1,4 @@
-"""Generate PHASE_2_REPORT.md from phase2_results.json (D2 v2.1)."""
+"""Generate PHASE_2_REPORT.md from phase2_results.json (D2 v2.2)."""
 
 from __future__ import annotations
 
@@ -11,10 +11,14 @@ def _suite_row(name: str, s: dict) -> str:
     headline = " **HEADLINE**" if s.get("headline") else ""
     mod = s.get("modulation_strength", "")
     mod_s = f" ({mod})" if mod else ""
+    margin = s.get("margin_bal_over_majority", 0)
+    weak = " **WEAK**" if s.get("weak_separation") else ""
     return (
         f"| {name}{headline}{mod_s} | {s.get('roc_auc', 0):.3f} | "
         f"{s.get('balanced_accuracy', 0):.3f} | {s.get('majority_baseline', 0):.3f} | "
-        f"{s.get('n_test', 0)} | {s.get('notes', '')[:80]} |"
+        f"{margin:.3f}{weak} | {s.get('n_test', 0)} | "
+        f"{(s.get('operating_point') or {}).get('test_fpr', 0):.3f} | "
+        f"{(s.get('notes') or '')[:60]} |"
     )
 
 
@@ -30,10 +34,12 @@ def generate(results_path: Path, out_path: Path) -> None:
 
     suites = d.get("suites", {})
     audit = d.get("detector_inference_audit", {})
+    feat = audit.get("feature_distributions", {})
 
     rows = ""
     for key in (
-        "hard_unauthorized_architecture",
+        "hard_unauthorized_architecture_volume_level",
+        "hard_unauthorized_architecture_bytes_matched",
         "hard_covert_modulator_adaptive",
         "hard_covert_modulator_light",
         "hard_covert_modulator_heavy",
@@ -42,39 +48,36 @@ def generate(results_path: Path, out_path: Path) -> None:
         if key in suites:
             rows += _suite_row(key, suites[key]) + "\n"
 
-    feat = audit.get("feature_distributions", {})
-    interp = feat.get("interpretation", audit.get("explanation", {}).get("why_binary_can_exceed_multiclass", ""))
+    covert = suites.get("hard_covert_modulator_adaptive", {}).get("covert_capacity", {})
 
-    md = f"""# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.1)
+    md = f"""# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.2)
 
-**Date:** 2026-06-03  
-**Methodology:** `{d.get('methodology_version', 'phase2.1')}`  
-**Backend:** `{d.get('backend', 'local-gpu')}`  
+**Methodology:** `{d.get('methodology_version', 'phase2.2')}`  
+**Backend:** `{d.get('backend')}`  
 
-> **PRELIMINARY** — Phase 3 not approved. Headline: **balanced** detector metrics + **adaptive** covert modulator.
-> Heavy covert AUC≈1 alone is **not** a strong claim. See `docs/detector_inference_inconsistency.md`.
+> **PRELIMINARY (local).** External/Azure gated — see `docs/EXTERNAL_AZURE_CONDITIONS.md`.
+> Prominent metric: **balanced accuracy vs majority baseline** (not raw AUC alone).
 
-## 1. ROC / balanced accuracy by suite
+## 1. Suites
 
-| Suite | ROC AUC | Bal.Acc | Maj.base | n_test | Notes |
-|-------|---------|---------|----------|--------|-------|
-{rows or '| — | — | — | — | — | — |'}
+| Suite | ROC AUC | Bal.Acc | Maj.base | Margin | n_test | FPR@op | Notes |
+|-------|---------|---------|----------|--------|--------|--------|-------|
+{rows or '| — | — | — | — | — | — | — | — |'}
 
-**Headline:** `{d.get('headline_detector_metric', '')}`  
-**Not headline:** `{d.get('not_headline', '')}`
+## 2. Detector honesty
 
-## 2. Detector vs 12-way inference
+**Volume-level** (`hard_unauthorized_architecture_volume_level`): detects wrong architecture at matched (mode, bs=4, seq=128). Margin over majority is often **small (<0.05 = WEAK)** even when AUC is high.
 
-{interp}
+**Bytes-matched** (`hard_unauthorized_architecture_bytes_matched`): ±10% total_bytes pairing, timing/structure features only.
 
-Feature audit (`volume_matched_on_coarse_features`): **{feat.get('volume_matched_on_coarse_features', 'n/a')}**  
-Mean L2 (benign vs wrong-arch): **{feat.get('mean_feature_l2_benign_vs_wrong_arch', 'n/a')}**
+**Compute confound:** `{feat.get('compute_volume_confound_at_matched_bs_seq', 'see JSON')}` — `{feat.get('headline_retraction_risk', '')}`
 
-## 3. Modulation presets
+## 3. Covert capacity under detector
 
-```json
-{json.dumps(d.get('modulation_presets', {}), indent=2)[:2000]}
-```
+Adaptive result: `{covert.get('covert_capacity_below_op_point', covert)}`  
+Test FPR @ operating point: `{suites.get('hard_covert_modulator_adaptive', {}).get('operating_point', {})}`
+
+Heavy/light AUC≈1 is **not** a strong security claim.
 
 ## 4. Azure
 
@@ -82,11 +85,11 @@ Not run.
 
 ---
 
-**STOP — Phase 2 gate v2.1.** Phase 3 blocked.
+**STOP — Phase 2 gate v2.2.**
 """
     out_path.write_text(md)
 
 
 if __name__ == "__main__":
     root = Path(__file__).resolve().parents[1]
-    generate(root / "report/phase2_results.json", root / "PHASE_2_REPORT.md")
+    generate(root / "report" / "phase2_results.json", root / "PHASE_2_REPORT.md")
