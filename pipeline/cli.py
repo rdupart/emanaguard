@@ -92,6 +92,27 @@ def cmd_smoke_simulate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_detect(args: argparse.Namespace) -> int:
+    if args.backend == "azure-cc":
+        from pipeline.backends.azure_cc import raise_phase4_only
+
+        raise_phase4_only()
+    trace_dir = Path(args.trace_dir)
+    from pipeline.backends.local_gpu import load_trace_dir
+    from detector.eval import run_detector_evaluation
+
+    runs = load_trace_dir(trace_dir)
+    if not runs:
+        print(f"No traces in {trace_dir}", file=sys.stderr)
+        return 1
+    result = run_detector_evaluation(runs, backend=args.backend)
+    out = Path(args.out_json)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(result, indent=2) + "\n")
+    print(f"Wrote detector eval -> {out}")
+    return 0
+
+
 def cmd_phase1(args: argparse.Namespace) -> int:
     """Full Phase 1: collect (local-gpu) + evaluate + write report stub paths."""
     trace_dir = Path(args.trace_dir)
@@ -157,6 +178,12 @@ def main(argv: list[str] | None = None) -> int:
     p_p1.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
     p_p1.add_argument("--results-json", default="report/phase1_results.json")
     p_p1.set_defaults(func=cmd_phase1)
+
+    p_det = sub.add_parser("detect", help="Phase 2 policy-deviation detector eval")
+    p_det.add_argument("--backend", default="local-gpu")
+    p_det.add_argument("--trace-dir", default="data/traces")
+    p_det.add_argument("--out-json", default="report/phase2_results.json")
+    p_det.set_defaults(func=cmd_detect)
 
     args = parser.parse_args(argv)
     return args.func(args)

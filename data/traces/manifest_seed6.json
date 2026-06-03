@@ -6,20 +6,22 @@
     "--backend",
     "local-gpu",
     "--out-dir",
-    "data/traces/local-gpu",
+    "data/traces",
     "--seeds",
-    "0,1,2,3,4,5,6,7"
+    "0,1,2,3,4,5,6,7",
+    "--repetitions-per-config",
+    "20"
   ],
   "extra": {
     "extra": {
-      "out_dir": "data/traces/local-gpu"
+      "out_dir": "data/traces"
     }
   },
-  "git_commit": "b8e11d55f5b6115abe14e61c37a8c56f5c45db21",
+  "git_commit": "6db3c6dead86ab3fc37e89e1a3a6e23b6ebd592d",
   "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
   "python_version": "3.12.13 (main, Mar  4 2026, 09:23:07) [GCC 11.4.0]",
-  "run_id": "f78634a246a9bafd",
+  "run_id": "833acbad54333b72",
   "seed": 6,
-  "started_at": "2026-06-03T02:03:17.172659+00:00",
+  "started_at": "2026-06-03T16:53:58.263496+00:00",
   "torch_cuda": true
 }

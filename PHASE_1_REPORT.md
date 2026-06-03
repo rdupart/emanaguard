@@ -1,291 +1,215 @@
-# PHASE 1 Report — Workload Inference (Gate, v1.2)
+# PHASE 1 Report — Workload Inference (Gate v1.3)
 
 **Date:** 2026-06-03  
-**Status:** Re-run after methodology fix (realistic observer + scaled corpus)  
 **Backend:** `local-gpu`  
-**Headline signal set:** `host_observer_realistic`
+**Methodology:** `phase1.3`  
+**External claims:** BLOCKED until scale + held-out-model gates pass
 
-## 0. Corpus scale (requirement #1)
+
+> **PRELIMINARY** — Do not use in external writeups, applications, or Azure until gates in
+> `docs/PRELIMINARY_CAVEATS.md` are satisfied (≥8 architectures, single-draw, held-out-model,
+> hard-case detector). Phase 3 **not approved**.
+
+
+## Gate summary
+
+- **external_fingerprint_claims:** BLOCKED
+- **architecture_inference_headline:** BLOCKED until >=8 physical architectures and held-out-model PASS on architecture_id
+- **detector_headline:** Phase 2 hard suites only (not trivial mode-change AUC)
+- **phase_3:** NOT_APPROVED — re-collect on 10-arch corpus then re-run gates
+
+## 0. Corpus (physical vs observation draws)
 
 
 | Metric | Value |
-|--------|-------|
-| **Total evaluation runs** | **3840** |
-| Unique base `local-gpu` captures | 96 |
-| Workload configs | 12 |
-| Stochastic observations per base capture | 40 |
-| Mean runs per config | 320.0 |
+|--------|--------|
+| **Physical base captures** | **4576** |
+| Stochastic observation draws | 183040 |
+| Workload configs | 39 |
 
-**Runs per config:**
-
-| config_id | runs |
-|-----------|------|
-| `w00_train` | 320 |
-| `w01_train` | 320 |
-| `w02_train_large_n_a` | 320 |
-| `w03_train_large_n_a` | 320 |
-| `w04_infer` | 320 |
-| `w05_infer` | 320 |
-| `w06_infer_large_n_a` | 320 |
-| `w07_infer_large_n_a` | 320 |
-| `w08_infer` | 320 |
-| `w09_infer` | 320 |
-| `w10_infer_large_prefill` | 320 |
-| `w11_infer_large_decode` | 320 |
+*'stochastic_observation_draws' are NOT additional GPU executions; only physical_base_captures are real local-gpu collects.*
 
 
-Base captures are from **`local-gpu`** (Colab). Additional runs are **stochastic host-observation replicas** per base capture (jitter, quantization, aggregation) — not new GPU executions. Re-collect with `--repetitions-per-config` for more physical repetitions across time.
+## 0b. architecture_id vs model_class (labeling audit)
 
-Collection-time **background GPU load + jitter** is implemented in `pipeline/workloads/noise.py` for future collects.
 
-## 1. Realistic host observer (requirement #2) — HEADLINE
+| Field | Value |
+|-------|--------|
+| Physical distinct `architecture_id` | **12** |
+| Min for fingerprint claim | 8 |
+| `model_class` | **RETRACTED** — do not cite in headline |
+| `architecture_id` | **CANONICAL_PENDING_GATES** |
 
-Transforms in `pipeline/features/realistic_observer.py`:
+architecture_id vs model_class disagreement on legacy 2-arch corpus: model_class is a coarse bucket aligned with train/infer volume; architecture_id can track config bundles. Only architecture_id is canonical for fingerprint claims after >=8 physical architectures.
 
-| Transform | Rationale |
-|-----------|-----------|
-| Size quantization / 4KiB alignment | Host sees staging-buffer transfer classes, not tensor exact bytes (2507.02770 §CPU–GSP path) |
-| 8–256 B RPC buckets | Small-transfer RPC overhead band (2507.02770) |
-| Timing jitter | Host clock / scheduling noise |
-| Window aggregation (~25 ms) | RPC/command queue batching |
+See `docs/architecture_labeling_audit.md`.
 
-**Not headline:** `host_observer_idealized` (exact byte counts) — upper-bound only.
 
-### Headline: realistic observer (logistic regression)
+## 1. Observer aggregation (requirement #1)
 
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| Report key | Interpretation |
+|------------|----------------|
+| `host_observer_realistic_single_draw` | **REALISTIC** — REALISTIC: one stochastic observer draw per physical base capture (observation_idx=0) |
+| `host_observer_realistic_mean_draw` | **GENEROUS upper bound** — GENEROUS upper bound: mean of N stochastic observer draws per physical base capture |
 
-Confusion (`mode`): `[[16, 0], [0, 8]]`
+### REALISTIC — single draw (headline for non-retracted axes)
 
-| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES |
+### Single-draw realistic observer
 
-Confusion (`model_class`): `[[8, 0], [0, 8]]`
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS | Claim |
+|------|-----|--------|-----|------------|------|-------|
+| mode | 1.000 | 0.500 | 0.683 | 1.000–1.000 | YES | PRELIMINARY |
 
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
+Confusion: `[[648, 0], [0, 488]]`
 
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
+| model_class | 0.859 | 0.333 | 0.810 | 0.838–0.880 | NO | RETRACTED |
 
-| seq_length | 0.250 | 0.250 | 0.693 | 0.125–0.406 | NO |
+*model_class:* model_class confounded with mode/volume — see docs/architecture_labeling_audit.md
 
-Confusion (`seq_length`): `[[0, 0, 8, 0], [0, 8, 0, 0], [0, 8, 0, 0], [0, 0, 8, 0]]`
+Confusion: `[[488, 0, 0], [0, 320, 0], [0, 160, 168]]`
 
-| llm_phase | 0.844 | 0.333 | 0.680 | 0.719–0.969 | YES |
+| architecture_id | 0.008 | 0.083 | 2.120 | 0.004–0.012 | NO | PRELIMINARY_PENDING_HELD_OUT |
 
-Confusion (`llm_phase`): `[[8, 0, 0], [0, 16, 0], [0, 5, 3]]`
+Confusion: `[[7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 6, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0], [0, 77, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0], [0, 0, 21, 0, 0, 139, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 153, 0]]`
+
+| batch_size | 0.952 | 0.250 | 0.671 | 0.940–0.964 | YES | PRELIMINARY |
+
+Confusion: `[[647, 0, 0, 1], [0, 0, 8, 0], [2, 0, 450, 36], [0, 0, 8, 0]]`
+
+| seq_length | 0.993 | 0.250 | 0.478 | 0.989–0.997 | YES | PRELIMINARY |
+
+Confusion: `[[0, 0, 0, 8], [0, 960, 0, 0], [0, 0, 160, 0], [0, 0, 0, 8]]`
+
+| llm_phase | 0.999 | 0.333 | 0.484 | 0.997–1.000 | YES | PRELIMINARY |
+
+Confusion: `[[8, 0, 0], [0, 815, 1], [0, 0, 160]]`
 
 
 
-## 2. Ablation — total bytes only (requirement #3)
+### GENEROUS — mean of 40 draws (upper bound)
 
-### Ablation: H2D/D2H/total bytes + count only
+### Mean-draw realistic observer
 
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS | Claim |
+|------|-----|--------|-----|------------|------|-------|
+| mode | 1.000 | 0.500 | 0.683 | 1.000–1.000 | YES | PRELIMINARY |
 
-Confusion (`mode`): `[[16, 0], [0, 8]]`
+Confusion: `[[648, 0], [0, 488]]`
 
-| model_class | 0.500 | 0.500 | 0.000 | 0.250–0.750 | NO |
+| model_class | 0.859 | 0.333 | 0.810 | 0.838–0.880 | NO | RETRACTED |
 
-Confusion (`model_class`): `[[0, 8], [0, 8]]`
+*model_class:* model_class confounded with mode/volume — see docs/architecture_labeling_audit.md
 
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
+Confusion: `[[488, 0, 0], [0, 320, 0], [0, 160, 168]]`
 
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
+| architecture_id | 0.006 | 0.083 | 2.181 | 0.002–0.010 | NO | PRELIMINARY_PENDING_HELD_OUT |
 
-| seq_length | 0.250 | 0.250 | 1.040 | 0.125–0.406 | NO |
+Confusion: `[[8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 2, 0, 0, 0, 0, 0, 0, 5, 0, 1, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0], [0, 146, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 159, 0]]`
 
-Confusion (`seq_length`): `[[0, 0, 0, 8], [0, 8, 0, 0], [0, 8, 0, 0], [0, 0, 8, 0]]`
+| batch_size | 0.970 | 0.250 | 0.674 | 0.959–0.979 | YES | PRELIMINARY |
 
-| llm_phase | 0.750 | 0.333 | 0.562 | 0.594–0.906 | YES |
+Confusion: `[[648, 0, 0, 0], [0, 0, 8, 0], [2, 0, 469, 17], [0, 0, 8, 0]]`
 
-Confusion (`llm_phase`): `[[0, 8, 0], [0, 16, 0], [0, 0, 8]]`
+| seq_length | 0.993 | 0.250 | 0.478 | 0.989–0.997 | YES | PRELIMINARY |
+
+Confusion: `[[0, 0, 0, 8], [0, 960, 0, 0], [0, 0, 160, 0], [0, 0, 0, 8]]`
+
+| llm_phase | 1.000 | 0.333 | 0.490 | 1.000–1.000 | YES | PRELIMINARY |
+
+Confusion: `[[8, 0, 0], [0, 816, 0], [0, 0, 160]]`
 
 
 
-**Interpretation:**
+## 2. Held-out-model validation (requirement #2)
+
+**Gate status:** PRELIMINARY — interpret held-out accuracy; no external fingerprint claim until PASS  
+**Physical architectures in corpus:** 12  
+Split: entire architecture_id held out of train; test rows are only unseen architectures (single-draw realistic observer)  
+Aggregation: `single_draw`  
+
+**architecture_id** — held out `['arch_legacy_large', 'arch_mlp_2048x12', 'arch_mlp_1920x10']`; train archs `['arch_legacy_small', 'arch_mlp_1024x8', 'arch_mlp_1280x8', 'arch_mlp_128x3', 'arch_mlp_1536x10', 'arch_mlp_256x4', 'arch_mlp_384x12', 'arch_mlp_512x6', 'arch_mlp_768x6']`; acc=0.000, PASS=False; NEGATIVE: held-out-model does not generalize — honest bounding result
+
+**model_class** — held out `['arch_legacy_large', 'arch_mlp_2048x12', 'arch_mlp_1920x10']`; train archs `['arch_legacy_small', 'arch_mlp_1024x8', 'arch_mlp_1280x8', 'arch_mlp_128x3', 'arch_mlp_1536x10', 'arch_mlp_256x4', 'arch_mlp_384x12', 'arch_mlp_512x6', 'arch_mlp_768x6']`; acc=1.000, PASS=False; NEGATIVE: test fold has a single class (holdout did not include all label values) RETRACTED: model_class not reported as fingerprint result
+
+
+Do **not** claim model fingerprinting unless `architecture_id` held-out-model passes with ≥8 physical architectures.
+
+## 3. Ablation (volume only)
+
+### Total bytes ablation
+
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS | Claim |
+|------|-----|--------|-----|------------|------|-------|
+| mode | 1.000 | 0.500 | 0.683 | 1.000–1.000 | YES | PRELIMINARY |
+
+Confusion: `[[648, 0], [0, 488]]`
+
+| model_class | 0.859 | 0.333 | 0.810 | 0.838–0.880 | YES | PRELIMINARY |
+
+Confusion: `[[488, 0, 0], [0, 320, 0], [0, 160, 168]]`
+
+| architecture_id | 0.000 | 0.083 | 2.173 | 0.000–0.000 | NO | PRELIMINARY |
+
+Confusion: `[[0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0], [0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0], [0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 0, 0, 10, 0, 149], [158, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0]]`
+
+| batch_size | 0.847 | 0.250 | 0.342 | 0.827–0.868 | YES | PRELIMINARY |
+
+Confusion: `[[648, 0, 0, 0], [0, 0, 8, 0], [160, 0, 328, 0], [0, 0, 8, 0]]`
+
+| seq_length | 0.993 | 0.250 | 0.447 | 0.989–0.997 | YES | PRELIMINARY |
+
+Confusion: `[[0, 8, 0, 0], [0, 960, 0, 0], [0, 0, 160, 0], [0, 0, 0, 8]]`
+
+| llm_phase | 0.667 | 0.333 | 0.448 | 0.637–0.695 | YES | PRELIMINARY |
+
+Confusion: `[[0, 8, 0], [320, 496, 0], [0, 0, 160]]`
+
+
 
 - **mode:** Coarse volume leakage: total-bytes ablation within 5% of full realistic features.
+- **model_class:** Volume channel dominates; fine-grained claim not supported.
+- **seq_length:** Coarse volume leakage: total-bytes ablation within 5% of full realistic features.
 
-## 3. Idealized vs realistic (sanity)
+## 4. D3 mitigation preview
 
-### Idealized observer (NOT headline — shows label leakage ceiling)
+See `mitigation_preview_d3` in JSON.
 
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+## 5. Idealized observer (not headline)
 
-Confusion (`mode`): `[[16, 0], [0, 8]]`
+### Idealized
 
-| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES |
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS | Claim |
+|------|-----|--------|-----|------------|------|-------|
+| mode | 1.000 | 0.500 | 0.683 | 1.000–1.000 | YES | PRELIMINARY |
 
-Confusion (`model_class`): `[[8, 0], [0, 8]]`
+Confusion: `[[648, 0], [0, 488]]`
 
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
+| model_class | 0.859 | 0.333 | 0.810 | 0.838–0.880 | YES | PRELIMINARY |
 
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
+Confusion: `[[488, 0, 0], [0, 320, 0], [0, 160, 168]]`
 
-| seq_length | 0.500 | 0.250 | 0.562 | 0.312–0.688 | YES |
+| architecture_id | 0.000 | 0.083 | 2.130 | 0.000–0.000 | NO | PRELIMINARY |
 
-Confusion (`seq_length`): `[[0, 0, 8, 0], [0, 8, 0, 0], [0, 0, 8, 0], [0, 0, 8, 0]]`
+Confusion: `[[0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0], [7, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 91, 0], [0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0], [0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0], [0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 160, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 0]]`
 
-| llm_phase | 0.500 | 0.333 | 0.000 | 0.312–0.688 | NO |
+| batch_size | 0.984 | 0.250 | 0.674 | 0.977–0.991 | YES | PRELIMINARY |
 
-Confusion (`llm_phase`): `[[0, 8, 0], [0, 16, 0], [0, 8, 0]]`
+Confusion: `[[648, 0, 0, 0], [0, 0, 8, 0], [2, 0, 486, 0], [0, 0, 8, 0]]`
 
+| seq_length | 1.000 | 0.250 | 0.488 | 1.000–1.000 | YES | PRELIMINARY |
 
+Confusion: `[[8, 0, 0, 0], [0, 960, 0, 0], [0, 0, 160, 0], [0, 0, 0, 8]]`
 
-## 4. Learning curves (requirement #4)
+| llm_phase | 0.990 | 0.333 | 0.443 | 0.983–0.996 | YES | PRELIMINARY |
 
-Holdout: **25% of config_id** groups (entire configs). Classifier uses **one row per base capture** (mean of 40 stochastic observer draws). Curves vary **# training configs**.
+Confusion: `[[0, 0, 8], [0, 816, 0], [0, 2, 158]]`
 
-#### Learning curve: `mode`
 
-| Train base runs | Train samples | Acc | CI lo–hi |
-|-----------------|---------------|-----|----------|
-| 4 | 32 | 0.583 | 0.375–0.792 |
-| 5 | 40 | 0.583 | 0.375–0.792 |
-| 6 | 48 | 1.000 | 1.000–1.000 |
-| 8 | 64 | 1.000 | 1.000–1.000 |
-| 9 | 72 | 1.000 | 1.000–1.000 |
-#### Learning curve: `model_class`
 
-| Train base runs | Train samples | Acc | CI lo–hi |
-|-----------------|---------------|-----|----------|
-| 2 | 16 | 0.500 | 0.250–0.750 |
-| 3 | 24 | 0.500 | 0.250–0.750 |
-| 4 | 32 | 1.000 | 1.000–1.000 |
-| 6 | 48 | 1.000 | 1.000–1.000 |
-| 7 | 56 | 1.000 | 1.000–1.000 |
-| 9 | 72 | 1.000 | 1.000–1.000 |
-| 10 | 80 | 1.000 | 1.000–1.000 |
-#### Learning curve: `batch_size`
+## 6. Azure
 
-| Train base runs | Train samples | Acc | CI lo–hi |
-|-----------------|---------------|-----|----------|
-| 3 | 24 | 0.250 | 0.094–0.406 |
-| 4 | 32 | 0.250 | 0.094–0.406 |
-| 6 | 48 | 0.250 | 0.094–0.406 |
-| 7 | 56 | 0.281 | 0.125–0.438 |
-| 8 | 64 | 0.250 | 0.094–0.406 |
-#### Learning curve: `seq_length`
-
-| Train base runs | Train samples | Acc | CI lo–hi |
-|-----------------|---------------|-----|----------|
-| 2 | 16 | 0.344 | 0.188–0.500 |
-| 2 | 16 | 0.344 | 0.188–0.500 |
-| 3 | 24 | 0.500 | 0.344–0.656 |
-| 4 | 32 | 0.500 | 0.344–0.656 |
-| 6 | 48 | 0.500 | 0.344–0.688 |
-| 7 | 56 | 0.250 | 0.125–0.406 |
-| 8 | 64 | 0.250 | 0.125–0.406 |
-#### Learning curve: `llm_phase`
-
-| Train base runs | Train samples | Acc | CI lo–hi |
-|-----------------|---------------|-----|----------|
-| 3 | 24 | 0.750 | 0.594–0.906 |
-| 4 | 32 | 0.750 | 0.594–0.906 |
-| 6 | 48 | 0.750 | 0.594–0.906 |
-| 7 | 56 | 0.844 | 0.719–0.969 |
-| 8 | 64 | 0.844 | 0.719–0.969 |
-
-
-## 5. D3 mitigation preview (requirement #5)
-
-Observer-feature shims (2507.02770-style defenses evaluated at feature layer):
-
-### After fixed 4KiB size padding
-
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
-
-Confusion (`mode`): `[[16, 0], [0, 8]]`
-
-| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES |
-
-Confusion (`model_class`): `[[8, 0], [0, 8]]`
-
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
-
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
-
-| seq_length | 0.500 | 0.250 | 1.040 | 0.344–0.656 | YES |
-
-Confusion (`seq_length`): `[[8, 0, 0, 0], [0, 8, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
-
-| llm_phase | 0.750 | 0.333 | 0.562 | 0.594–0.906 | YES |
-
-Confusion (`llm_phase`): `[[0, 8, 0], [0, 16, 0], [0, 0, 8]]`
-
-
-
-### After constant-RPC cadence + 256B size
-
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
-
-Confusion (`mode`): `[[16, 0], [0, 8]]`
-
-| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES |
-
-Confusion (`model_class`): `[[8, 0], [0, 8]]`
-
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
-
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
-
-| seq_length | 0.250 | 0.250 | 1.040 | 0.125–0.406 | NO |
-
-Confusion (`seq_length`): `[[0, 0, 8, 0], [0, 8, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
-
-| llm_phase | 0.750 | 0.333 | 0.562 | 0.594–0.906 | YES |
-
-Confusion (`llm_phase`): `[[0, 8, 0], [0, 16, 0], [0, 0, 8]]`
-
-
-
-**Mitigation readout:** Fixed-size padding removes **batch_size** signal (null) but **train vs infer (mode)** and coarse **llm_phase** volume often **persist** — inference is dominated by aggregate transfer volume, not fine timing. **constant-RPC** disrupts **model_class** more than **mode**. Full driver-level mitigations (Phase 3) still required.
-
-## 6. In-VM upper bound (a) — not headline
-
-### vm_ground_truth (random forest)
-
-| Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
-|------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
-
-Confusion (`mode`): `[[16, 0], [0, 8]]`
-
-| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES |
-
-Confusion (`model_class`): `[[8, 0], [0, 8]]`
-
-| batch_size | 0.250 | 0.250 | 0.562 | 0.094–0.406 | NO |
-
-Confusion (`batch_size`): `[[8, 0, 0, 0], [8, 0, 0, 0], [8, 0, 0, 0], [0, 0, 8, 0]]`
-
-| seq_length | 0.500 | 0.250 | 0.562 | 0.312–0.688 | YES |
-
-Confusion (`seq_length`): `[[0, 0, 8, 0], [0, 8, 0, 0], [0, 0, 8, 0], [0, 0, 8, 0]]`
-
-| llm_phase | 1.000 | 0.333 | 1.040 | 1.000–1.000 | YES |
-
-Confusion (`llm_phase`): `[[8, 0, 0], [0, 16, 0], [0, 0, 8]]`
-
-
-
-## 7. Proxy disclaimer
-
-**(b)** metrics are from **non-CC `local-gpu`** — proxy until Phase 4 Azure CC. Do not conflate **(a)** and **(b)**.
-
-## 8. Split policy
-
-hold out 25% of config_id groups (stratified per label axis); ML uses one mean feature vector per base capture (40 obs averaged)
+Not run (Phase 4).
 
 ---
 
-**STOP — Phase 1 gate (v1.2).** Await human approval. **Do not proceed to Phase 2** until approved.
+**STOP — Phase 1 gate (v1.3).** Re-collect on **10-architecture** corpus, then re-run evaluate + detect. Phase 3 blocked.

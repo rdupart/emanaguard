@@ -97,7 +97,7 @@ def _linear_block(
     hidden = spec.hidden
     batch = spec.batch_size
     seq = spec.seq_length
-    layers = 4 if spec.model_class == "small" else 8
+    layers = spec.num_layers
 
     x_cpu = torch.randn(batch, seq, hidden)
     x = recorder.h2d(x_cpu, "input_activation", phase)
@@ -175,6 +175,7 @@ def run_workload(
         workload_id=spec.workload_id,
         mode=spec.mode,
         model_class=spec.model_class,
+        architecture_id=spec.architecture_id,
         batch_size=spec.batch_size,
         seq_length=spec.seq_length,
         llm_phase=spec.llm_phase,

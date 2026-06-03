@@ -10,7 +10,7 @@ import numpy as np
 from pipeline.corpus.expand import corpus_statistics, expand_observations
 from pipeline.eval.classifiers import fit_predict, make_logreg, make_rf
 from pipeline.eval.metrics import AxisResult, chance_level, evaluate_predictions
-from pipeline.eval.splits import split_by_config_stratified
+from pipeline.eval.splits import split_by_config_stratified, split_holdout_architectures
 from pipeline.features.host_observer import host_observer_feature_vector, project_host_observer
 from pipeline.features.realistic_observer import (
     apply_realistic_observer,
@@ -20,10 +20,16 @@ from pipeline.features.realistic_observer import (
 from pipeline.features.vm_ground_truth import vm_ground_truth_feature_vector
 from pipeline.mitigation.feature_shim import mitigate_constant_rpc, mitigate_size_padding
 from pipeline.trace.events import RunLabels, TransferEvent
+from pipeline.workloads.corpus import (
+    MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+    all_architecture_ids,
+    count_architectures_in_runs,
+)
 
 LABEL_AXES = [
     ("mode", lambda lb: lb.mode),
     ("model_class", lambda lb: lb.model_class),
+    ("architecture_id", lambda lb: lb.architecture_id or lb.model_class),
     ("batch_size", lambda lb: str(lb.batch_size)),
     ("seq_length", lambda lb: str(lb.seq_length)),
     ("llm_phase", lambda lb: lb.llm_phase),
@@ -70,13 +76,137 @@ def _collapse_runs_to_base_means(
 def _build_matrix(
     runs: list[tuple[list[TransferEvent], RunLabels]],
     feature_fn: Callable[[list[dict], np.random.Generator], np.ndarray],
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, dict[str, np.ndarray]]:
-    collapsed = _collapse_runs_to_base_means(runs, feature_fn)
-    xs = np.vstack([c[0] for c in collapsed])
-    base_ids = np.array([c[1].base_run_id for c in collapsed])
-    config_ids = np.array([c[2] for c in collapsed])
-    ys: dict[str, np.ndarray] = {ax: np.array([fn(c[1]) for c in collapsed]) for ax, fn in LABEL_AXES}
-    return xs, base_ids, config_ids, ys
+    *,
+    aggregation: str = "mean_per_base",
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, dict[str, np.ndarray]]:
+    if aggregation == "mean_per_base":
+        collapsed = _collapse_runs_to_base_means(runs, feature_fn)
+        rows = [(c[0], c[1], c[2]) for c in collapsed]
+    elif aggregation == "single_draw":
+        rows = []
+        for events, labels in runs:
+            if labels.observation_idx != 0:
+                continue
+            host = project_host_observer(events)
+            rows.append(
+                (
+                    feature_fn(host, _rng_for(labels)),
+                    labels,
+                    labels.config_id or labels.workload_id,
+                )
+            )
+    else:
+        raise ValueError(aggregation)
+
+    xs = np.vstack([r[0] for r in rows])
+    base_ids = np.array([r[1].base_run_id for r in rows])
+    config_ids = np.array([r[2] for r in rows])
+    arch_ids = np.array([r[1].architecture_id or r[1].model_class for r in rows])
+    ys = {ax: np.array([fn(r[1]) for r in rows]) for ax, fn in LABEL_AXES}
+    return xs, base_ids, config_ids, arch_ids, ys
+
+
+def _eval_all_axes_with_matrix(
+    aggregation: str,
+    runs: list[tuple[list[TransferEvent], RunLabels]],
+    feature_fn: Callable,
+    signal_set: str,
+    backend: str,
+    seed: int,
+) -> tuple[list[AxisResult], list[dict]]:
+    x, base_ids, config_ids, _arch, y_dict = _build_matrix(
+        runs, feature_fn, aggregation=aggregation
+    )
+    results: list[AxisResult] = []
+    curves: list[dict] = []
+    for axis, _ in LABEL_AXES:
+        y = y_dict[axis]
+        train_m, test_m = split_by_config_stratified(
+            config_ids, y, holdout_fraction=0.25, seed=seed + hash(axis) % 997
+        )
+        results.append(
+            _eval_axis_masked(
+                x, y, train_m, test_m, axis, signal_set, backend, make_logreg, seed
+            )
+        )
+    return results, curves
+
+
+def eval_held_out_architecture(
+    runs: list[tuple[list[TransferEvent], RunLabels]],
+    feature_fn: Callable,
+    backend: str,
+    seed: int,
+    aggregation: str = "single_draw",
+) -> dict:
+    """Generalization to entirely unseen architecture_id in test (not unseen runs only)."""
+    expanded = runs  # caller passes already expanded
+    x, _b, _c, arch_ids, y_dict = _build_matrix(
+        expanded, feature_fn, aggregation=aggregation
+    )
+    n_arch_corpus = len(set(arch_ids))
+    train_m, test_m, held_out = split_holdout_architectures(
+        arch_ids, holdout_fraction=0.25, seed=seed, min_train_architectures=2
+    )
+    train_archs = sorted(set(arch_ids[train_m]))
+    test_archs = sorted(set(arch_ids[test_m]))
+    out: dict = {
+        "held_out_architectures": held_out,
+        "train_architectures": train_archs,
+        "test_architectures": test_archs,
+        "distinct_architectures_in_physical_corpus": n_arch_corpus,
+        "min_architectures_for_valid_fingerprint_claim": MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        "split": (
+            "entire architecture_id held out of train; test rows are only unseen "
+            "architectures (single-draw realistic observer)"
+        ),
+        "aggregation": aggregation,
+        "headline_axis": "architecture_id",
+        "model_class_status": "RETRACTED — confounded with volume/mode; not a fingerprint axis",
+        "axes": {},
+    }
+    if n_arch_corpus < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+        out["gate_status"] = (
+            f"BLOCKED: only {n_arch_corpus} physical architectures; need "
+            f">={MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM} after collect on expanded corpus"
+        )
+    elif len(train_archs) < 2:
+        out["gate_status"] = "NEGATIVE: train fold has fewer than 2 architecture classes"
+    else:
+        out["gate_status"] = "PRELIMINARY — interpret held-out accuracy; no external fingerprint claim until PASS"
+
+    for axis in ("architecture_id", "model_class"):
+        y = y_dict[axis]
+        res = _eval_axis_masked(
+            x,
+            y,
+            train_m,
+            test_m,
+            axis,
+            "host_observer_realistic_held_out_model",
+            backend,
+            make_logreg,
+            seed,
+        )
+        if axis == "model_class":
+            res.pass_lower_ci_above_chance = False
+            res.notes = (
+                (res.notes or "")
+                + " RETRACTED: model_class not reported as fingerprint result"
+            ).strip()
+        elif n_arch_corpus < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+            res.pass_lower_ci_above_chance = False
+            res.notes = (
+                (res.notes or "")
+                + f" RETRACTED: <{MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM} architectures in corpus"
+            ).strip()
+        elif axis == "architecture_id" and not res.pass_lower_ci_above_chance:
+            res.notes = (
+                (res.notes or "")
+                + " NEGATIVE: held-out-model does not generalize — honest bounding result"
+            ).strip()
+        out["axes"][axis] = res.to_dict()
+    return out
 
 
 def _eval_axis_masked(
@@ -227,7 +357,9 @@ def _eval_all_axes(
     backend: str,
     seed: int,
 ) -> tuple[list[AxisResult], list[dict], list[LearningCurvePoint]]:
-    x, base_ids, config_ids, y_dict = _build_matrix(runs, feature_fn)
+    x, base_ids, config_ids, _arch, y_dict = _build_matrix(
+        runs, feature_fn, aggregation="mean_per_base"
+    )
     results: list[AxisResult] = []
     curves: list[LearningCurvePoint] = []
     for axis, _ in LABEL_AXES:
@@ -284,8 +416,18 @@ def run_evaluation(
     """
     Full Phase 1.2 evaluation on local-gpu captures + scaled stochastic observations.
     """
-    expanded = expand_observations(runs, observations_per_base, global_seed=eval_seed)
-    stats = corpus_statistics(expanded)
+    expanded_mean = expand_observations(
+        runs, observations_per_base, global_seed=eval_seed
+    )
+    expanded_single = expand_observations(
+        runs, observations_per_base, global_seed=eval_seed, single_draw_only=True
+    )
+    stats = corpus_statistics(
+        expanded_mean, observations_per_base=observations_per_base
+    )
+    stats_single = corpus_statistics(
+        expanded_single, observations_per_base=1, single_draw=True
+    )
 
     def realistic_fn(host, rng):
         return realistic_observer_features(host, rng)
@@ -296,16 +438,27 @@ def run_evaluation(
     def volume_fn(host, rng):
         return volume_only_features(host, rng)
 
-    headline, learning_curves, _ = _eval_all_axes(
-        expanded, realistic_fn, "host_observer_realistic", backend, eval_seed
+    headline_mean, learning_curves, _ = _eval_all_axes(
+        expanded_mean, realistic_fn, "host_observer_realistic_mean_draw", backend, eval_seed
+    )
+    headline_single, _ = _eval_all_axes_with_matrix(
+        "single_draw",
+        expanded_single,
+        realistic_fn,
+        "host_observer_realistic_single_draw",
+        backend,
+        eval_seed,
+    )
+    held_out_model = eval_held_out_architecture(
+        expanded_single, realistic_fn, backend, eval_seed, aggregation="single_draw"
     )
 
     idealized, _, _ = _eval_all_axes(
-        expanded, idealized_fn, "host_observer_idealized_upper_bound", backend, eval_seed
+        expanded_mean, idealized_fn, "host_observer_idealized_upper_bound", backend, eval_seed
     )
 
     ablation_volume, _, _ = _eval_all_axes(
-        expanded, volume_fn, "ablation_volume_only", backend, eval_seed
+        expanded_mean, volume_fn, "ablation_volume_only", backend, eval_seed
     )
 
     from collections import defaultdict
@@ -347,11 +500,76 @@ def run_evaluation(
             )
         )
 
-    mitigation = _mitigation_eval(expanded, backend, eval_seed)
+    mitigation = _mitigation_eval(expanded_mean, backend, eval_seed)
+
+    physical_labels = [lb for _, lb in runs]
+    n_arch_physical = count_architectures_in_runs(physical_labels)
+    target_archs = all_architecture_ids()
+
+    def _apply_labeling_gates(results: list[AxisResult]) -> list[dict]:
+        out_rows: list[dict] = []
+        for r in results:
+            d = r.to_dict()
+            if r.label_axis == "model_class":
+                d["pass_lower_ci_above_chance"] = False
+                d["claim_status"] = "RETRACTED"
+                d["notes"] = (
+                    (d.get("notes") or "")
+                    + " model_class confounded with mode/volume — see docs/architecture_labeling_audit.md"
+                ).strip()
+            elif r.label_axis == "architecture_id":
+                if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
+                    d["pass_lower_ci_above_chance"] = False
+                    d["claim_status"] = "RETRACTED_INSUFFICIENT_CORPUS"
+                    d["notes"] = (
+                        (d.get("notes") or "")
+                        + f" only {n_arch_physical} physical architectures (need "
+                        f">={MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM}); collect expanded corpus"
+                    ).strip()
+                else:
+                    d["claim_status"] = "PRELIMINARY_PENDING_HELD_OUT"
+            else:
+                d["claim_status"] = "PRELIMINARY"
+            out_rows.append(d)
+        return out_rows
+
+    single_gated = _apply_labeling_gates(headline_single)
+    mean_gated = _apply_labeling_gates(headline_mean)
+
+    architecture_labeling_audit = {
+        "doc": "docs/architecture_labeling_audit.md",
+        "physical_distinct_architecture_ids": n_arch_physical,
+        "target_architecture_ids_in_corpus_spec": target_archs,
+        "min_architectures_for_fingerprint": MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        "explanation": (
+            "architecture_id vs model_class disagreement on legacy 2-arch corpus: "
+            "model_class is a coarse bucket aligned with train/infer volume; "
+            "architecture_id can track config bundles. Only architecture_id is "
+            "canonical for fingerprint claims after >=8 physical architectures."
+        ),
+        "model_class": {"status": "RETRACTED", "report_in_headline": False},
+        "architecture_id": {
+            "status": (
+                "RETRACTED_INSUFFICIENT_CORPUS"
+                if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM
+                else "CANONICAL_PENDING_GATES"
+            ),
+            "report_in_headline": n_arch_physical >= MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM,
+        },
+    }
+
+    gate_summary = {
+        "external_fingerprint_claims": "BLOCKED",
+        "architecture_inference_headline": (
+            "BLOCKED until >=8 physical architectures and held-out-model PASS on architecture_id"
+        ),
+        "detector_headline": "Phase 2 hard suites only (not trivial mode-change AUC)",
+        "phase_3": "NOT_APPROVED — re-collect on 10-arch corpus then re-run gates",
+    }
 
     # Interpret ablation: if volume-only ≈ realistic, channel is coarse
     ablation_notes = {}
-    for h, v in zip(headline, ablation_volume):
+    for h, v in zip(headline_mean, ablation_volume):
         if h.label_axis != v.label_axis:
             continue
         if v.accuracy >= 0.9 and abs(h.accuracy - v.accuracy) < 0.05:
@@ -365,11 +583,27 @@ def run_evaluation(
 
     return {
         "backend": backend,
-        "methodology_version": "phase1.2",
+        "methodology_version": "phase1.3",
+        "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
+        "external_claims_status": "BLOCKED until scale + held-out-model gates pass",
         "corpus_statistics": stats,
+        "corpus_statistics_single_draw": stats_single,
         "observations_per_base_capture": observations_per_base,
-        "headline_signal_set": "host_observer_realistic",
-        "host_observer_realistic": [r.to_dict() for r in headline],
+        "headline_signal_set": "host_observer_realistic_single_draw",
+        "observer_aggregation_labels": {
+            "host_observer_realistic_mean_draw": (
+                "GENEROUS upper bound: mean of N stochastic observer draws per physical base capture"
+            ),
+            "host_observer_realistic_single_draw": (
+                "REALISTIC: one stochastic observer draw per physical base capture (observation_idx=0)"
+            ),
+        },
+        "architecture_labeling_audit": architecture_labeling_audit,
+        "gate_summary": gate_summary,
+        "host_observer_realistic_mean_draw": mean_gated,
+        "host_observer_realistic_single_draw": single_gated,
+        "host_observer_realistic": mean_gated,
+        "held_out_model_evaluation": held_out_model,
         "host_observer_idealized": [r.to_dict() for r in idealized],
         "ablation_volume_only": [r.to_dict() for r in ablation_volume],
         "ablation_interpretation": ablation_notes,
@@ -377,8 +611,9 @@ def run_evaluation(
         "learning_curves": learning_curves,
         "mitigation_preview_d3": mitigation,
         "observer_transform_doc": "pipeline/features/realistic_observer.py",
-        "split_policy": "hold out 25% of config_id groups (stratified per label axis); ML uses one mean feature vector per base capture (40 obs averaged)",
-        "classifier_samples": stats.get("unique_base_captures", 0),
+        "split_policy": "config stratified (inference); held_out_model uses architecture_id split",
+        "classifier_samples_mean_aggregation": stats.get("physical_base_captures", 0),
+        "classifier_samples_single_draw": stats_single.get("physical_base_captures", 0),
     }
 
 

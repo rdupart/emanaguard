@@ -51,12 +51,13 @@ class RunLabels:
 
     workload_id: str
     mode: str  # train | infer
-    model_class: str  # small | large
+    model_class: str  # small | large | medium | wide | xlarge
     batch_size: int
     seq_length: int
     llm_phase: str  # prefill | decode | n/a
     seed: int
     run_id: str
+    architecture_id: str = ""
     config_id: str = ""
     base_run_id: str = ""
     observation_idx: int = 0
@@ -76,4 +77,6 @@ class RunLabels:
             lb = replace(lb, config_id=config_id_from_workload(lb.workload_id))
         if not lb.base_run_id:
             lb = replace(lb, base_run_id=lb.run_id)
+        if not lb.architecture_id:
+            lb = replace(lb, architecture_id=f"arch_legacy_{lb.model_class}")
         return lb

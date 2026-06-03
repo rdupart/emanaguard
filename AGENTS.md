@@ -17,9 +17,21 @@ CPU PyTorch is enough for **evaluate** on committed traces in `data/traces/`. **
 | Task | Command |
 |------|---------|
 | Evaluate traces | `python3 -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces` |
-| Regenerate gate report | `python3 report/generate_phase1_report.py` |
+| Phase 2 detector | `python3 -m pipeline.cli detect --trace-dir data/traces` |
+| Regenerate gate reports | `python3 report/generate_phase1_report.py` / `generate_phase2_report.py` |
 | Tests (no GPU) | `python3 -m pytest tests/ -q` |
-| Plumbing only | `python3 -m pipeline.cli smoke-simulate` |
+| Scale physical collects | `collect --repetitions-per-config N` (see `pipeline/workloads/noise.py`) |
+
+### Preliminary caveat
+
+All metrics are **PRELIMINARY** until gates in `docs/PRELIMINARY_CAVEATS.md` pass. Do not use for external claims or Azure. **Phase 3 blocked** until ≥8 physical `architecture_id`s are collected on the 10-arch corpus (`pipeline/workloads/corpus.py`) and gates re-run.
+
+### Gate v1.3 (current branch)
+
+- Labeling: `docs/architecture_labeling_audit.md` — `model_class` **retracted**; `architecture_id` positive only with ≥8 physical architectures.
+- Phase 1 headline: `host_observer_realistic_single_draw` in `report/phase1_results.json`.
+- Phase 2 headline: `suites.hard_unauthorized_architecture` + `suites.hard_covert_modulator` (not `trivial_mode_change`).
+- Legacy traces (2 arch) will show **NEGATIVE** hard-detector / held-out-model until re-collect.
 
 ### Gotchas
 
