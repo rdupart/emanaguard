@@ -23,11 +23,11 @@
 |--------|--------|
 | ROC AUC | **1.000** |
 | TPR @ op. point | 1.000 |
-| FPR @ op. point | 0.143 |
+| FPR @ op. point | 0.046 |
 | Threshold (95th %ile benign train score) | 0.0000 |
-| TP / FP / TN / FN | 12 / 1 / 6 / 0 |
-| Test samples | 19 |
-| Physical base captures (corpus) | 96 |
+| TP / FP / TN / FN | 273 / 6 / 124 / 0 |
+| Test samples | 403 |
+| Physical base captures (corpus) | 2016 |
 
 *Notes:* PRELIMINARY; see docs/PRELIMINARY_CAVEATS.md
 
@@ -35,8 +35,8 @@
 
 ```json
 {
-  "infer:arch_legacy_small": 5,
-  "infer:arch_legacy_large": 7
+  "infer:arch_legacy_small": 140,
+  "infer:arch_legacy_large": 133
 }
 ```
 
