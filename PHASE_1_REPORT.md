@@ -10,28 +10,28 @@
 
 | Metric | Value |
 |--------|-------|
-| **Total evaluation runs** | **3840** |
-| Unique base `local-gpu` captures | 96 |
+| **Total evaluation runs** | **34920** |
+| Unique base `local-gpu` captures | 873 |
 | Workload configs | 12 |
 | Stochastic observations per base capture | 40 |
-| Mean runs per config | 320.0 |
+| Mean runs per config | 2910.0 |
 
 **Runs per config:**
 
 | config_id | runs |
 |-----------|------|
-| `w00_train` | 320 |
-| `w01_train` | 320 |
-| `w02_train_large_n_a` | 320 |
-| `w03_train_large_n_a` | 320 |
-| `w04_infer` | 320 |
-| `w05_infer` | 320 |
-| `w06_infer_large_n_a` | 320 |
-| `w07_infer_large_n_a` | 320 |
-| `w08_infer` | 320 |
-| `w09_infer` | 320 |
-| `w10_infer_large_prefill` | 320 |
-| `w11_infer_large_decode` | 320 |
+| `w00_train` | 3120 |
+| `w01_train` | 3120 |
+| `w02_train_large_n_a` | 3120 |
+| `w03_train_large_n_a` | 3120 |
+| `w04_infer` | 3120 |
+| `w05_infer` | 3000 |
+| `w06_infer_large_n_a` | 2720 |
+| `w07_infer_large_n_a` | 2720 |
+| `w08_infer` | 2720 |
+| `w09_infer` | 2720 |
+| `w10_infer_large_prefill` | 2720 |
+| `w11_infer_large_decode` | 2720 |
 
 
 Base captures are from **`local-gpu`** (Colab). Additional runs are **stochastic host-observation replicas** per base capture (jitter, quantization, aggregation) — not new GPU executions. Re-collect with `--repetitions-per-config` for more physical repetitions across time.
@@ -47,7 +47,7 @@ Transforms in `pipeline/features/realistic_observer.py`:
 | Size quantization / 4KiB alignment | Host sees staging-buffer transfer classes, not tensor exact bytes (2507.02770 §CPU–GSP path) |
 | 8–256 B RPC buckets | Small-transfer RPC overhead band (2507.02770) |
 | Timing jitter | Host clock / scheduling noise |
-| Window aggregation (~8 ms) | RPC/command queue batching |
+| Window aggregation (~25 ms) | RPC/command queue batching |
 
 **Not headline:** `host_observer_idealized` (exact byte counts) — upper-bound only.
 
@@ -55,25 +55,25 @@ Transforms in `pipeline/features/realistic_observer.py`:
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| mode | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [1, 7]]`
+Confusion (`mode`): `[[136, 0], [2, 76]]`
 
-| model_class | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| model_class | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`model_class`): `[[16, 0], [1, 7]]`
+Confusion (`model_class`): `[[136, 0], [2, 76]]`
 
-| batch_size | 0.333 | 0.333 | 0.968 | 0.167–0.542 | NO |
+| batch_size | 0.047 | 0.333 | 0.665 | 0.019–0.075 | NO |
 
-Confusion (`batch_size`): `[[8, 0, 0], [0, 0, 8], [1, 0, 0]]`
+Confusion (`batch_size`): `[[10, 0, 58], [0, 0, 68], [2, 0, 0]]`
 
-| seq_length | 0.292 | 0.333 | 0.968 | 0.125–0.500 | NO |
+| seq_length | 0.575 | 0.333 | 0.701 | 0.509–0.636 | YES |
 
-Confusion (`seq_length`): `[[7, 0, 0], [0, 0, 0], [0, 8, 0]]`
+Confusion (`seq_length`): `[[76, 0, 0], [0, 47, 0], [0, 68, 0]]`
 
-| llm_phase | 0.292 | 1.000 | 0.000 | 0.125–0.500 | NO |
+| llm_phase | 0.355 | 1.000 | 0.000 | 0.290–0.421 | NO |
 
-Confusion (`llm_phase`): `[[7]]`
+Confusion (`llm_phase`): `[[76]]`
 
 
 
@@ -83,25 +83,25 @@ Confusion (`llm_phase`): `[[7]]`
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| mode | 1.000 | 0.500 | 0.656 | 1.000–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [0, 8]]`
+Confusion (`mode`): `[[136, 0], [0, 78]]`
 
-| model_class | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| model_class | 1.000 | 0.500 | 0.656 | 1.000–1.000 | YES |
 
-Confusion (`model_class`): `[[16, 0], [0, 8]]`
+Confusion (`model_class`): `[[136, 0], [0, 78]]`
 
-| batch_size | 0.333 | 0.333 | 0.637 | 0.167–0.542 | NO |
+| batch_size | 0.318 | 0.333 | 0.656 | 0.257–0.383 | NO |
 
-Confusion (`batch_size`): `[[8, 0, 0], [8, 0, 0], [0, 0, 0]]`
+Confusion (`batch_size`): `[[68, 0, 0], [68, 0, 0], [0, 0, 0]]`
 
-| seq_length | 0.333 | 0.333 | 0.637 | 0.125–0.542 | NO |
+| seq_length | 0.364 | 0.333 | 0.656 | 0.299–0.430 | NO |
 
-Confusion (`seq_length`): `[[8, 0, 0], [0, 0, 0], [0, 0, 0]]`
+Confusion (`seq_length`): `[[78, 0, 0], [0, 0, 0], [0, 0, 0]]`
 
-| llm_phase | 0.333 | 1.000 | 0.000 | 0.125–0.542 | NO |
+| llm_phase | 0.000 | 1.000 | 0.000 | 0.000–0.000 | NO |
 
-Confusion (`llm_phase`): `[[8]]`
+Confusion (`llm_phase`): `[[0]]`
 
 
 
@@ -116,25 +116,25 @@ Confusion (`llm_phase`): `[[8]]`
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| mode | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [1, 7]]`
+Confusion (`mode`): `[[136, 0], [2, 76]]`
 
-| model_class | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| model_class | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`model_class`): `[[16, 0], [1, 7]]`
+Confusion (`model_class`): `[[136, 0], [2, 76]]`
 
-| batch_size | 0.000 | 0.333 | 0.637 | 0.000–0.000 | NO |
+| batch_size | 0.000 | 0.333 | 0.656 | 0.000–0.000 | NO |
 
-Confusion (`batch_size`): `[[0, 0, 8], [0, 0, 8], [1, 0, 0]]`
+Confusion (`batch_size`): `[[0, 0, 68], [0, 0, 68], [2, 0, 0]]`
 
-| seq_length | 0.292 | 0.333 | 0.968 | 0.125–0.500 | NO |
+| seq_length | 0.668 | 0.333 | 0.650 | 0.607–0.724 | YES |
 
-Confusion (`seq_length`): `[[7, 0, 0], [0, 0, 0], [0, 8, 0]]`
+Confusion (`seq_length`): `[[76, 0, 0], [0, 67, 0], [0, 68, 0]]`
 
-| llm_phase | 0.958 | 1.000 | 0.000 | 0.875–1.000 | NO |
+| llm_phase | 0.944 | 1.000 | 0.000 | 0.911–0.972 | NO |
 
-Confusion (`llm_phase`): `[[23]]`
+Confusion (`llm_phase`): `[[202]]`
 
 
 
@@ -146,42 +146,38 @@ Holdout: **25% of config_id** groups (entire configs). Classifier uses **one row
 
 | Train base runs | Train samples | Acc | CI lo–hi |
 |-----------------|---------------|-----|----------|
-| 2 | 16 | 1.000 | 1.000–1.000 |
-| 2 | 16 | 1.000 | 1.000–1.000 |
-| 4 | 32 | 0.417 | 0.208–0.625 |
-| 5 | 40 | 0.333 | 0.125–0.542 |
-| 6 | 48 | 1.000 | 1.000–1.000 |
-| 8 | 64 | 0.958 | 0.875–1.000 |
-| 9 | 72 | 0.958 | 0.875–1.000 |
+| 4 | 292 | 1.000 | 1.000–1.000 |
+| 5 | 360 | 0.991 | 0.977–1.000 |
+| 6 | 428 | 0.958 | 0.930–0.981 |
+| 8 | 581 | 0.991 | 0.977–1.000 |
+| 9 | 659 | 0.991 | 0.977–1.000 |
 #### Learning curve: `model_class`
 
 | Train base runs | Train samples | Acc | CI lo–hi |
 |-----------------|---------------|-----|----------|
-| 4 | 32 | 0.958 | 0.875–1.000 |
-| 5 | 40 | 0.958 | 0.875–1.000 |
-| 6 | 48 | 0.958 | 0.875–1.000 |
-| 8 | 64 | 0.958 | 0.875–1.000 |
-| 9 | 72 | 0.958 | 0.875–1.000 |
+| 4 | 292 | 0.991 | 0.977–1.000 |
+| 5 | 360 | 0.991 | 0.977–1.000 |
+| 6 | 435 | 0.991 | 0.977–1.000 |
+| 8 | 581 | 0.991 | 0.977–1.000 |
+| 9 | 659 | 0.991 | 0.977–1.000 |
 #### Learning curve: `batch_size`
 
 | Train base runs | Train samples | Acc | CI lo–hi |
 |-----------------|---------------|-----|----------|
-| 4 | 32 | 0.625 | 0.417–0.833 |
-| 5 | 40 | 0.625 | 0.417–0.833 |
-| 6 | 48 | 0.625 | 0.417–0.833 |
-| 8 | 64 | 0.333 | 0.167–0.542 |
-| 9 | 72 | 0.333 | 0.167–0.542 |
+| 4 | 279 | 0.416 | 0.350–0.481 |
+| 5 | 347 | 0.355 | 0.290–0.421 |
+| 6 | 425 | 0.355 | 0.290–0.421 |
+| 8 | 581 | 0.000 | 0.000–0.000 |
+| 9 | 659 | 0.047 | 0.019–0.075 |
 #### Learning curve: `seq_length`
 
 | Train base runs | Train samples | Acc | CI lo–hi |
 |-----------------|---------------|-----|----------|
-| 2 | 16 | 0.292 | 0.125–0.500 |
-| 2 | 16 | 0.292 | 0.125–0.500 |
-| 4 | 32 | 0.000 | 0.000–0.000 |
-| 5 | 40 | 0.292 | 0.125–0.500 |
-| 6 | 48 | 0.292 | 0.125–0.500 |
-| 8 | 64 | 0.292 | 0.125–0.500 |
-| 9 | 72 | 0.292 | 0.125–0.500 |
+| 4 | 299 | 0.355 | 0.290–0.421 |
+| 5 | 367 | 0.355 | 0.290–0.421 |
+| 6 | 435 | 0.355 | 0.290–0.421 |
+| 8 | 591 | 0.355 | 0.290–0.421 |
+| 9 | 659 | 0.575 | 0.509–0.636 |
 
 
 ## 5. D3 mitigation preview (requirement #5)
@@ -192,25 +188,25 @@ Observer-feature shims (2507.02770-style defenses evaluated at feature layer):
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| mode | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [1, 7]]`
+Confusion (`mode`): `[[136, 0], [2, 76]]`
 
-| model_class | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| model_class | 0.458 | 0.500 | 0.026 | 0.393–0.528 | NO |
 
-Confusion (`model_class`): `[[16, 0], [1, 7]]`
+Confusion (`model_class`): `[[22, 114], [2, 76]]`
 
-| batch_size | 0.000 | 0.333 | 0.637 | 0.000–0.000 | NO |
+| batch_size | 0.000 | 0.333 | 0.656 | 0.000–0.000 | NO |
 
-Confusion (`batch_size`): `[[0, 0, 8], [0, 0, 8], [1, 0, 0]]`
+Confusion (`batch_size`): `[[0, 0, 68], [0, 0, 68], [2, 0, 0]]`
 
-| seq_length | 0.292 | 0.333 | 0.048 | 0.125–0.500 | NO |
+| seq_length | 0.355 | 0.333 | 0.127 | 0.290–0.421 | NO |
 
-Confusion (`seq_length`): `[[7, 0, 0], [8, 0, 0], [8, 0, 0]]`
+Confusion (`seq_length`): `[[76, 0, 0], [68, 0, 0], [48, 20, 0]]`
 
-| llm_phase | 0.958 | 1.000 | 0.000 | 0.875–1.000 | NO |
+| llm_phase | 0.958 | 1.000 | 0.000 | 0.925–0.981 | NO |
 
-Confusion (`llm_phase`): `[[23]]`
+Confusion (`llm_phase`): `[[205]]`
 
 
 
@@ -218,25 +214,25 @@ Confusion (`llm_phase`): `[[23]]`
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 0.958 | 0.500 | 0.478 | 0.875–1.000 | YES |
+| mode | 0.991 | 0.500 | 0.607 | 0.977–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [1, 7]]`
+Confusion (`mode`): `[[136, 0], [2, 76]]`
 
-| model_class | 0.292 | 0.500 | 0.048 | 0.125–0.500 | NO |
+| model_class | 0.379 | 0.500 | 0.000 | 0.313–0.444 | NO |
 
-Confusion (`model_class`): `[[0, 16], [1, 7]]`
+Confusion (`model_class`): `[[5, 131], [2, 76]]`
 
-| batch_size | 0.000 | 0.333 | 0.637 | 0.000–0.000 | NO |
+| batch_size | 0.000 | 0.333 | 0.656 | 0.000–0.000 | NO |
 
-Confusion (`batch_size`): `[[0, 0, 8], [0, 0, 8], [1, 0, 0]]`
+Confusion (`batch_size`): `[[0, 0, 68], [0, 0, 68], [2, 0, 0]]`
 
-| seq_length | 0.292 | 0.333 | 0.667 | 0.125–0.500 | NO |
+| seq_length | 0.355 | 0.333 | 0.496 | 0.290–0.421 | NO |
 
-Confusion (`seq_length`): `[[7, 0, 0], [0, 0, 8], [8, 0, 0]]`
+Confusion (`seq_length`): `[[76, 0, 0], [0, 0, 31], [48, 0, 0]]`
 
-| llm_phase | 0.958 | 1.000 | 0.000 | 0.875–1.000 | NO |
+| llm_phase | 0.967 | 1.000 | 0.000 | 0.939–0.986 | NO |
 
-Confusion (`llm_phase`): `[[23]]`
+Confusion (`llm_phase`): `[[207]]`
 
 
 
@@ -248,25 +244,25 @@ Confusion (`llm_phase`): `[[23]]`
 
 | Axis | Acc | Chance | MI | CI (lo–hi) | PASS |
 |------|-----|--------|-----|------------|------|
-| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| mode | 1.000 | 0.500 | 0.656 | 1.000–1.000 | YES |
 
-Confusion (`mode`): `[[16, 0], [0, 8]]`
+Confusion (`mode`): `[[136, 0], [0, 78]]`
 
-| model_class | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES |
+| model_class | 1.000 | 0.500 | 0.656 | 1.000–1.000 | YES |
 
-Confusion (`model_class`): `[[16, 0], [0, 8]]`
+Confusion (`model_class`): `[[136, 0], [0, 78]]`
 
-| batch_size | 0.333 | 0.333 | 1.099 | 0.167–0.542 | NO |
+| batch_size | 0.000 | 0.333 | 0.656 | 0.000–0.000 | NO |
 
-Confusion (`batch_size`): `[[8, 0, 0], [0, 0, 8], [0, 0, 0]]`
+Confusion (`batch_size`): `[[0, 0, 68], [0, 0, 68], [0, 0, 0]]`
 
-| seq_length | 0.417 | 0.333 | 0.492 | 0.208–0.625 | NO |
+| seq_length | 0.364 | 0.333 | 0.625 | 0.299–0.430 | NO |
 
-Confusion (`seq_length`): `[[8, 0, 0], [6, 2, 0], [0, 8, 0]]`
+Confusion (`seq_length`): `[[78, 0, 0], [68, 0, 0], [0, 68, 0]]`
 
 | llm_phase | 1.000 | 1.000 | 0.000 | 1.000–1.000 | NO |
 
-Confusion (`llm_phase`): `[[24]]`
+Confusion (`llm_phase`): `[[214]]`
 
 
 

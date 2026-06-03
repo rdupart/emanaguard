@@ -106,7 +106,7 @@ Transforms in `{data.get('observer_transform_doc', 'pipeline/features/realistic_
 | Size quantization / 4KiB alignment | Host sees staging-buffer transfer classes, not tensor exact bytes (2507.02770 §CPU–GSP path) |
 | 8–256 B RPC buckets | Small-transfer RPC overhead band (2507.02770) |
 | Timing jitter | Host clock / scheduling noise |
-| Window aggregation (~8 ms) | RPC/command queue batching |
+| Window aggregation (~25 ms) | RPC/command queue batching |
 
 **Not headline:** `host_observer_idealized` (exact byte counts) — upper-bound only.
 
