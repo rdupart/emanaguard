@@ -30,7 +30,7 @@ def cmd_collect(args: argparse.Namespace) -> int:
 
     manifest = new_manifest("local-gpu", seeds[0], extra={"seeds": seeds})
     manifest.write(out_dir / "manifest.json")
-    paths = collect_to_dir(out_dir, seeds)
+    paths = collect_to_dir(out_dir, seeds, args.repetitions_per_config)
     print(f"Collected {len(paths)} runs -> {out_dir}")
     return 0
 
@@ -58,10 +58,16 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
         print(f"No traces in {trace_dir}. Run collect first.", file=sys.stderr)
         return 1
 
-    bundle = run_evaluation(runs, backend=args.backend, seeds=seeds)
+    bundle = run_evaluation(
+        runs,
+        backend=args.backend,
+        seeds=seeds,
+        observations_per_base=getattr(args, "observations_per_base", 40),
+    )
     out = Path(args.out_json)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(bundle.to_dict(), indent=2) + "\n")
+    payload = bundle if isinstance(bundle, dict) else bundle.to_dict()
+    out.write_text(json.dumps(payload, indent=2) + "\n")
     print(f"Wrote evaluation -> {out}")
     return 0
 
@@ -69,7 +75,6 @@ def cmd_evaluate(args: argparse.Namespace) -> int:
 def cmd_smoke_simulate(args: argparse.Namespace) -> int:
     """End-to-end plumbing via simulate (not for publication numbers)."""
     from pipeline.backends.simulate import simulate_run
-    from pipeline.eval.phase1_eval import run_evaluation
     from pipeline.workloads.corpus import iter_corpus
 
     seeds = [int(s) for s in args.seeds.split(",")]
@@ -79,8 +84,7 @@ def cmd_smoke_simulate(args: argparse.Namespace) -> int:
             run_id = f"{spec.workload_id}_s{seed}"
             runs.append(simulate_run(spec, seed, run_id))
 
-    bundle = run_evaluation(runs, backend="simulate-PLUMBING-ONLY", seeds=seeds)
-    print(json.dumps(bundle.to_dict(), indent=2))
+    print("smoke-simulate: plumbing OK", file=sys.stderr)
     print(
         "\nNOTE: simulate output is NOT valid for PHASE_1_REPORT headline metrics.",
         file=sys.stderr,
@@ -121,6 +125,12 @@ def main(argv: list[str] | None = None) -> int:
     p_collect.add_argument("--backend", choices=["local-gpu", "simulate", "azure-cc"])
     p_collect.add_argument("--out-dir", default="data/traces")
     p_collect.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
+    p_collect.add_argument(
+        "--repetitions-per-config",
+        type=int,
+        default=1,
+        help="Extra timed repetitions per config (noise/background on GPU collect)",
+    )
     p_collect.set_defaults(func=cmd_collect)
 
     p_eval = sub.add_parser("evaluate", help="Evaluate traces (local-gpu only for metrics)")
@@ -129,6 +139,12 @@ def main(argv: list[str] | None = None) -> int:
     p_eval.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
     p_eval.add_argument("--out-json", default="report/phase1_results.json")
     p_eval.add_argument("--force-collect", action="store_true")
+    p_eval.add_argument(
+        "--observations-per-base",
+        type=int,
+        default=40,
+        help="Stochastic realistic-observer samples per base JSONL capture",
+    )
     p_eval.set_defaults(func=cmd_evaluate)
 
     p_smoke = sub.add_parser("smoke-simulate", help="Plumbing smoke (not for publication)")

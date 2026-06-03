@@ -14,6 +14,7 @@ from pipeline.workloads.runner import run_workload
 def collect_to_dir(
     out_dir: Path,
     seeds: list[int],
+    repetitions_per_config: int = 1,
 ) -> list[Path]:
     import torch
 
@@ -28,9 +29,12 @@ def collect_to_dir(
         manifest = new_manifest("local-gpu", seed, extra={"out_dir": str(out_dir)})
         manifest.write(out_dir / f"manifest_seed{seed}.json")
         for spec in iter_corpus():
-            run_id = f"{spec.workload_id}_s{seed}"
-            events, labels = run_workload(spec, seed, run_id)
-            paths.append(write_run(out_dir, events, labels))
+            for rep in range(repetitions_per_config):
+                run_id = f"{spec.workload_id}_s{seed}_r{rep}"
+                events, labels = run_workload(
+                    spec, seed, run_id, enable_noise=True, repetition=rep
+                )
+                paths.append(write_run(out_dir, events, labels))
     return paths
 
 

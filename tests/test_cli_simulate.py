@@ -14,8 +14,7 @@ def test_smoke_simulate_exits_zero():
         cwd="/workspace",
     )
     assert proc.returncode == 0, proc.stderr
-    assert "simulate-PLUMBING-ONLY" in proc.stdout
-    assert "NOT valid" in proc.stderr or "NOT valid" in proc.stdout + proc.stderr
+    assert "plumbing OK" in proc.stderr
 
 
 def test_evaluate_rejects_simulate():

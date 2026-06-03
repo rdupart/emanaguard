@@ -23,7 +23,8 @@ CPU PyTorch is enough for **evaluate** on committed traces in `data/traces/`. **
 
 ### Gotchas
 
-- Traces live in **`data/traces/`** (96 `*.jsonl` runs + manifests), not `data/traces/local-gpu/`.
+- Traces live in **`data/traces/`** (96 base `*.jsonl` captures + manifests).
+- **Phase 1.2 evaluate** expands each base capture with `--observations-per-base` (default 40) stochastic realistic-observer draws; classifier uses **one mean vector per base** (96 rows), not 3840 correlated rows.
+- Headline metrics use **`host_observer_realistic`** (`pipeline/features/realistic_observer.py`), not idealized exact byte counts.
 - `evaluate` **rejects** `--backend simulate` for publication metrics.
-- `load_trace_dir` skips non-`*.jsonl` files (manifests are `.json`).
 - This VM often has **no GPU**; use committed traces + evaluate rather than collect.

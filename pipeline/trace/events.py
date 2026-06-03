@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields, replace
 from enum import Enum
 from typing import Any
 
@@ -57,10 +57,23 @@ class RunLabels:
     llm_phase: str  # prefill | decode | n/a
     seed: int
     run_id: str
+    config_id: str = ""
+    base_run_id: str = ""
+    observation_idx: int = 0
+    machine_id: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> RunLabels:
-        return cls(**data)
+        known = {f.name for f in fields(cls)}
+        filtered = {k: v for k, v in data.items() if k in known}
+        lb = cls(**filtered)
+        if not lb.config_id:
+            from pipeline.workloads.corpus import config_id_from_workload
+
+            lb = replace(lb, config_id=config_id_from_workload(lb.workload_id))
+        if not lb.base_run_id:
+            lb = replace(lb, base_run_id=lb.run_id)
+        return lb

@@ -53,3 +53,8 @@ def iter_corpus() -> Iterator[WorkloadSpec]:
 
 def corpus_size() -> int:
     return sum(1 for _ in iter_corpus())
+
+
+def config_id_from_workload(workload_id: str) -> str:
+    """Stable config key (strip seed / repetition suffixes)."""
+    return workload_id.split("_s")[0].replace("/", "_")

@@ -3,19 +3,30 @@
 from __future__ import annotations
 
 import time
+from typing import TYPE_CHECKING
 
+import numpy as np
 import torch
 
 from pipeline.trace.events import Direction, RunLabels, TransferEvent
-from pipeline.workloads.corpus import WorkloadSpec
+from pipeline.workloads.corpus import WorkloadSpec, config_id_from_workload
+
+if TYPE_CHECKING:
+    pass
 
 
 class TransferRecorder:
     """Records H↔D copies with in-VM metadata (stripped later for host-observer)."""
 
-    def __init__(self, run_id: str, device: torch.device) -> None:
+    def __init__(
+        self,
+        run_id: str,
+        device: torch.device,
+        rng: np.random.Generator | None = None,
+    ) -> None:
         self.run_id = run_id
         self.device = device
+        self.rng = rng
         self.events: list[TransferEvent] = []
 
     def h2d(
@@ -25,6 +36,10 @@ class TransferRecorder:
         phase: str,
         stream: int = 0,
     ) -> torch.Tensor:
+        if self.rng is not None:
+            from pipeline.workloads.noise import collection_jitter_sleep
+
+            collection_jitter_sleep(self.rng)
         t0 = time.perf_counter_ns()
         gpu = cpu_tensor.to(self.device, non_blocking=False)
         torch.cuda.synchronize()
@@ -50,6 +65,10 @@ class TransferRecorder:
         phase: str,
         stream: int = 0,
     ) -> torch.Tensor:
+        if self.rng is not None:
+            from pipeline.workloads.noise import collection_jitter_sleep
+
+            collection_jitter_sleep(self.rng)
         t0 = time.perf_counter_ns()
         cpu = gpu_tensor.detach().cpu()
         torch.cuda.synchronize()
@@ -131,8 +150,12 @@ def run_workload(
     seed: int,
     run_id: str,
     device: torch.device | None = None,
+    *,
+    enable_noise: bool = True,
+    repetition: int = 0,
 ) -> tuple[list[TransferEvent], RunLabels]:
-    torch.manual_seed(seed)
+    torch.manual_seed(seed + repetition * 9973)
+    rng = np.random.default_rng(seed + repetition * 17) if enable_noise else None
     if device is None:
         if not torch.cuda.is_available():
             raise RuntimeError(
@@ -140,7 +163,14 @@ def run_workload(
             )
         device = torch.device("cuda")
 
-    recorder = TransferRecorder(run_id, device)
+    bg = None
+    if enable_noise and rng is not None:
+        from pipeline.workloads.noise import BackgroundGpuLoad
+
+        bg = BackgroundGpuLoad(device, rng)
+        bg.start()
+
+    recorder = TransferRecorder(run_id, device, rng=rng)
     labels = RunLabels(
         workload_id=spec.workload_id,
         mode=spec.mode,
@@ -150,13 +180,21 @@ def run_workload(
         llm_phase=spec.llm_phase,
         seed=seed,
         run_id=run_id,
+        config_id=config_id_from_workload(spec.workload_id),
+        base_run_id=run_id,
+        observation_idx=repetition,
+        machine_id=f"coloc_{seed % 4}",
     )
 
-    if spec.llm_phase in ("prefill", "decode"):
-        _llm_prefill_decode(recorder, spec)
-    else:
-        for _ in range(spec.steps):
-            phase = "train_step" if spec.mode == "train" else "infer_step"
-            _linear_block(recorder, spec, phase, train=(spec.mode == "train"))
+    try:
+        if spec.llm_phase in ("prefill", "decode"):
+            _llm_prefill_decode(recorder, spec)
+        else:
+            for _ in range(spec.steps):
+                phase = "train_step" if spec.mode == "train" else "infer_step"
+                _linear_block(recorder, spec, phase, train=(spec.mode == "train"))
+    finally:
+        if bg is not None:
+            bg.stop()
 
     return recorder.events, labels
