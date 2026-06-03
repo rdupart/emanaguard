@@ -22,8 +22,9 @@ from detector.audit import (
 from detector.bytes_matched import match_bytes_pairs, timing_structure_features
 from detector.covert_modulator import (
     MODULATION_PRESETS,
+    aggregate_amplitude_sweep,
     apply_covert_modulator,
-    search_adaptive_covert_below_threshold,
+    sweep_cadence_amplitude_curve,
 )
 from detector.policy import AttestedPolicy, violation_label
 from pipeline.corpus.expand import expand_observations
@@ -80,6 +81,7 @@ class DetectorResult:
     operating_point: dict | None = None
     covert_capacity: dict | None = None
     bytes_matched_meta: dict | None = None
+    suite_status: str = "EVALUATED"
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -237,10 +239,52 @@ def _eval_suite(
         use_adaptive=False,
     )
     bytes_meta: dict | None = None
+    suite_status = "EVALUATED"
     if suite == ViolationSuite.HARD_WRONG_ARCH_BYTES:
-        x, y, groups, bytes_meta = match_bytes_pairs(x, y, groups)
-        if x.size:
-            x = timing_structure_features(x)
+        x_full = x.copy()
+        y_full = y.copy()
+        groups_full = groups.copy()
+        x, y, groups, bytes_meta = match_bytes_pairs(
+            x_full, y_full, groups_full, relative_tolerance=0.10
+        )
+        if bytes_meta.get("n_pairs", 0) == 0:
+            diagnostic: dict[str, dict] = {}
+            for tol in (0.15, 0.20, 0.25, 0.35):
+                _, _, _, dm = match_bytes_pairs(
+                    x_full, y_full, groups_full, relative_tolerance=tol
+                )
+                diagnostic[f"tolerance_{tol:.2f}"] = {
+                    "n_pairs": dm.get("n_pairs", 0),
+                    "status": dm.get("status"),
+                }
+            bytes_meta["diagnostic_loosened_tolerances"] = diagnostic
+            bytes_meta["suite_status"] = "UNTESTABLE_OPEN_QUESTION"
+            bytes_meta["interpretation"] = (
+                "No benign/violation pairs within ±10% total_bytes on this corpus; "
+                "non-volume detector survival cannot be measured — not a resolved negative."
+            )
+            return DetectorResult(
+                suite=suite.value,
+                policy_name=policy.name,
+                signal_set="host_observer_realistic_single_draw",
+                backend=backend,
+                roc_auc=0.0,
+                balanced_accuracy=0.0,
+                majority_baseline=float(majority_baseline(y)) if len(y) else 0.0,
+                fpr_at_threshold=0.0,
+                tpr_at_threshold=0.0,
+                threshold=0.5,
+                false_positives=0,
+                true_positives=0,
+                false_negatives=0,
+                true_negatives=0,
+                n_test=0,
+                headline=headline,
+                notes=bytes_meta["interpretation"],
+                bytes_matched_meta=bytes_meta,
+                suite_status="UNTESTABLE_OPEN_QUESTION",
+            )
+        x = timing_structure_features(x)
     mod_name = ""
     if suite in (
         ViolationSuite.HARD_COVERT_MOD,
@@ -304,43 +348,35 @@ def _eval_suite(
 
     covert_cap: dict | None = None
     if suite == ViolationSuite.HARD_COVERT_ADAPTIVE:
-        n_evade = 0
-        n_try = 0
+        per_trace_curves: list[list[dict]] = []
+        test_groups = set(groups[test_m])
         for events, labels in runs:
             if labels.observation_idx != 0:
                 continue
             arch = labels.architecture_id or labels.model_class
             if not attested or not _volume_matched_train(labels) or arch != attested:
                 continue
-            if labels.base_run_id not in set(groups[test_m]):
+            gid = _split_group_id(labels.base_run_id)
+            if gid not in test_groups:
                 continue
             host = project_host_observer(events)
             benign_x = _features(events, labels)
+            rng = _rng_for(labels)
 
-            def score_fn(h):
-                return float(clf.predict_proba(_features_from_host(h).reshape(1, -1))[0, 1])
+            def score_fn(h, _clf=clf):
+                return float(_clf.predict_proba(_features_from_host(h).reshape(1, -1))[0, 1])
 
-            _, ameta = search_adaptive_covert_below_threshold(
+            curve = sweep_cadence_amplitude_curve(
                 host,
-                _rng_for(labels),
+                rng,
                 benign_x,
                 _features_from_host,
                 score_fn,
                 threshold=thresh,
             )
-            n_try += 1
-            if ameta.get("evades_detector"):
-                n_evade += 1
-        covert_cap = {
-            "n_test_attested_traces": n_try,
-            "n_evade_at_operating_point": n_evade,
-            "fraction_evading": n_evade / max(n_try, 1),
-            "operating_threshold": thresh,
-        }
-        if n_evade == 0:
-            covert_cap["covert_capacity_below_op_point"] = (
-                "≈zero covert capacity below the detector operating point"
-            )
+            per_trace_curves.append(curve)
+        covert_cap = aggregate_amplitude_sweep(per_trace_curves, threshold=thresh)
+        covert_cap["n_test_attested_traces"] = covert_cap.get("n_traces", 0)
 
     scores = clf.predict_proba(x[test_m])[:, 1]
     y_test = y[test_m]
@@ -373,18 +409,14 @@ def _eval_suite(
         )
     elif suite == ViolationSuite.HARD_WRONG_ARCH_BYTES:
         note = (
-            "TRUE total_bytes-matched pairs (±5%), timing/structure features only. "
-            f"Pairs={bytes_meta.get('n_pairs', 0) if bytes_meta else 0}. "
-            + (
-                "Non-volume signal survives."
-                if bal_acc > maj + 0.02
-                else "No non-volume signal above majority — detection collapses to volume."
-            )
+            f"Bytes-matched (±10% total_bytes): pairs={bytes_meta.get('n_pairs', 0) if bytes_meta else 0}. "
+            + (bytes_meta.get("interpretation", "") if bytes_meta else "")
         )
     elif suite == ViolationSuite.HARD_COVERT_LIGHT:
         note = MODULATION_PRESETS["light"].description + "; confirm subtle vs heavy"
     elif suite == ViolationSuite.HARD_COVERT_ADAPTIVE:
-        note = "Adaptive search for cadence modulation below operating threshold"
+        claim = (covert_cap or {}).get("covert_capacity_claim", "")
+        note = f"Continuous cadence-amplitude sweep to feature noise floor. {claim}"
     return DetectorResult(
         suite=suite.value,
         policy_name=policy.name,
@@ -409,6 +441,7 @@ def _eval_suite(
         operating_point=op_point,
         covert_capacity=covert_cap,
         bytes_matched_meta=bytes_meta,
+        suite_status=suite_status,
     )
 
 
@@ -482,7 +515,7 @@ def run_detector_evaluation(
     explain = inconsistency_explanation()
 
     return {
-        "methodology_version": "phase2.2",
+        "methodology_version": "phase2.3",
         "preliminary": True,
         "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
         "backend": backend,
@@ -494,8 +527,14 @@ def run_detector_evaluation(
         },
         "distinct_architecture_ids_in_corpus": n_arch,
         "modulation_presets": {k: asdict(v) for k, v in MODULATION_PRESETS.items()},
+        "bytes_matched_policy": (
+            "If n_pairs=0 at ±10%, suite_status=UNTESTABLE_OPEN_QUESTION — do not treat as resolved."
+        ),
+        "covert_capacity_policy": (
+            "Continuous cadence-amplitude sweep; no '≈zero capacity' claim from preset/adaptive alone."
+        ),
         "headline_detector_metric": (
-            "volume-level hard_unauthorized_architecture + bytes_matched timing + adaptive covert capacity"
+            "volume-level hard_unauthorized_architecture + bytes_matched (when pairable) + amplitude sweep"
         ),
         "not_headline": "trivial_mode_change; heavy covert AUC alone; raw AUC without balanced vs majority",
         "external_claim_conditions": (

@@ -17,6 +17,11 @@ def test_detector_returns_three_suites():
     assert "hard_unauthorized_architecture_volume_level" in out["suites"]
     assert "hard_unauthorized_architecture_bytes_matched" in out["suites"]
     assert "hard_covert_modulator_adaptive" in out["suites"]
+    bm = out["suites"]["hard_unauthorized_architecture_bytes_matched"]
+    assert bm.get("suite_status") in (
+        "EVALUATED",
+        "UNTESTABLE_OPEN_QUESTION",
+    )
     assert out["suites"]["trivial_mode_change"]["headline"] is False
     assert out["suites"]["hard_unauthorized_architecture_volume_level"]["headline"] is True
     assert "detector_inference_audit" in out

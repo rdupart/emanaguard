@@ -1,5 +1,5 @@
 {
-  "methodology_version": "phase2.2",
+  "methodology_version": "phase2.3",
   "preliminary": true,
   "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
   "backend": "local-gpu",
@@ -30,7 +30,9 @@
       "description": "Strong cadence quantization \u2014 legacy default"
     }
   },
-  "headline_detector_metric": "volume-level hard_unauthorized_architecture + bytes_matched timing + adaptive covert capacity",
+  "bytes_matched_policy": "If n_pairs=0 at \u00b110%, suite_status=UNTESTABLE_OPEN_QUESTION \u2014 do not treat as resolved.",
+  "covert_capacity_policy": "Continuous cadence-amplitude sweep; no '\u2248zero capacity' claim from preset/adaptive alone.",
+  "headline_detector_metric": "volume-level hard_unauthorized_architecture + bytes_matched (when pairable) + amplitude sweep",
   "not_headline": "trivial_mode_change; heavy covert AUC alone; raw AUC without balanced vs majority",
   "external_claim_conditions": "Azure/external: bytes-matched non-volume survival + covert capacity-under-detection required",
   "detector_inference_audit": {
@@ -93,65 +95,67 @@
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
       "roc_auc": 1.0,
-      "balanced_accuracy": 0.9782135076252723,
+      "balanced_accuracy": 0.977124183006536,
       "majority_baseline": 0.5047801147227533,
-      "fpr_at_threshold": 0.04357298474945534,
+      "fpr_at_threshold": 0.0457516339869281,
       "tpr_at_threshold": 1.0,
-      "threshold": 2.439601253455474e-110,
-      "false_positives": 20,
+      "threshold": 3.879870073416321e-69,
+      "false_positives": 21,
       "true_positives": 456,
       "false_negatives": 0,
-      "true_negatives": 439,
+      "true_negatives": 438,
       "n_test": 915,
       "headline": false,
       "modulation_strength": "",
       "notes": "",
-      "margin_bal_over_majority": 0.47343339290251896,
+      "margin_bal_over_majority": 0.4723440682837827,
       "weak_separation": false,
       "operating_point": {
-        "threshold_95th_percentile_benign_train": 2.439601253455474e-110,
-        "test_fpr": 0.04357298474945534,
+        "threshold_95th_percentile_benign_train": 3.879870073416321e-69,
+        "test_fpr": 0.0457516339869281,
         "test_tpr": 1.0,
         "tp": 456,
-        "fp": 20,
-        "tn": 439,
+        "fp": 21,
+        "tn": 438,
         "fn": 0
       },
       "covert_capacity": null,
-      "bytes_matched_meta": null
+      "bytes_matched_meta": null,
+      "suite_status": "EVALUATED"
     },
     "hard_unauthorized_architecture_volume_level": {
       "suite": "hard_unauthorized_architecture",
       "policy_name": "train_volume_matched_arch_mlp_256x4_only",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "roc_auc": 0.9826405290505432,
-      "balanced_accuracy": 0.9328649031648559,
+      "roc_auc": 0.9885451110061407,
+      "balanced_accuracy": 0.9794520547945205,
       "majority_baseline": 0.8982128982128982,
-      "fpr_at_threshold": 0.10344827586206896,
-      "tpr_at_threshold": 0.9691780821917808,
-      "threshold": 0.2230415057718762,
-      "false_positives": 3,
-      "true_positives": 283,
-      "false_negatives": 9,
-      "true_negatives": 26,
+      "fpr_at_threshold": 0.0,
+      "tpr_at_threshold": 0.958904109589041,
+      "threshold": 0.22873573495381555,
+      "false_positives": 0,
+      "true_positives": 280,
+      "false_negatives": 12,
+      "true_negatives": 29,
       "n_test": 321,
       "headline": true,
       "modulation_strength": "",
-      "notes": "Reframed: volume-level violation detection at matched (mode, bs=4, seq=128). Balanced acc 0.933 vs majority 0.898 (margin 0.035 \u2014 WEAK separation).",
-      "margin_bal_over_majority": 0.03465200495195775,
-      "weak_separation": true,
+      "notes": "Reframed: volume-level violation detection at matched (mode, bs=4, seq=128). Balanced acc 0.979 vs majority 0.898 (margin 0.081).",
+      "margin_bal_over_majority": 0.08123915658162228,
+      "weak_separation": false,
       "operating_point": {
-        "threshold_95th_percentile_benign_train": 0.2230415057718762,
-        "test_fpr": 0.10344827586206896,
-        "test_tpr": 0.9691780821917808,
-        "tp": 283,
-        "fp": 3,
-        "tn": 26,
-        "fn": 9
+        "threshold_95th_percentile_benign_train": 0.22873573495381555,
+        "test_fpr": 0.0,
+        "test_tpr": 0.958904109589041,
+        "tp": 280,
+        "fp": 0,
+        "tn": 29,
+        "fn": 12
       },
       "covert_capacity": null,
-      "bytes_matched_meta": null
+      "bytes_matched_meta": null,
+      "suite_status": "EVALUATED"
     },
     "hard_unauthorized_architecture_bytes_matched": {
       "suite": "hard_unauthorized_architecture_bytes_matched",
@@ -171,48 +175,43 @@
       "n_test": 0,
       "headline": true,
       "modulation_strength": "",
-      "notes": "NEGATIVE: insufficient classes or samples",
+      "notes": "No benign/violation pairs within \u00b110% total_bytes on this corpus; non-volume detector survival cannot be measured \u2014 not a resolved negative.",
       "margin_bal_over_majority": 0.0,
       "weak_separation": false,
       "operating_point": null,
       "covert_capacity": null,
-      "bytes_matched_meta": null
+      "bytes_matched_meta": {
+        "status": "no_pairs_within_tolerance",
+        "n_pairs": 0,
+        "relative_tolerance": 0.1,
+        "mean_relative_bytes_error": null,
+        "n_benign_pool": 160,
+        "n_violation": 1448,
+        "diagnostic_loosened_tolerances": {
+          "tolerance_0.15": {
+            "n_pairs": 0,
+            "status": "no_pairs_within_tolerance"
+          },
+          "tolerance_0.20": {
+            "n_pairs": 1,
+            "status": "ok"
+          },
+          "tolerance_0.25": {
+            "n_pairs": 6,
+            "status": "ok"
+          },
+          "tolerance_0.35": {
+            "n_pairs": 8,
+            "status": "ok"
+          }
+        },
+        "suite_status": "UNTESTABLE_OPEN_QUESTION",
+        "interpretation": "No benign/violation pairs within \u00b110% total_bytes on this corpus; non-volume detector survival cannot be measured \u2014 not a resolved negative."
+      },
+      "suite_status": "UNTESTABLE_OPEN_QUESTION"
     },
     "hard_covert_modulator_heavy": {
       "suite": "hard_covert_modulator",
-      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
-      "signal_set": "host_observer_realistic_single_draw",
-      "backend": "local-gpu",
-      "roc_auc": 1.0,
-      "balanced_accuracy": 0.96875,
-      "majority_baseline": 0.5,
-      "fpr_at_threshold": 0.0625,
-      "tpr_at_threshold": 1.0,
-      "threshold": 3.1830157768097616e-12,
-      "false_positives": 2,
-      "true_positives": 32,
-      "false_negatives": 0,
-      "true_negatives": 30,
-      "n_test": 64,
-      "headline": false,
-      "modulation_strength": "heavy",
-      "notes": "Strong cadence quantization \u2014 legacy default",
-      "margin_bal_over_majority": 0.46875,
-      "weak_separation": false,
-      "operating_point": {
-        "threshold_95th_percentile_benign_train": 3.1830157768097616e-12,
-        "test_fpr": 0.0625,
-        "test_tpr": 1.0,
-        "tp": 32,
-        "fp": 2,
-        "tn": 30,
-        "fn": 0
-      },
-      "covert_capacity": null,
-      "bytes_matched_meta": null
-    },
-    "hard_covert_modulator_light": {
-      "suite": "hard_covert_modulator_light",
       "policy_name": "train_volume_matched_arch_mlp_256x4_only",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
@@ -221,19 +220,19 @@
       "majority_baseline": 0.5,
       "fpr_at_threshold": 0.09375,
       "tpr_at_threshold": 1.0,
-      "threshold": 3.229087910394409e-12,
+      "threshold": 4.313963870432085e-12,
       "false_positives": 3,
       "true_positives": 32,
       "false_negatives": 0,
       "true_negatives": 29,
       "n_test": 64,
       "headline": false,
-      "modulation_strength": "light",
-      "notes": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation; confirm subtle vs heavy",
+      "modulation_strength": "heavy",
+      "notes": "Strong cadence quantization \u2014 legacy default",
       "margin_bal_over_majority": 0.453125,
       "weak_separation": false,
       "operating_point": {
-        "threshold_95th_percentile_benign_train": 3.229087910394409e-12,
+        "threshold_95th_percentile_benign_train": 4.313963870432085e-12,
         "test_fpr": 0.09375,
         "test_tpr": 1.0,
         "tp": 32,
@@ -242,7 +241,42 @@
         "fn": 0
       },
       "covert_capacity": null,
-      "bytes_matched_meta": null
+      "bytes_matched_meta": null,
+      "suite_status": "EVALUATED"
+    },
+    "hard_covert_modulator_light": {
+      "suite": "hard_covert_modulator_light",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "balanced_accuracy": 0.96875,
+      "majority_baseline": 0.5,
+      "fpr_at_threshold": 0.0625,
+      "tpr_at_threshold": 1.0,
+      "threshold": 3.4607192477003157e-12,
+      "false_positives": 2,
+      "true_positives": 32,
+      "false_negatives": 0,
+      "true_negatives": 30,
+      "n_test": 64,
+      "headline": false,
+      "modulation_strength": "light",
+      "notes": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation; confirm subtle vs heavy",
+      "margin_bal_over_majority": 0.46875,
+      "weak_separation": false,
+      "operating_point": {
+        "threshold_95th_percentile_benign_train": 3.4607192477003157e-12,
+        "test_fpr": 0.0625,
+        "test_tpr": 1.0,
+        "tp": 32,
+        "fp": 2,
+        "tn": 30,
+        "fn": 0
+      },
+      "covert_capacity": null,
+      "bytes_matched_meta": null,
+      "suite_status": "EVALUATED"
     },
     "hard_covert_modulator_adaptive": {
       "suite": "hard_covert_modulator_adaptive",
@@ -250,38 +284,475 @@
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
       "roc_auc": 1.0,
-      "balanced_accuracy": 1.0,
+      "balanced_accuracy": 0.984375,
       "majority_baseline": 0.5,
-      "fpr_at_threshold": 0.0,
+      "fpr_at_threshold": 0.03125,
       "tpr_at_threshold": 1.0,
-      "threshold": 2.741226552404674e-12,
-      "false_positives": 0,
+      "threshold": 2.610761758281537e-12,
+      "false_positives": 1,
       "true_positives": 32,
       "false_negatives": 0,
-      "true_negatives": 32,
+      "true_negatives": 31,
       "n_test": 64,
       "headline": true,
       "modulation_strength": "adaptive",
-      "notes": "Adaptive search for cadence modulation below operating threshold",
-      "margin_bal_over_majority": 0.5,
+      "notes": "Continuous cadence-amplitude sweep to feature noise floor. Tested continuous cadence sweep (0.02\u20134.0\u00d7 light baseline): no scale evades detector at operating point on held-out attested traces; adaptive-adversary covert capacity NOT established (preset-only evasion search retired).",
+      "margin_bal_over_majority": 0.484375,
       "weak_separation": false,
       "operating_point": {
-        "threshold_95th_percentile_benign_train": 2.741226552404674e-12,
-        "test_fpr": 0.0,
+        "threshold_95th_percentile_benign_train": 2.610761758281537e-12,
+        "test_fpr": 0.03125,
         "test_tpr": 1.0,
         "tp": 32,
-        "fp": 0,
-        "tn": 32,
+        "fp": 1,
+        "tn": 31,
         "fn": 0
       },
       "covert_capacity": {
-        "n_test_attested_traces": 32,
-        "n_evade_at_operating_point": 0,
-        "fraction_evading": 0.0,
-        "operating_threshold": 2.741226552404674e-12,
-        "covert_capacity_below_op_point": "\u2248zero covert capacity below the detector operating point"
+        "n_traces": 32,
+        "operating_threshold": 2.610761758281537e-12,
+        "curve": [
+          {
+            "cadence_scale": 0.02,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 284440309640.244
+          },
+          {
+            "cadence_scale": 0.1046808510638298,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 54090850124.11124
+          },
+          {
+            "cadence_scale": 0.18936170212765957,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 29876987077.33582
+          },
+          {
+            "cadence_scale": 0.2740425531914894,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 20610495072.137768
+          },
+          {
+            "cadence_scale": 0.3587234042553192,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 15685719086.38581
+          },
+          {
+            "cadence_scale": 0.44340425531914895,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 12686005959.555084
+          },
+          {
+            "cadence_scale": 0.5280851063829788,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 10622969233.842327
+          },
+          {
+            "cadence_scale": 0.6127659574468085,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 9111987729.360317
+          },
+          {
+            "cadence_scale": 0.6974468085106383,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 8003385497.338395
+          },
+          {
+            "cadence_scale": 0.7821276595744682,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 7130258285.606776
+          },
+          {
+            "cadence_scale": 0.8668085106382979,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 6415986078.836918
+          },
+          {
+            "cadence_scale": 0.9514893617021277,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 5819734067.371445
+          },
+          {
+            "cadence_scale": 1.0361702127659576,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 5331142922.684923
+          },
+          {
+            "cadence_scale": 1.1208510638297873,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 4926113537.53927
+          },
+          {
+            "cadence_scale": 1.205531914893617,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.0,
+            "mean_l2_distance": 4567972630.337308
+          },
+          {
+            "cadence_scale": 1.290212765957447,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999999999998,
+            "mean_l2_distance": 4253472147.5149784
+          },
+          {
+            "cadence_scale": 1.3748936170212767,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999999999749,
+            "mean_l2_distance": 3985152584.0510798
+          },
+          {
+            "cadence_scale": 1.4595744680851064,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999999990621,
+            "mean_l2_distance": 3750663381.0205593
+          },
+          {
+            "cadence_scale": 1.5442553191489363,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999999724665,
+            "mean_l2_distance": 3534148821.9806347
+          },
+          {
+            "cadence_scale": 1.628936170212766,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999994683602,
+            "mean_l2_distance": 3344425146.6224422
+          },
+          {
+            "cadence_scale": 1.7136170212765958,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999919603266,
+            "mean_l2_distance": 3170955657.2821484
+          },
+          {
+            "cadence_scale": 1.7982978723404257,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999999000465479,
+            "mean_l2_distance": 3011626937.1277566
+          },
+          {
+            "cadence_scale": 1.8829787234042554,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.999999134189892,
+            "mean_l2_distance": 2871085817.5403423
+          },
+          {
+            "cadence_scale": 1.9676595744680851,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999934790565452,
+            "mean_l2_distance": 2741702789.5520496
+          },
+          {
+            "cadence_scale": 2.052340425531915,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9999544951020394,
+            "mean_l2_distance": 2617363999.006957
+          },
+          {
+            "cadence_scale": 2.137021276595745,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9997576835170819,
+            "mean_l2_distance": 2509528577.040813
+          },
+          {
+            "cadence_scale": 2.2217021276595745,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9989230283059559,
+            "mean_l2_distance": 2414649800.164295
+          },
+          {
+            "cadence_scale": 2.3063829787234043,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9949998034246748,
+            "mean_l2_distance": 2316115167.549082
+          },
+          {
+            "cadence_scale": 2.391063829787234,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9810846618853534,
+            "mean_l2_distance": 2229627032.855779
+          },
+          {
+            "cadence_scale": 2.475744680851064,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.9351446875077888,
+            "mean_l2_distance": 2147453797.124497
+          },
+          {
+            "cadence_scale": 2.560425531914894,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.8079378843682671,
+            "mean_l2_distance": 2068418087.6940022
+          },
+          {
+            "cadence_scale": 2.6451063829787236,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.5909615500465557,
+            "mean_l2_distance": 1999572224.5492768
+          },
+          {
+            "cadence_scale": 2.7297872340425533,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.34892938014436714,
+            "mean_l2_distance": 1935683301.1337504
+          },
+          {
+            "cadence_scale": 2.814468085106383,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.1648613803606283,
+            "mean_l2_distance": 1871425794.5903707
+          },
+          {
+            "cadence_scale": 2.8991489361702127,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.07479057283140789,
+            "mean_l2_distance": 1814096814.9239194
+          },
+          {
+            "cadence_scale": 2.9838297872340425,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.031863505479725156,
+            "mean_l2_distance": 1756661711.013441
+          },
+          {
+            "cadence_scale": 3.0685106382978726,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.014349263353148322,
+            "mean_l2_distance": 1704682932.3498907
+          },
+          {
+            "cadence_scale": 3.1531914893617023,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.006573513581355445,
+            "mean_l2_distance": 1653995779.2953012
+          },
+          {
+            "cadence_scale": 3.237872340425532,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.003052483995106843,
+            "mean_l2_distance": 1604985884.283019
+          },
+          {
+            "cadence_scale": 3.322553191489362,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.0016136577897507037,
+            "mean_l2_distance": 1563949153.4786382
+          },
+          {
+            "cadence_scale": 3.4072340425531915,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.0008392753660655849,
+            "mean_l2_distance": 1521901559.0713305
+          },
+          {
+            "cadence_scale": 3.4919148936170212,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.00043940890352690484,
+            "mean_l2_distance": 1480717679.4809833
+          },
+          {
+            "cadence_scale": 3.5765957446808514,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.00025288413443991893,
+            "mean_l2_distance": 1445339152.8738184
+          },
+          {
+            "cadence_scale": 3.661276595744681,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 0.00013122477151115126,
+            "mean_l2_distance": 1403263422.055738
+          },
+          {
+            "cadence_scale": 3.745957446808511,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 7.516627546676403e-05,
+            "mean_l2_distance": 1367692676.3376942
+          },
+          {
+            "cadence_scale": 3.8306382978723406,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 4.6751272742719184e-05,
+            "mean_l2_distance": 1337418879.9724412
+          },
+          {
+            "cadence_scale": 3.9153191489361703,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 2.754610026676494e-05,
+            "mean_l2_distance": 1303454290.737452
+          },
+          {
+            "cadence_scale": 4.0,
+            "n_traces": 32,
+            "fraction_evading": 0.0,
+            "fraction_detected": 1.0,
+            "fraction_below_noise_floor": 0.0,
+            "mean_score": 1.7151059847470125e-05,
+            "mean_l2_distance": 1273210803.8067303
+          }
+        ],
+        "any_evasion_in_sweep": false,
+        "min_evasion_cadence_scale": null,
+        "covert_capacity_claim": "Tested continuous cadence sweep (0.02\u20134.0\u00d7 light baseline): no scale evades detector at operating point on held-out attested traces; adaptive-adversary covert capacity NOT established (preset-only evasion search retired).",
+        "preset_adaptive_note": "Three-preset adaptive search is not used for capacity claims; see continuous amplitude curve.",
+        "n_test_attested_traces": 32
       },
-      "bytes_matched_meta": null
+      "bytes_matched_meta": null,
+      "suite_status": "EVALUATED"
     }
   },
   "tier_red_note": "covert_modulator.py \u2014 measurement transforms only"

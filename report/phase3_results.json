@@ -1,71 +1,167 @@
 {
-  "methodology_version": "phase3.0",
+  "methodology_version": "phase3.1",
   "backend": "local-gpu",
   "scope": "local_only \u2014 no Azure",
-  "external_claims": "Azure Phase 4 gated; mitigation numbers PRELIMINARY until independent replay",
+  "phase1_baseline_source": "report/phase1_results.json",
+  "volume_reference_total_bytes_median": 127009652,
+  "overhead_measurement": "post-realistic_observer stream; bytes_ratio=mitigated/baseline (pad-up >=1)",
+  "leakage_policy": "Reduction only vs Phase-1 canonical baseline when axis_leaks=true; do not claim reduction from null/non-leaking baselines",
   "target_axes": [
     "mode",
     "batch_size"
   ],
   "mitigations": [
     "size_padding",
-    "constant_rpc"
+    "constant_rpc",
+    "constant_volume"
   ],
   "results": [
     {
       "mitigation": "size_padding",
       "label_axis": "mode",
-      "baseline_balanced_accuracy": 1.0,
-      "mitigated_balanced_accuracy": 0.9940476190476191,
-      "baseline_mi_bits": 0.6931471805599445,
-      "mitigated_mi_bits": 0.6478407959078061,
-      "leakage_reduction_balanced": 0.005952380952380931,
-      "overhead_bytes_ratio": 0.001087015603173814,
-      "overhead_event_ratio": 1.0
+      "phase1_canonical_baseline_balanced_accuracy": 1.0,
+      "phase1_canonical_majority_baseline": 0.6043360433604336,
+      "phase1_axis_leaks": true,
+      "mitigated_balanced_accuracy": 1.0,
+      "leakage_reduction_vs_phase1_baseline": 0.0,
+      "leakage_reduction_reportable": false,
+      "baseline_mi_bits": 0.6840404826584345,
+      "mitigated_mi_bits": 0.6840404826584345,
+      "overhead_bytes_ratio": 1.0003302886495173,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 1.0003234269254786,
+      "volume_channel_note": "Does not target total-volume channel (ablation \u2248 volume-only inference)."
     },
     {
       "mitigation": "size_padding",
       "label_axis": "batch_size",
-      "baseline_balanced_accuracy": 0.25,
-      "mitigated_balanced_accuracy": 0.25,
-      "baseline_mi_bits": 0.31708531579841936,
-      "mitigated_mi_bits": 0.0,
-      "leakage_reduction_balanced": 0.0,
-      "overhead_bytes_ratio": 0.001087015603173814,
-      "overhead_event_ratio": 1.0
+      "phase1_canonical_baseline_balanced_accuracy": 0.5,
+      "phase1_canonical_majority_baseline": 0.32786885245901637,
+      "phase1_axis_leaks": true,
+      "mitigated_balanced_accuracy": 0.4453125,
+      "leakage_reduction_vs_phase1_baseline": null,
+      "leakage_reduction_reportable": false,
+      "baseline_mi_bits": 0.6326591066986162,
+      "mitigated_mi_bits": 0.6326591066986162,
+      "overhead_bytes_ratio": 1.0003302886495173,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 1.0003234269254786,
+      "volume_channel_note": "Does not target total-volume channel (ablation \u2248 volume-only inference)."
     },
     {
       "mitigation": "constant_rpc",
       "label_axis": "mode",
-      "baseline_balanced_accuracy": 1.0,
+      "phase1_canonical_baseline_balanced_accuracy": 1.0,
+      "phase1_canonical_majority_baseline": 0.6043360433604336,
+      "phase1_axis_leaks": true,
       "mitigated_balanced_accuracy": 1.0,
+      "leakage_reduction_vs_phase1_baseline": 0.0,
+      "leakage_reduction_reportable": false,
       "baseline_mi_bits": 0.6931471805599445,
-      "mitigated_mi_bits": 0.6931471805599454,
-      "leakage_reduction_balanced": 0.0,
-      "overhead_bytes_ratio": 6.793847519836338e-05,
-      "overhead_event_ratio": 1.0
+      "mitigated_mi_bits": 0.6931471805599445,
+      "overhead_bytes_ratio": 4.251317548248438e-05,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 0.034561299209892794,
+      "volume_channel_note": "Does not target total-volume channel (ablation \u2248 volume-only inference)."
     },
     {
       "mitigation": "constant_rpc",
       "label_axis": "batch_size",
-      "baseline_balanced_accuracy": 0.25,
-      "mitigated_balanced_accuracy": 0.03125,
-      "baseline_mi_bits": 0.31708531579841936,
-      "mitigated_mi_bits": 0.2809025102806451,
-      "leakage_reduction_balanced": 0.21875,
-      "overhead_bytes_ratio": 6.793847519836338e-05,
-      "overhead_event_ratio": 1.0
+      "phase1_canonical_baseline_balanced_accuracy": 0.5,
+      "phase1_canonical_majority_baseline": 0.32786885245901637,
+      "phase1_axis_leaks": true,
+      "mitigated_balanced_accuracy": 0.25,
+      "leakage_reduction_vs_phase1_baseline": null,
+      "leakage_reduction_reportable": false,
+      "baseline_mi_bits": 0.33891639626410475,
+      "mitigated_mi_bits": 0.33891639626410475,
+      "overhead_bytes_ratio": 4.251317548248438e-05,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 0.034561299209892794,
+      "volume_channel_note": "Does not target total-volume channel (ablation \u2248 volume-only inference)."
+    },
+    {
+      "mitigation": "constant_volume",
+      "label_axis": "mode",
+      "phase1_canonical_baseline_balanced_accuracy": 1.0,
+      "phase1_canonical_majority_baseline": 0.6043360433604336,
+      "phase1_axis_leaks": true,
+      "mitigated_balanced_accuracy": 1.0,
+      "leakage_reduction_vs_phase1_baseline": 0.0,
+      "leakage_reduction_reportable": false,
+      "baseline_mi_bits": 0.6931471805599454,
+      "mitigated_mi_bits": 0.6931471805599454,
+      "overhead_bytes_ratio": 0.39883609482284377,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 1.0003234269254786,
+      "volume_channel_note": "Targets total-byte volume shaping to corpus median."
+    },
+    {
+      "mitigation": "constant_volume",
+      "label_axis": "batch_size",
+      "phase1_canonical_baseline_balanced_accuracy": 0.5,
+      "phase1_canonical_majority_baseline": 0.32786885245901637,
+      "phase1_axis_leaks": true,
+      "mitigated_balanced_accuracy": 0.25,
+      "leakage_reduction_vs_phase1_baseline": null,
+      "leakage_reduction_reportable": false,
+      "baseline_mi_bits": 0.08364970461058867,
+      "mitigated_mi_bits": 0.08364970461058867,
+      "overhead_bytes_ratio": 0.39883609482284377,
+      "overhead_event_ratio": 1.001489831897301,
+      "overhead_time_ratio": 1.0003234269254786,
+      "volume_channel_note": "Targets total-byte volume shaping to corpus median."
     }
   ],
   "overhead": {
     "size_padding": {
-      "bytes_ratio": 0.001087015603173814,
-      "event_count_ratio": 1.0
+      "bytes_ratio": 1.0003302886495173,
+      "event_count_ratio": 1.001489831897301,
+      "time_span_ratio": 1.0003234269254786,
+      "detail": {
+        "mean_baseline_total_bytes": 318450680.21153843,
+        "mean_mitigated_total_bytes": 318555860.8566434,
+        "mean_baseline_events": 52.80550699300699,
+        "mean_mitigated_events": 52.88417832167832,
+        "bugfix": "measured post-realistic_observer (was wrongly compared raw host vs mitigated raw)",
+        "pad_up_semantics": "size_padding uses max(size, block) so bytes_ratio must be >= 1"
+      },
+      "bytes_ratio_interpretation": "mitigated/baseline total bytes on observer path; pad-up mitigations expect >= 1"
     },
     "constant_rpc": {
-      "bytes_ratio": 6.793847519836338e-05,
-      "event_count_ratio": 1.0
+      "bytes_ratio": 4.251317548248438e-05,
+      "event_count_ratio": 1.001489831897301,
+      "time_span_ratio": 0.034561299209892794,
+      "detail": {
+        "mean_baseline_total_bytes": 318450680.21153843,
+        "mean_mitigated_total_bytes": 13538.34965034965,
+        "mean_baseline_events": 52.80550699300699,
+        "mean_mitigated_events": 52.88417832167832,
+        "bugfix": "measured post-realistic_observer (was wrongly compared raw host vs mitigated raw)",
+        "pad_up_semantics": "size_padding uses max(size, block) so bytes_ratio must be >= 1"
+      },
+      "bytes_ratio_interpretation": "constant_rpc fixes 256 B RPCs \u2014 total bytes may shrink vs baseline"
+    },
+    "constant_volume": {
+      "bytes_ratio": 0.39883609482284377,
+      "event_count_ratio": 1.001489831897301,
+      "time_span_ratio": 1.0003234269254786,
+      "detail": {
+        "mean_baseline_total_bytes": 318450680.21153843,
+        "mean_mitigated_total_bytes": 127009625.68924825,
+        "mean_baseline_events": 52.80550699300699,
+        "mean_mitigated_events": 52.88417832167832,
+        "bugfix": "measured post-realistic_observer (was wrongly compared raw host vs mitigated raw)",
+        "pad_up_semantics": "size_padding uses max(size, block) so bytes_ratio must be >= 1"
+      },
+      "bytes_ratio_interpretation": "constant_volume targets corpus median (ratio near 1 on average)"
     }
   },
-  "gate_status": "STOP \u2014 Phase 3 gate (mitigation measured)"
+  "volume_channel_findings": {
+    "size_padding_on_mode": "No reportable reduction on mode (size/cadence defense; does not remove total-volume channel)",
+    "constant_rpc_on_mode": "No reportable volume-channel reduction (expected)",
+    "constant_volume_on_mode": "Phase-1 baseline bal=1.000 \u2192 mitigated=1.000; reportable reduction=False"
+  },
+  "gate_status": "STOP \u2014 Phase 3 gate (mitigation measured)",
+  "phase_4_external": "GATED"
 }
