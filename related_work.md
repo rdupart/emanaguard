@@ -1,7 +1,9 @@
 # Related Work Survey — H100 CC Trust Boundary for AI Model-Weight Protection
 
-**Assessment date:** 2026-06-03  
-**Scope:** NVIDIA H100/Hopper confidential computing (CC), GPU/PCIe/NVLink I/O side channels, model extraction via system channels, attestation-gated secret release, SL5 / frontier weight-protection framing.
+**Assessment date:** 2026-06-03 (Phase 0.5 targeted update: 2026-06-03)  
+**Scope:** NVIDIA H100/Hopper confidential computing (CC), host-observable I/O metadata, workload inference, policy-violation detection, SL5 frontier weight-protection framing.
+
+**Project positioning:** Extends arXiv:2507.02770 (GPU-CC security analysis); we do **not** claim discovery of the CPU–GSP DMA **timing vs. size** channel—they reported it. Our deltas are workload inference (D1), policy-violation detection (D2), mitigation evaluation (D3), and SL5-focused control overlay diff (D4).
 
 **Verification policy:** Each entry below was checked against a primary landing page (publisher, arXiv, NVIDIA docs, or RAND). Entries marked **UNVERIFIED** could not be fully confirmed from primary metadata during this review.
 
@@ -133,4 +135,41 @@
 
 ---
 
-*End of related work survey. No project code was produced as part of this assessment.*
+---
+
+## Phase 0.5 addendum (2026-06-03) — targeted surveys
+
+*Sections 8–9 above reflect the earlier four-contribution framing. **D1–D4** below supersede that table for the current project.*
+
+### (a) Workload / architecture inference from CPU–GPU I/O metadata → **D1**
+
+| Title | Authors | Venue / year | Link |
+|-------|---------|--------------|------|
+| *Invisible Probe: Timing Attacks with PCIe Congestion Side-channel* | Mingtian Tan, Junpeng Wan, Zhe Zhou, Zhou Li | IEEE S&P 2021 | https://doi.org/10.1109/SP40001.2021.00030 |
+| *LockedDown: Exploiting Contention on Host-GPU PCIe Bus for Fun and Profit* | Mert Side, Fan Yao, Zhenkai Zhang | EuroS&P 2022 | https://www.mertside.com/documents/lockeddown/2022-EuroSP-LockedDown.pdf |
+| *Blueprint, Bootstrap, and Bridge: A Security Look at NVIDIA GPU Confidential Computing* | Anonymous (preprint) | arXiv 2025 | https://arxiv.org/abs/2507.02770 |
+| *Bandwidth Utilization Side-Channel on ML Inference Accelerators* | **UNVERIFIED — full author list** | arXiv 2021 | https://arxiv.org/abs/2110.07157 |
+
+**Gap:** Pre-CC coarse ML/activity fingerprinting exists. **No verified paper** classifies `{model class, batch, seq len, train vs infer, prefill vs decode}` from **host-visible CC staging telemetry**.
+
+### (b) Anomaly / policy-violation detection → **D2**
+
+| Title | Authors | Venue / year | Link |
+|-------|---------|--------------|------|
+| *Overcoming the Pitfalls of HPC-based Cryptojacking Detection in Presence of GPUs* | **UNVERIFIED — author list** | ACM CODASPY 2023 | https://doi.org/10.1145/3577923.3583655 |
+| *MagTracer: Detecting GPU Cryptojacking Attacks via Magnetic Leakage Signals* | Rui Xiao, Tianyu Li, Soundarya Ramesh, Jun Han, Jinsong Han | ACM MobiCom 2023 | https://doi.org/10.1145/3570361.3613283 |
+| *ShadowScope: GPU Monitoring and Validation via Composable Side Channel Signals* | **UNVERIFIED — full author list** | arXiv 2025 | https://arxiv.org/abs/2509.00300 |
+
+**Gap:** No verified detector for **deviation from attested workload** using **only** GPU-CC **host-visible** I/O metadata.
+
+### (c) D1 / D2 with **CC enabled**
+
+| Work | CC on? | Notes |
+|------|--------|-------|
+| arXiv:2507.02770 | **Yes** | Timing vs transfer size on CPU–GSP path; **does not** do D1 classifiers or D2 detector |
+| Invisible Probe / LockedDown | No | Pre-CC PCIe contention |
+| Lee et al., arXiv:2501.11771 | Yes | Performance of encrypted links, not inference |
+
+---
+
+*End of related work survey. See `delta_assessment.md`, `observer_feasibility.md`.*
