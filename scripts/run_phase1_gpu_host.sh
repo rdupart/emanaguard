@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 -m pip install -r requirements.txt
-python3 -m pipeline.cli collect --backend local-gpu --out-dir data/traces/local-gpu --seeds "${SEEDS:-0,1,2,3,4,5,6,7}"
-python3 -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces/local-gpu --out-json report/phase1_results.json
+python3 -m pipeline.cli collect --backend local-gpu --out-dir data/traces --seeds "${SEEDS:-0,1,2,3,4,5,6,7}"
+python3 -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces --out-json report/phase1_results.json
 python3 report/generate_phase1_report.py
 echo "Wrote PHASE_1_REPORT.md"

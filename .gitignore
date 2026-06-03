@@ -4,5 +4,5 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
-data/traces/**/*.jsonl
-report/phase1_results.json
+# Keep jsonl traces in-repo when collected (Phase 1 corpus); omit only local scratch
+# report/phase1_results.json is committed for gate reproducibility

@@ -119,13 +119,13 @@ def main(argv: list[str] | None = None) -> int:
 
     p_collect = sub.add_parser("collect", help="Collect traces")
     p_collect.add_argument("--backend", choices=["local-gpu", "simulate", "azure-cc"])
-    p_collect.add_argument("--out-dir", default="data/traces/local-gpu")
+    p_collect.add_argument("--out-dir", default="data/traces")
     p_collect.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
     p_collect.set_defaults(func=cmd_collect)
 
     p_eval = sub.add_parser("evaluate", help="Evaluate traces (local-gpu only for metrics)")
     p_eval.add_argument("--backend", choices=["local-gpu", "simulate", "azure-cc"])
-    p_eval.add_argument("--trace-dir", default="data/traces/local-gpu")
+    p_eval.add_argument("--trace-dir", default="data/traces")
     p_eval.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
     p_eval.add_argument("--out-json", default="report/phase1_results.json")
     p_eval.add_argument("--force-collect", action="store_true")
@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p_p1 = sub.add_parser("phase1", help="Collect + evaluate local-gpu")
     p_p1.add_argument("--backend", default="local-gpu")
-    p_p1.add_argument("--trace-dir", default="data/traces/local-gpu")
+    p_p1.add_argument("--trace-dir", default="data/traces")
     p_p1.add_argument("--seeds", default="0,1,2,3,4,5,6,7")
     p_p1.add_argument("--results-json", default="report/phase1_results.json")
     p_p1.set_defaults(func=cmd_phase1)

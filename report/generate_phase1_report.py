@@ -39,8 +39,8 @@ This Cloud Agent VM has **no CUDA GPU** (`torch.cuda.is_available() == False`). 
 ```bash
 pip install -r requirements.txt
 # Install CUDA-matched PyTorch per https://pytorch.org/get-started/locally/
-python -m pipeline.cli collect --backend local-gpu --out-dir data/traces/local-gpu --seeds 0,1,2,3,4,5,6,7
-python -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces/local-gpu --out-json report/phase1_results.json
+python -m pipeline.cli collect --backend local-gpu --out-dir data/traces --seeds 0,1,2,3,4,5,6,7
+python -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces --out-json report/phase1_results.json
 python report/generate_phase1_report.py
 ```
 

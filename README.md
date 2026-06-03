@@ -20,11 +20,11 @@ pip install -r requirements.txt
 ```bash
 # Collect real traces (requires CUDA)
 python3 -m pipeline.cli collect --backend local-gpu \
-  --out-dir data/traces/local-gpu --seeds 0,1,2,3,4,5,6,7
+  --out-dir data/traces --seeds 0,1,2,3,4,5,6,7
 
 # Evaluate — headline metrics from host_observer (b) only
 python3 -m pipeline.cli evaluate --backend local-gpu \
-  --trace-dir data/traces/local-gpu --out-json report/phase1_results.json
+  --trace-dir data/traces --out-json report/phase1_results.json
 
 # Regenerate gate report
 python3 report/generate_phase1_report.py

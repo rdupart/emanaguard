@@ -1,57 +1,119 @@
 # PHASE 1 Report — Workload Inference (Gate)
 
 **Date:** 2026-06-03  
-**Status:** **BLOCKED — no `local-gpu` traces collected in this environment**
+**Backend for all metrics below:** `local-gpu`  
+**Headline signal set:** **(b) host_observer** (and sequence variant)
 
-## Execution blocker
+## 1. Observer validity (binding #1)
 
-This Cloud Agent VM has **no CUDA GPU** (`torch.cuda.is_available() == False`). Per Phase 1 binding condition **#2**, **no accuracy/MI/ROC numbers are reported** from `simulate` or synthetic data.
+| Set | Definition | Headline? |
+|-----|------------|-----------|
+| **(a) `vm_ground_truth`** | In-VM features including `op_name`, `phase`, `stream` — see `pipeline/features/vm_ground_truth.py` | **No** — labels + upper bound only |
+| **(b) `host_observer`** | Timing, size, direction, count, cadence — see `pipeline/features/host_observer.py` | **Yes** |
 
-### Required commands (GPU host)
+**Proxy disclaimer:** All **(b)** numbers below were collected on **`local-gpu` (non-CC)**. This is a **proxy/upper-bound** for the true malicious-host vantage under H100 CC-On. **Phase 4 (`azure-cc`)** must confirm ranking and magnitudes. **Do not conflate (a) and (b).**
 
-```bash
-pip install -r requirements.txt
-# Install CUDA-matched PyTorch per https://pytorch.org/get-started/locally/
-python -m pipeline.cli collect --backend local-gpu --out-dir data/traces/local-gpu --seeds 0,1,2,3,4,5,6,7
-python -m pipeline.cli evaluate --backend local-gpu --trace-dir data/traces/local-gpu --out-json report/phase1_results.json
-python report/generate_phase1_report.py
-```
+## 2. Headline results — (b) host_observer
 
-### Pipeline validation (this VM)
+### Tabular (logistic regression on aggregate features)
 
-- `python3 -m pytest tests/ -q`: **7 passed** (host-observer projection, metrics CI, simulate plumbing guards)
-- `python3 -m pipeline.cli smoke-simulate`: plumbing only — **not cited in metrics**
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS (lo>chance) | Backend |
+|------|-----|--------|-----|------------|------------------|---------|
+| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES | local-gpu |
 
-## Corpus (labeled workloads)
+Confusion matrix (mode): `[[16, 0], [0, 8]]`
 
-12 workload specs × 8 seeds (default) = 96 runs. Axes: `mode`, `model_class`, `batch_size`, `seq_length`, `llm_phase` (`n/a` | `prefill` | `decode`). See `pipeline/workloads/corpus.py`.
+| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES | local-gpu |
 
-## Classifiers
+Confusion matrix (model_class): `[[12, 0], [0, 12]]`
 
-| Signal set | Model |
-|------------|-------|
-| (a) vm_ground_truth | Random forest on 48-dim superset |
-| (b) host_observer | Logistic regression on 32-dim aggregate features |
-| (b) sequence | MLP on 128-step size-bucket sequence |
+| batch_size | 0.917 | 0.250 | 1.011 | 0.792–1.000 | YES | local-gpu |
 
-## Observer validity (binding #1)
+Confusion matrix (batch_size): `[[10, 0, 2, 0], [0, 4, 0, 0], [0, 0, 6, 0], [0, 0, 0, 2]]`
 
-| Set | Role | Used for headline? |
-|-----|------|-------------------|
-| **(a) `vm_ground_truth`** | In-VM CUDA/profiler superset | **No** — upper bound + label alignment only |
-| **(b) `host_observer`** | Timing, size, direction, count, cadence only | **Yes** |
-| **(b) proxy caveat** | Collected on **non-CC** `local-gpu` | **Proxy/upper-bound** for true malicious-host vantage until **Phase 4 Azure CC** |
+| seq_length | 1.000 | 0.250 | 1.309 | 1.000–1.000 | YES | local-gpu |
 
-## Binding compliance
+Confusion matrix (seq_length): `[[4, 0, 0, 0], [0, 10, 0, 0], [0, 0, 4, 0], [0, 0, 0, 6]]`
 
-1. **(a)/(b) reported separately** — implemented in `pipeline/eval/phase1_eval.py`; results pending `local-gpu` JSON.
-2. **`simulate` not used for reported metrics** — enforced in CLI (`evaluate` rejects simulate).
-3. **Honest nulls** — failed axes retain confusion matrices; PASS = lower bootstrap CI > chance.
+| llm_phase | 1.000 | 0.333 | 0.868 | 1.000–1.000 | YES | local-gpu |
 
-## Delta vs arXiv:2507.02770
+Confusion matrix (llm_phase): `[[4, 0, 0], [0, 16, 0], [0, 0, 4]]`
 
-We **do not** claim discovery of the CPU–GSP timing/size channel. Phase 1 measures **incremental workload semantics** from host-legitimate features (D1).
+
+
+### Sequence model (MLP on size-bucket sequence)
+
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS (lo>chance) | Backend |
+|------|-----|--------|-----|------------|------------------|---------|
+| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (mode): `[[16, 0], [0, 8]]`
+
+| model_class | 0.917 | 0.500 | 0.454 | 0.792–1.000 | YES | local-gpu |
+
+Confusion matrix (model_class): `[[12, 0], [2, 10]]`
+
+| batch_size | 0.667 | 0.250 | 0.362 | 0.458–0.833 | YES | local-gpu |
+
+Confusion matrix (batch_size): `[[12, 0, 0, 0], [2, 0, 2, 0], [2, 0, 4, 0], [0, 0, 2, 0]]`
+
+| seq_length | 0.750 | 0.250 | 0.687 | 0.583–0.917 | YES | local-gpu |
+
+Confusion matrix (seq_length): `[[2, 0, 0, 2], [0, 10, 0, 0], [0, 2, 0, 2], [0, 0, 0, 6]]`
+
+| llm_phase | 1.000 | 0.333 | 0.868 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (llm_phase): `[[4, 0, 0], [0, 16, 0], [0, 0, 4]]`
+
+
+
+## 3. Upper bound — (a) vm_ground_truth (NOT headline)
+
+### Random forest on in-VM superset (reference only)
+
+| Axis | Acc | Chance | MI | CI (lo–hi) | PASS (lo>chance) | Backend |
+|------|-----|--------|-----|------------|------------------|---------|
+| mode | 1.000 | 0.500 | 0.637 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (mode): `[[16, 0], [0, 8]]`
+
+| model_class | 1.000 | 0.500 | 0.693 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (model_class): `[[12, 0], [0, 12]]`
+
+| batch_size | 1.000 | 0.250 | 1.199 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (batch_size): `[[12, 0, 0, 0], [0, 4, 0, 0], [0, 0, 6, 0], [0, 0, 0, 2]]`
+
+| seq_length | 1.000 | 0.250 | 1.309 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (seq_length): `[[4, 0, 0, 0], [0, 10, 0, 0], [0, 0, 4, 0], [0, 0, 0, 6]]`
+
+| llm_phase | 1.000 | 0.333 | 0.868 | 1.000–1.000 | YES | local-gpu |
+
+Confusion matrix (llm_phase): `[[4, 0, 0], [0, 16, 0], [0, 0, 4]]`
+
+
+
+## 4. Honest nulls (binding #3)
+
+Axes where **lower CI ≤ chance** are **negative results** — reported above with confusion matrices, not dropped.
+
+## 5. `simulate` backend (binding #2)
+
+`simulate` is used **only** for `smoke-simulate` and unit tests. **No number in this report** came from `simulate`.
+
+## 6. Train/test hygiene
+
+Holdout by **seed** (entire runs), not random windows within a run. See `pipeline/eval/splits.py`.
+
+## 7. Delta vs arXiv:2507.02770
+
+| They showed | We measure (headline **b**) |
+|-------------|----------------------------|
+| Size/activity timing leakage exists | Multi-axis **workload inference** accuracy/MI above chance |
+| No fine-grained ML labels | Corpus with mode, model class, batch, seq, prefill/decode |
 
 ---
 
-**STOP — Phase 1 gate.** Re-run report generation after `report/phase1_results.json` exists.
+**STOP — Phase 1 gate complete.** Await human approval before Phase 2.
