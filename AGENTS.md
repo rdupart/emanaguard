@@ -2,40 +2,49 @@
 
 Guidance for AI agents and developers working in **emanaguard**.
 
-## Repository status
+## Project overview
 
-As of the initial commit, this repository contains only `README.md` (project title). There is no application source, package manifest, Docker/Compose configuration, CI workflows, or test suite yet.
-
-When application code is added, update this file with stack-specific commands (install, lint, test, run).
+pnpm monorepo: shared types, Express API (`apps/api`), Vite React UI (`apps/web`). Incidents are stored in memory (resets on API restart).
 
 ## Cursor Cloud specific instructions
 
-### What runs today
+### Services (dev)
 
-No local services are required. There is nothing to lint, test, build, or run beyond normal Git operations on the repo itself.
+| Service | Required | Port | Start |
+|---------|----------|------|--------|
+| API | MUST | 3001 | Included in `pnpm dev` (`@emanaguard/api`) |
+| Web | MUST | 5173 | Included in `pnpm dev` (`@emanaguard/web`) |
+| Shared (build/watch) | MUST (types) | — | `pnpm dev` builds shared once, then `tsc --watch` |
 
-### VM tooling (available for future work)
+Start both app processes from the repo root:
 
-The Cloud Agent VM typically includes:
+```bash
+pnpm dev
+```
 
-- **Git** — clone, branch, commit, push
-- **Node.js** (via nvm) and **npm** / **pnpm**
-- **Python 3.12**
+Do not run only the web app without the API — the UI will show a connection error.
 
-After you add a stack (e.g. `package.json`, `pyproject.toml`, `docker-compose.yml`), document the exact install and dev commands here instead of guessing.
+### Commands (from repo root)
 
-### Suggested workflow once code exists
+| Task | Command |
+|------|---------|
+| Install deps | `pnpm install` |
+| Dev servers | `pnpm dev` |
+| Lint | `pnpm lint` |
+| Test | `pnpm test` |
+| Build | `pnpm build` |
+| Typecheck | `pnpm typecheck` |
 
-1. Install dependencies using the repo’s lockfile and package manager (`package-lock.json` → npm, `pnpm-lock.yaml` → pnpm, etc.).
-2. Copy or create env files from `.env.example` if the project documents them.
-3. Start required services (API, DB, frontend) per README or `docker compose` — not via the VM update script.
-4. Run lint and tests before claiming a change is complete.
+### Environment variables
 
-### Update script scope
-
-The VM **update script** only refreshes dependencies on session start. It must stay minimal (e.g. `npm install`, `pnpm install`). Do not put `docker compose up`, dev servers, migrations, or test commands in the update script.
+None required for local dev. Optional: `PORT` on the API (default `3001`).
 
 ### Gotchas
 
-- **Empty tree**: Agents should not invent a full app stack; follow manifests and README once they exist.
-- **Remote**: `origin` points at `github.com/rdupart/emanaguard`; only `main` exists today.
+- **`@emanaguard/shared` must be built** before API tests or dev import resolved `dist/`. Root `pnpm dev` and `pnpm test` run `pnpm --filter @emanaguard/shared build` first.
+- **Web proxy**: Vite proxies `/api` → `http://localhost:3001`; curl the API directly on 3001 for debugging.
+- **In-memory data**: Restarting the API clears incidents.
+
+### Update script scope
+
+VM startup should run only `pnpm install` (not `pnpm dev` or Docker).
