@@ -4,78 +4,186 @@
   "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
   "external_claims_status": "BLOCKED until scale + held-out-model gates pass",
   "corpus_statistics": {
-    "physical_base_captures": 96,
-    "stochastic_observation_draws": 3840,
+    "physical_base_captures": 4576,
+    "stochastic_observation_draws": 183040,
     "observations_per_base_capture": 40,
-    "num_configs": 12,
+    "num_configs": 39,
     "observation_draws_per_config": {
-      "w00_train": 320,
+      "w00_train": 6720,
+      "w01_infer": 6400,
       "w01_train": 320,
       "w02_train_large_n_a": 320,
+      "w02_train": 6400,
+      "w03_infer": 6400,
       "w03_train_large_n_a": 320,
       "w04_infer": 320,
+      "w04_train_medium_n_a": 6400,
+      "w05_infer_medium_n_a": 6400,
       "w05_infer": 320,
       "w06_infer_large_n_a": 320,
+      "w06_train_medium_n_a": 6400,
       "w07_infer_large_n_a": 320,
+      "w07_infer_medium_n_a": 6400,
       "w08_infer": 320,
+      "w08_train_medium_n_a": 6400,
+      "w09_infer_medium_n_a": 6400,
       "w09_infer": 320,
       "w10_infer_large_prefill": 320,
-      "w11_infer_large_decode": 320
+      "w10_train_large_n_a": 6400,
+      "w11_infer_large_decode": 320,
+      "w11_infer_large_n_a": 6400,
+      "w12_train_large_n_a": 6400,
+      "w13_infer_large_n_a": 6400,
+      "w14_train_large_n_a": 6400,
+      "w15_infer_large_n_a": 6400,
+      "w16_train_large_n_a": 6400,
+      "w17_infer_large_n_a": 6400,
+      "w18_train_large_n_a": 6400,
+      "w19_infer_large_n_a": 6400,
+      "w20_train": 6400,
+      "w21_train": 6400,
+      "w22_train_medium_n_a": 6400,
+      "w23_train_medium_n_a": 6400,
+      "w24_infer": 6400,
+      "w25_infer": 6400,
+      "w26_infer": 6400,
+      "w27_infer": 6400
     },
-    "mean_draws_per_config": 320.0,
-    "unique_base_captures": 96,
-    "total_runs": 3840,
+    "mean_draws_per_config": 4693.333333333333,
+    "unique_base_captures": 4576,
+    "total_runs": 183040,
     "runs_per_config": {
-      "w00_train": 320,
+      "w00_train": 6720,
+      "w01_infer": 6400,
       "w01_train": 320,
       "w02_train_large_n_a": 320,
+      "w02_train": 6400,
+      "w03_infer": 6400,
       "w03_train_large_n_a": 320,
       "w04_infer": 320,
+      "w04_train_medium_n_a": 6400,
+      "w05_infer_medium_n_a": 6400,
       "w05_infer": 320,
       "w06_infer_large_n_a": 320,
+      "w06_train_medium_n_a": 6400,
       "w07_infer_large_n_a": 320,
+      "w07_infer_medium_n_a": 6400,
       "w08_infer": 320,
+      "w08_train_medium_n_a": 6400,
+      "w09_infer_medium_n_a": 6400,
       "w09_infer": 320,
       "w10_infer_large_prefill": 320,
-      "w11_infer_large_decode": 320
+      "w10_train_large_n_a": 6400,
+      "w11_infer_large_decode": 320,
+      "w11_infer_large_n_a": 6400,
+      "w12_train_large_n_a": 6400,
+      "w13_infer_large_n_a": 6400,
+      "w14_train_large_n_a": 6400,
+      "w15_infer_large_n_a": 6400,
+      "w16_train_large_n_a": 6400,
+      "w17_infer_large_n_a": 6400,
+      "w18_train_large_n_a": 6400,
+      "w19_infer_large_n_a": 6400,
+      "w20_train": 6400,
+      "w21_train": 6400,
+      "w22_train_medium_n_a": 6400,
+      "w23_train_medium_n_a": 6400,
+      "w24_infer": 6400,
+      "w25_infer": 6400,
+      "w26_infer": 6400,
+      "w27_infer": 6400
     },
     "terminology_note": "'stochastic_observation_draws' are NOT additional GPU executions; only physical_base_captures are real local-gpu collects."
   },
   "corpus_statistics_single_draw": {
-    "physical_base_captures": 96,
-    "stochastic_observation_draws": 96,
+    "physical_base_captures": 4576,
+    "stochastic_observation_draws": 4576,
     "observations_per_base_capture": 1,
-    "num_configs": 12,
+    "num_configs": 39,
     "observation_draws_per_config": {
-      "w00_train": 8,
+      "w00_train": 168,
+      "w01_infer": 160,
       "w01_train": 8,
       "w02_train_large_n_a": 8,
+      "w02_train": 160,
+      "w03_infer": 160,
       "w03_train_large_n_a": 8,
       "w04_infer": 8,
+      "w04_train_medium_n_a": 160,
+      "w05_infer_medium_n_a": 160,
       "w05_infer": 8,
       "w06_infer_large_n_a": 8,
+      "w06_train_medium_n_a": 160,
       "w07_infer_large_n_a": 8,
+      "w07_infer_medium_n_a": 160,
       "w08_infer": 8,
+      "w08_train_medium_n_a": 160,
+      "w09_infer_medium_n_a": 160,
       "w09_infer": 8,
       "w10_infer_large_prefill": 8,
-      "w11_infer_large_decode": 8
+      "w10_train_large_n_a": 160,
+      "w11_infer_large_decode": 8,
+      "w11_infer_large_n_a": 160,
+      "w12_train_large_n_a": 160,
+      "w13_infer_large_n_a": 160,
+      "w14_train_large_n_a": 160,
+      "w15_infer_large_n_a": 160,
+      "w16_train_large_n_a": 160,
+      "w17_infer_large_n_a": 160,
+      "w18_train_large_n_a": 160,
+      "w19_infer_large_n_a": 160,
+      "w20_train": 160,
+      "w21_train": 160,
+      "w22_train_medium_n_a": 160,
+      "w23_train_medium_n_a": 160,
+      "w24_infer": 160,
+      "w25_infer": 160,
+      "w26_infer": 160,
+      "w27_infer": 160
     },
-    "mean_draws_per_config": 8.0,
-    "unique_base_captures": 96,
-    "total_runs": 96,
+    "mean_draws_per_config": 117.33333333333333,
+    "unique_base_captures": 4576,
+    "total_runs": 4576,
     "runs_per_config": {
-      "w00_train": 8,
+      "w00_train": 168,
+      "w01_infer": 160,
       "w01_train": 8,
       "w02_train_large_n_a": 8,
+      "w02_train": 160,
+      "w03_infer": 160,
       "w03_train_large_n_a": 8,
       "w04_infer": 8,
+      "w04_train_medium_n_a": 160,
+      "w05_infer_medium_n_a": 160,
       "w05_infer": 8,
       "w06_infer_large_n_a": 8,
+      "w06_train_medium_n_a": 160,
       "w07_infer_large_n_a": 8,
+      "w07_infer_medium_n_a": 160,
       "w08_infer": 8,
+      "w08_train_medium_n_a": 160,
+      "w09_infer_medium_n_a": 160,
       "w09_infer": 8,
       "w10_infer_large_prefill": 8,
-      "w11_infer_large_decode": 8
+      "w10_train_large_n_a": 160,
+      "w11_infer_large_decode": 8,
+      "w11_infer_large_n_a": 160,
+      "w12_train_large_n_a": 160,
+      "w13_infer_large_n_a": 160,
+      "w14_train_large_n_a": 160,
+      "w15_infer_large_n_a": 160,
+      "w16_train_large_n_a": 160,
+      "w17_infer_large_n_a": 160,
+      "w18_train_large_n_a": 160,
+      "w19_infer_large_n_a": 160,
+      "w20_train": 160,
+      "w21_train": 160,
+      "w22_train_medium_n_a": 160,
+      "w23_train_medium_n_a": 160,
+      "w24_infer": 160,
+      "w25_infer": 160,
+      "w26_infer": 160,
+      "w27_infer": 160
     },
     "terminology_note": "'single_draw_per_base' are NOT additional GPU executions; only physical_base_captures are real local-gpu collects."
   },
@@ -87,7 +195,7 @@
   },
   "architecture_labeling_audit": {
     "doc": "docs/architecture_labeling_audit.md",
-    "physical_distinct_architecture_ids": 2,
+    "physical_distinct_architecture_ids": 12,
     "target_architecture_ids_in_corpus_spec": [
       "arch_mlp_128x3",
       "arch_mlp_256x4",
@@ -107,8 +215,8 @@
       "report_in_headline": false
     },
     "architecture_id": {
-      "status": "RETRACTED_INSUFFICIENT_CORPUS",
-      "report_in_headline": false
+      "status": "CANONICAL_PENDING_GATES",
+      "report_in_headline": true
     }
   },
   "gate_summary": {
@@ -122,22 +230,22 @@
       "label_axis": "mode",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -151,26 +259,34 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8591549295774648,
+      "mi_bits": 0.8095891089273535,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          488,
+          0,
           0
         ],
         [
           0,
-          8
+          320,
+          0
+        ],
+        [
+          0,
+          160,
+          168
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": "model_class confounded with mode/volume \u2014 see docs/architecture_labeling_audit.md",
@@ -180,48 +296,218 @@
       "label_axis": "architecture_id",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.006188118811881188,
+      "mi_bits": 2.1807606823451846,
+      "ci_lower": 0.0024752475247524753,
+      "ci_upper": 0.009900990099009901,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
           8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         [
           0,
-          8
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          146,
+          0,
+          0,
+          14,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          159,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
-      "notes": "only 2 physical architectures (need >=8); collect expanded corpus",
-      "claim_status": "RETRACTED_INSUFFICIENT_CORPUS"
+      "notes": "",
+      "claim_status": "PRELIMINARY_PENDING_HELD_OUT"
     },
     {
       "label_axis": "batch_size",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.4375,
-      "mi_bits": 0.37395006399059,
-      "ci_lower": 0.28125,
-      "ci_upper": 0.625,
+      "accuracy": 0.9696180555555556,
+      "mi_bits": 0.6740819477863192,
+      "ci_lower": 0.9592013888888888,
+      "ci_upper": 0.9791666666666666,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          7,
+          648,
           0,
-          1,
+          0,
           0
         ],
         [
@@ -231,10 +517,10 @@
           0
         ],
         [
-          1,
+          2,
           0,
-          7,
-          0
+          469,
+          17
         ],
         [
           0,
@@ -256,27 +542,15 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.4375,
-      "mi_bits": 1.0972902397718838,
-      "ci_lower": 0.28046875000000004,
-      "ci_upper": 0.625,
+      "accuracy": 0.9929577464788732,
+      "mi_bits": 0.4783626282629144,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
       "pass_lower_ci_above_chance": true,
       "confusion": [
-        [
-          5,
-          0,
-          3,
-          0
-        ],
-        [
-          0,
-          8,
-          0,
-          0
-        ],
         [
           0,
           0,
@@ -285,9 +559,21 @@
         ],
         [
           0,
+          960,
           0,
-          7,
-          1
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -303,13 +589,13 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.8125,
-      "mi_bits": 0.636878345756227,
-      "ci_lower": 0.65625,
-      "ci_upper": 0.9375,
+      "accuracy": 1.0,
+      "mi_bits": 0.48973010800595024,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
@@ -319,13 +605,13 @@
         ],
         [
           0,
-          16,
+          816,
           0
         ],
         [
           0,
-          6,
-          2
+          0,
+          160
         ]
       ],
       "class_names": [
@@ -342,22 +628,22 @@
       "label_axis": "mode",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -371,26 +657,34 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8591549295774648,
+      "mi_bits": 0.8095891089273535,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          488,
+          0,
           0
         ],
         [
           0,
-          8
+          320,
+          0
+        ],
+        [
+          0,
+          160,
+          168
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": "model_class confounded with mode/volume \u2014 see docs/architecture_labeling_audit.md",
@@ -400,49 +694,219 @@
       "label_axis": "architecture_id",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.008044554455445545,
+      "mi_bits": 2.1199972936471023,
+      "ci_lower": 0.0037128712871287127,
+      "ci_upper": 0.012376237623762377,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          7,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         [
           0,
-          8
+          6,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          77,
+          0,
+          0,
+          83,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          21,
+          0,
+          0,
+          139,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160
+        ],
+        [
+          0,
+          0,
+          0,
+          7,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          153,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
-      "notes": "only 2 physical architectures (need >=8); collect expanded corpus",
-      "claim_status": "RETRACTED_INSUFFICIENT_CORPUS"
+      "notes": "",
+      "claim_status": "PRELIMINARY_PENDING_HELD_OUT"
     },
     {
       "label_axis": "batch_size",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.46875,
-      "mi_bits": 0.499937482410729,
-      "ci_lower": 0.28125,
-      "ci_upper": 0.625,
+      "accuracy": 0.9522569444444444,
+      "mi_bits": 0.6706585306895488,
+      "ci_lower": 0.9401041666666666,
+      "ci_upper": 0.9635416666666666,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
+          647,
           0,
           0,
-          0
+          1
         ],
         [
           0,
@@ -451,10 +915,10 @@
           0
         ],
         [
-          1,
+          2,
           0,
-          7,
-          0
+          450,
+          36
         ],
         [
           0,
@@ -476,27 +940,15 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.5,
-      "mi_bits": 0.9311463079577509,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.65625,
+      "accuracy": 0.9929577464788732,
+      "mi_bits": 0.4783626282629144,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
       "pass_lower_ci_above_chance": true,
       "confusion": [
-        [
-          8,
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          8,
-          0,
-          0
-        ],
         [
           0,
           0,
@@ -504,10 +956,22 @@
           8
         ],
         [
-          6,
-          2,
+          0,
+          960,
           0,
           0
+        ],
+        [
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -523,29 +987,29 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.5625,
-      "mi_bits": 0.0887282768632375,
-      "ci_lower": 0.375,
-      "ci_upper": 0.75,
+      "accuracy": 0.9989837398373984,
+      "mi_bits": 0.48355298165931715,
+      "ci_lower": 0.9969512195121951,
+      "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          1,
-          7,
+          8,
+          0,
           0
         ],
         [
           0,
-          16,
-          0
-        ],
-        [
-          0,
-          7,
+          815,
           1
+        ],
+        [
+          0,
+          0,
+          160
         ]
       ],
       "class_names": [
@@ -562,22 +1026,22 @@
       "label_axis": "mode",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -591,26 +1055,34 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8591549295774648,
+      "mi_bits": 0.8095891089273535,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
-          8,
+          488,
+          0,
           0
         ],
         [
           0,
-          8
+          320,
+          0
+        ],
+        [
+          0,
+          160,
+          168
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": "model_class confounded with mode/volume \u2014 see docs/architecture_labeling_audit.md",
@@ -620,48 +1092,218 @@
       "label_axis": "architecture_id",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.006188118811881188,
+      "mi_bits": 2.1807606823451846,
+      "ci_lower": 0.0024752475247524753,
+      "ci_upper": 0.009900990099009901,
       "pass_lower_ci_above_chance": false,
       "confusion": [
         [
           8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         [
           0,
-          8
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5,
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          146,
+          0,
+          0,
+          14,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          159,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
-      "notes": "only 2 physical architectures (need >=8); collect expanded corpus",
-      "claim_status": "RETRACTED_INSUFFICIENT_CORPUS"
+      "notes": "",
+      "claim_status": "PRELIMINARY_PENDING_HELD_OUT"
     },
     {
       "label_axis": "batch_size",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.4375,
-      "mi_bits": 0.37395006399059,
-      "ci_lower": 0.28125,
-      "ci_upper": 0.625,
+      "accuracy": 0.9696180555555556,
+      "mi_bits": 0.6740819477863192,
+      "ci_lower": 0.9592013888888888,
+      "ci_upper": 0.9791666666666666,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          7,
+          648,
           0,
-          1,
+          0,
           0
         ],
         [
@@ -671,10 +1313,10 @@
           0
         ],
         [
-          1,
+          2,
           0,
-          7,
-          0
+          469,
+          17
         ],
         [
           0,
@@ -696,27 +1338,15 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.4375,
-      "mi_bits": 1.0972902397718838,
-      "ci_lower": 0.28046875000000004,
-      "ci_upper": 0.625,
+      "accuracy": 0.9929577464788732,
+      "mi_bits": 0.4783626282629144,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
       "pass_lower_ci_above_chance": true,
       "confusion": [
-        [
-          5,
-          0,
-          3,
-          0
-        ],
-        [
-          0,
-          8,
-          0,
-          0
-        ],
         [
           0,
           0,
@@ -725,9 +1355,21 @@
         ],
         [
           0,
+          960,
           0,
-          7,
-          1
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -743,13 +1385,13 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_realistic_mean_draw",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.8125,
-      "mi_bits": 0.636878345756227,
-      "ci_lower": 0.65625,
-      "ci_upper": 0.9375,
+      "accuracy": 1.0,
+      "mi_bits": 0.48973010800595024,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
@@ -759,13 +1401,13 @@
         ],
         [
           0,
-          16,
+          816,
           0
         ],
         [
           0,
-          6,
-          2
+          0,
+          160
         ]
       ],
       "class_names": [
@@ -779,15 +1421,27 @@
   ],
   "held_out_model_evaluation": {
     "held_out_architectures": [
-      "arch_legacy_small"
+      "arch_legacy_large",
+      "arch_mlp_2048x12",
+      "arch_mlp_1920x10"
     ],
     "train_architectures": [
-      "arch_legacy_large"
+      "arch_legacy_small",
+      "arch_mlp_1024x8",
+      "arch_mlp_1280x8",
+      "arch_mlp_128x3",
+      "arch_mlp_1536x10",
+      "arch_mlp_256x4",
+      "arch_mlp_384x12",
+      "arch_mlp_512x6",
+      "arch_mlp_768x6"
     ],
     "test_architectures": [
-      "arch_legacy_small"
+      "arch_legacy_large",
+      "arch_mlp_1920x10",
+      "arch_mlp_2048x12"
     ],
-    "distinct_architectures_in_physical_corpus": 2,
+    "distinct_architectures_in_physical_corpus": 12,
     "min_architectures_for_valid_fingerprint_claim": 8,
     "split": "entire architecture_id held out of train; test rows are only unseen architectures (single-draw realistic observer)",
     "aggregation": "single_draw",
@@ -798,64 +1452,248 @@
         "label_axis": "architecture_id",
         "signal_set": "host_observer_realistic_held_out_model",
         "backend": "local-gpu",
-        "n_samples": 48,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
+        "n_samples": 688,
+        "n_classes": 12,
+        "chance_accuracy": 0.08333333333333333,
         "accuracy": 0.0,
-        "mi_bits": 0.0,
+        "mi_bits": 0.25303697544793957,
         "ci_lower": 0.0,
         "ci_upper": 0.0,
         "pass_lower_ci_above_chance": false,
-        "confusion": [],
+        "confusion": [
+          [
+            0,
+            0,
+            16,
+            23,
+            0,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            7
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            320,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            320,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
         "class_names": [
           "arch_legacy_large",
-          "arch_legacy_small"
+          "arch_legacy_small",
+          "arch_mlp_1024x8",
+          "arch_mlp_1280x8",
+          "arch_mlp_128x3",
+          "arch_mlp_1536x10",
+          "arch_mlp_1920x10",
+          "arch_mlp_2048x12",
+          "arch_mlp_256x4",
+          "arch_mlp_384x12",
+          "arch_mlp_512x6",
+          "arch_mlp_768x6"
         ],
-        "notes": "NEGATIVE: train fold has a single class RETRACTED: <8 architectures in corpus"
+        "notes": "NEGATIVE: held-out-model does not generalize \u2014 honest bounding result"
       },
       "model_class": {
         "label_axis": "model_class",
         "signal_set": "host_observer_realistic_held_out_model",
         "backend": "local-gpu",
-        "n_samples": 48,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
-        "accuracy": 0.0,
+        "n_samples": 688,
+        "n_classes": 3,
+        "chance_accuracy": 0.3333333333333333,
+        "accuracy": 1.0,
         "mi_bits": 0.0,
         "ci_lower": 0.0,
         "ci_upper": 0.0,
         "pass_lower_ci_above_chance": false,
-        "confusion": [],
+        "confusion": [
+          [
+            688
+          ]
+        ],
         "class_names": [
           "large",
+          "medium",
           "small"
         ],
-        "notes": "NEGATIVE: train fold has a single class RETRACTED: model_class not reported as fingerprint result"
+        "notes": "NEGATIVE: test fold has a single class (holdout did not include all label values) RETRACTED: model_class not reported as fingerprint result"
       }
     },
-    "gate_status": "BLOCKED: only 2 physical architectures; need >=8 after collect on expanded corpus"
+    "gate_status": "PRELIMINARY \u2014 interpret held-out accuracy; no external fingerprint claim until PASS"
   },
   "host_observer_idealized": [
     {
       "label_axis": "mode",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -868,26 +1706,34 @@
       "label_axis": "model_class",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8591549295774648,
+      "mi_bits": 0.8095891089273535,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
+          488,
+          0,
           0
         ],
         [
           0,
-          8
+          320,
+          0
+        ],
+        [
+          0,
+          160,
+          168
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": ""
@@ -896,27 +1742,197 @@
       "label_axis": "architecture_id",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "pass_lower_ci_above_chance": true,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.0,
+      "mi_bits": 2.1298741408141835,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "pass_lower_ci_above_chance": false,
       "confusion": [
         [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           8,
+          0,
+          0,
+          0
+        ],
+        [
+          7,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         [
           0,
-          8
+          0,
+          0,
+          69,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          91,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
       "notes": ""
     },
@@ -924,17 +1940,17 @@
       "label_axis": "batch_size",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.46875,
-      "mi_bits": 0.499937482410729,
-      "ci_lower": 0.28125,
-      "ci_upper": 0.625,
+      "accuracy": 0.984375,
+      "mi_bits": 0.6735955283711863,
+      "ci_lower": 0.9774305555555556,
+      "ci_upper": 0.9913194444444444,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
+          648,
           0,
           0,
           0
@@ -946,9 +1962,9 @@
           0
         ],
         [
-          1,
+          2,
           0,
-          7,
+          486,
           0
         ],
         [
@@ -970,13 +1986,13 @@
       "label_axis": "seq_length",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.53125,
-      "mi_bits": 0.9643150329231858,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.6882812499999993,
+      "accuracy": 1.0,
+      "mi_bits": 0.48812526460882916,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
@@ -987,8 +2003,14 @@
         ],
         [
           0,
-          8,
+          960,
           0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
           0
         ],
         [
@@ -996,12 +2018,6 @@
           0,
           0,
           8
-        ],
-        [
-          7,
-          0,
-          0,
-          1
         ]
       ],
       "class_names": [
@@ -1016,29 +2032,29 @@
       "label_axis": "llm_phase",
       "signal_set": "host_observer_idealized_upper_bound",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.5,
-      "mi_bits": 0.0,
-      "ci_lower": 0.3125,
-      "ci_upper": 0.6875,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.9898373983739838,
+      "mi_bits": 0.4428912780824714,
+      "ci_lower": 0.9827235772357723,
+      "ci_upper": 0.9959349593495935,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
           0,
-          8,
+          0,
+          8
+        ],
+        [
+          0,
+          816,
           0
         ],
         [
           0,
-          16,
-          0
-        ],
-        [
-          0,
-          8,
-          0
+          2,
+          158
         ]
       ],
       "class_names": [
@@ -1054,22 +2070,22 @@
       "label_axis": "mode",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -1082,26 +2098,34 @@
       "label_axis": "model_class",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 0.5,
-      "mi_bits": 0.0,
-      "ci_lower": 0.25,
-      "ci_upper": 0.75,
-      "pass_lower_ci_above_chance": false,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8591549295774648,
+      "mi_bits": 0.8095891089273535,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
+          488,
           0,
-          8
+          0
         ],
         [
           0,
-          8
+          320,
+          0
+        ],
+        [
+          0,
+          160,
+          168
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": ""
@@ -1110,27 +2134,197 @@
       "label_axis": "architecture_id",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "pass_lower_ci_above_chance": true,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.0,
+      "mi_bits": 2.173361565544122,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "pass_lower_ci_above_chance": false,
       "confusion": [
         [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           8,
+          0,
           0
         ],
         [
           0,
-          8
+          0,
+          0,
+          0,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          10,
+          0,
+          149
+        ],
+        [
+          158,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
       "notes": ""
     },
@@ -1138,19 +2332,19 @@
       "label_axis": "batch_size",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.28125,
-      "mi_bits": 0.044868258140631515,
-      "ci_lower": 0.125,
-      "ci_upper": 0.4375,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.8472222222222222,
+      "mi_bits": 0.34168147537873794,
+      "ci_lower": 0.8272352430555555,
+      "ci_upper": 0.8680555555555556,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          1,
+          648,
           0,
-          7,
+          0,
           0
         ],
         [
@@ -1160,9 +2354,9 @@
           0
         ],
         [
+          160,
           0,
-          0,
-          8,
+          328,
           0
         ],
         [
@@ -1184,32 +2378,32 @@
       "label_axis": "seq_length",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.25,
-      "mi_bits": 0.0,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "pass_lower_ci_above_chance": false,
+      "accuracy": 0.9929577464788732,
+      "mi_bits": 0.4473390189513637,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
+      "pass_lower_ci_above_chance": true,
       "confusion": [
         [
           0,
+          8,
           0,
+          0
+        ],
+        [
           0,
-          8
+          960,
+          0,
+          0
         ],
         [
           0,
           0,
-          0,
-          8
-        ],
-        [
-          0,
-          0,
-          0,
-          8
+          160,
+          0
         ],
         [
           0,
@@ -1230,29 +2424,29 @@
       "label_axis": "llm_phase",
       "signal_set": "ablation_volume_only",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
-      "accuracy": 0.75,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 0.59375,
-      "ci_upper": 0.90625,
+      "accuracy": 0.6666666666666666,
+      "mi_bits": 0.447980873128951,
+      "ci_lower": 0.6371951219512195,
+      "ci_upper": 0.6951219512195121,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
           0,
+          8,
+          0
+        ],
+        [
+          320,
+          496,
           0
         ],
         [
           0,
-          8,
-          8
-        ],
-        [
           0,
-          0,
-          8
+          160
         ]
       ],
       "class_names": [
@@ -1265,29 +2459,30 @@
   ],
   "ablation_interpretation": {
     "mode": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features.",
-    "architecture_id": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
+    "model_class": "Volume channel dominates; fine-grained claim not supported.",
+    "seq_length": "Coarse volume leakage: total-bytes ablation within 5% of full realistic features."
   },
   "vm_ground_truth": [
     {
       "label_axis": "mode",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 24,
+      "n_samples": 1136,
       "n_classes": 2,
       "chance_accuracy": 0.5,
       "accuracy": 1.0,
-      "mi_bits": 0.636514168294813,
+      "mi_bits": 0.6831954572981658,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          16,
+          648,
           0
         ],
         [
           0,
-          8
+          488
         ]
       ],
       "class_names": [
@@ -1300,26 +2495,34 @@
       "label_axis": "model_class",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1136,
+      "n_classes": 3,
+      "chance_accuracy": 0.3333333333333333,
+      "accuracy": 0.8389084507042254,
+      "mi_bits": 0.6988105609280473,
+      "ci_lower": 0.8177816901408451,
+      "ci_upper": 0.8609154929577465,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
+          488,
+          0,
+          0
+        ],
+        [
+          160,
+          160,
           0
         ],
         [
           0,
-          8
+          23,
+          305
         ]
       ],
       "class_names": [
         "large",
+        "medium",
         "small"
       ],
       "notes": ""
@@ -1328,27 +2531,197 @@
       "label_axis": "architecture_id",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 16,
-      "n_classes": 2,
-      "chance_accuracy": 0.5,
-      "accuracy": 1.0,
-      "mi_bits": 0.6931471805599454,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_samples": 1616,
+      "n_classes": 12,
+      "chance_accuracy": 0.08333333333333333,
+      "accuracy": 0.3001237623762376,
+      "mi_bits": 2.044408758164012,
+      "ci_lower": 0.275990099009901,
+      "ci_upper": 0.3224009900990099,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
+          0,
+          0,
+          0,
+          0,
           8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
           0
         ],
         [
           0,
-          8
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0
+        ],
+        [
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          160,
+          0
         ]
       ],
       "class_names": [
         "arch_legacy_large",
-        "arch_legacy_small"
+        "arch_legacy_small",
+        "arch_mlp_1024x8",
+        "arch_mlp_1280x8",
+        "arch_mlp_128x3",
+        "arch_mlp_1536x10",
+        "arch_mlp_1920x10",
+        "arch_mlp_2048x12",
+        "arch_mlp_256x4",
+        "arch_mlp_384x12",
+        "arch_mlp_512x6",
+        "arch_mlp_768x6"
       ],
       "notes": ""
     },
@@ -1356,17 +2729,17 @@
       "label_axis": "batch_size",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1152,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.5,
-      "mi_bits": 0.5623351446188083,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.65625,
+      "accuracy": 0.9765625,
+      "mi_bits": 0.7259493457345026,
+      "ci_lower": 0.9678602430555555,
+      "ci_upper": 0.984375,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
+          648,
           0,
           0,
           0
@@ -1374,20 +2747,20 @@
         [
           0,
           0,
-          8,
-          0
+          0,
+          8
         ],
         [
           0,
           0,
-          8,
-          0
+          469,
+          19
         ],
         [
           0,
           0,
-          8,
-          0
+          0,
+          8
         ]
       ],
       "class_names": [
@@ -1402,22 +2775,16 @@
       "label_axis": "seq_length",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 1136,
       "n_classes": 4,
       "chance_accuracy": 0.25,
-      "accuracy": 0.75,
-      "mi_bits": 1.039720770839918,
-      "ci_lower": 0.59375,
-      "ci_upper": 0.90625,
+      "accuracy": 0.852112676056338,
+      "mi_bits": 0.04191758898631971,
+      "ci_lower": 0.8318661971830986,
+      "ci_upper": 0.8723591549295775,
       "pass_lower_ci_above_chance": true,
       "confusion": [
         [
-          8,
-          0,
-          0,
-          0
-        ],
-        [
           0,
           8,
           0,
@@ -1425,9 +2792,15 @@
         ],
         [
           0,
+          960,
           0,
+          0
+        ],
+        [
           0,
-          8
+          160,
+          0,
+          0
         ],
         [
           0,
@@ -1448,11 +2821,11 @@
       "label_axis": "llm_phase",
       "signal_set": "vm_ground_truth",
       "backend": "local-gpu",
-      "n_samples": 32,
+      "n_samples": 984,
       "n_classes": 3,
       "chance_accuracy": 0.3333333333333333,
       "accuracy": 1.0,
-      "mi_bits": 1.039720770839918,
+      "mi_bits": 0.48973010800595024,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "pass_lower_ci_above_chance": true,
@@ -1464,13 +2837,13 @@
         ],
         [
           0,
-          16,
+          816,
           0
         ],
         [
           0,
           0,
-          8
+          160
         ]
       ],
       "class_names": [
@@ -1484,80 +2857,62 @@
   "learning_curves": [
     {
       "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.6666666666666666,
-      "ci_lower": 0.4583333333333333,
-      "ci_upper": 0.8333333333333334,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.6666666666666666,
-      "ci_lower": 0.4583333333333333,
-      "ci_upper": 0.8333333333333334,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
       "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 5,
-      "n_train_samples": 40,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "mode",
-      "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
+      "n_train_samples": 336,
+      "accuracy": 0.7130281690140845,
+      "ci_lower": 0.6866197183098591,
+      "ci_upper": 0.7420774647887324,
       "chance_accuracy": 0.5
     },
     {
       "label_axis": "mode",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
+      "n_train_samples": 984,
+      "accuracy": 0.9929577464788732,
+      "ci_lower": 0.9876760563380281,
+      "ci_upper": 0.9973591549295775,
+      "chance_accuracy": 0.5
+    },
+    {
+      "label_axis": "mode",
+      "n_train_base_runs": 13,
+      "n_train_samples": 1016,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
-      "label_axis": "model_class",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
+      "label_axis": "mode",
+      "n_train_base_runs": 18,
+      "n_train_samples": 1816,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
       "chance_accuracy": 0.5
     },
     {
-      "label_axis": "model_class",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
+      "label_axis": "mode",
+      "n_train_base_runs": 22,
+      "n_train_samples": 2464,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
+      "chance_accuracy": 0.5
+    },
+    {
+      "label_axis": "mode",
+      "n_train_base_runs": 27,
+      "n_train_samples": 2960,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
+      "chance_accuracy": 0.5
+    },
+    {
+      "label_axis": "mode",
+      "n_train_base_runs": 30,
+      "n_train_samples": 3440,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
@@ -1566,280 +2921,316 @@
     {
       "label_axis": "model_class",
       "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "model_class",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "model_class",
-      "n_train_base_runs": 7,
-      "n_train_samples": 56,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "n_train_samples": 336,
+      "accuracy": 0.7183098591549296,
+      "ci_lower": 0.6919014084507042,
+      "ci_upper": 0.7464788732394366,
+      "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "model_class",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "n_train_samples": 984,
+      "accuracy": 0.7183098591549296,
+      "ci_lower": 0.6919014084507042,
+      "ci_upper": 0.7464788732394366,
+      "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "model_class",
-      "n_train_base_runs": 10,
-      "n_train_samples": 80,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "n_train_base_runs": 13,
+      "n_train_samples": 1480,
+      "accuracy": 0.7191901408450704,
+      "ci_lower": 0.6954225352112676,
+      "ci_upper": 0.747381161971831,
+      "chance_accuracy": 0.3333333333333333
     },
     {
-      "label_axis": "architecture_id",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.5,
-      "ci_lower": 0.25,
-      "ci_upper": 0.75,
-      "chance_accuracy": 0.5
+      "label_axis": "model_class",
+      "n_train_base_runs": 18,
+      "n_train_samples": 2280,
+      "accuracy": 0.7191901408450704,
+      "ci_lower": 0.6927596830985916,
+      "ci_upper": 0.7447183098591549,
+      "chance_accuracy": 0.3333333333333333
     },
     {
-      "label_axis": "architecture_id",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
-      "accuracy": 0.5,
-      "ci_lower": 0.25,
-      "ci_upper": 0.75,
-      "chance_accuracy": 0.5
+      "label_axis": "model_class",
+      "n_train_base_runs": 22,
+      "n_train_samples": 2464,
+      "accuracy": 0.7183098591549296,
+      "ci_lower": 0.6936399647887324,
+      "ci_upper": 0.7473591549295775,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "model_class",
+      "n_train_base_runs": 27,
+      "n_train_samples": 3112,
+      "accuracy": 0.8591549295774648,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "model_class",
+      "n_train_base_runs": 30,
+      "n_train_samples": 3440,
+      "accuracy": 0.8591549295774648,
+      "ci_lower": 0.8380281690140845,
+      "ci_upper": 0.8803036971830986,
+      "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "architecture_id",
       "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.5,
-      "ci_lower": 0.25,
-      "ci_upper": 0.75,
-      "chance_accuracy": 0.5
+      "n_train_samples": 496,
+      "accuracy": 0.11448019801980198,
+      "ci_lower": 0.09900990099009901,
+      "ci_upper": 0.1311881188118812,
+      "chance_accuracy": 0.08333333333333333
     },
     {
       "label_axis": "architecture_id",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "n_train_base_runs": 8,
+      "n_train_samples": 984,
+      "accuracy": 0.14975247524752475,
+      "ci_lower": 0.13302908415841586,
+      "ci_upper": 0.1676980198019802,
+      "chance_accuracy": 0.08333333333333333
     },
     {
       "label_axis": "architecture_id",
-      "n_train_base_runs": 7,
-      "n_train_samples": 56,
-      "accuracy": 1.0,
-      "ci_lower": 1.0,
-      "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "n_train_base_runs": 12,
+      "n_train_samples": 1320,
+      "accuracy": 0.10272277227722772,
+      "ci_lower": 0.0891089108910891,
+      "ci_upper": 0.11819306930693069,
+      "chance_accuracy": 0.08333333333333333
     },
     {
       "label_axis": "architecture_id",
+      "n_train_base_runs": 16,
+      "n_train_samples": 1960,
+      "accuracy": 0.005569306930693069,
+      "ci_lower": 0.0024752475247524753,
+      "ci_upper": 0.009282178217821782,
+      "chance_accuracy": 0.08333333333333333
+    },
+    {
+      "label_axis": "architecture_id",
+      "n_train_base_runs": 20,
+      "n_train_samples": 2448,
+      "accuracy": 0.04888613861386139,
+      "ci_lower": 0.038985148514851485,
+      "ci_upper": 0.06002475247524752,
+      "chance_accuracy": 0.08333333333333333
+    },
+    {
+      "label_axis": "architecture_id",
+      "n_train_base_runs": 24,
+      "n_train_samples": 2784,
+      "accuracy": 0.0018564356435643563,
+      "ci_lower": 0.0,
+      "ci_upper": 0.004331683168316832,
+      "chance_accuracy": 0.08333333333333333
+    },
+    {
+      "label_axis": "architecture_id",
+      "n_train_base_runs": 27,
+      "n_train_samples": 2960,
+      "accuracy": 0.006188118811881188,
+      "ci_lower": 0.0024752475247524753,
+      "ci_upper": 0.009900990099009901,
+      "chance_accuracy": 0.08333333333333333
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 4,
+      "n_train_samples": 336,
+      "accuracy": 0.5572916666666666,
+      "ci_lower": 0.5286458333333334,
+      "ci_upper": 0.5859375,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 8,
+      "n_train_samples": 976,
+      "accuracy": 0.7013888888888888,
+      "ci_lower": 0.6744791666666666,
+      "ci_upper": 0.7274522569444445,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 13,
+      "n_train_samples": 1624,
+      "accuracy": 0.7083333333333334,
+      "ci_lower": 0.6814236111111112,
+      "ci_upper": 0.7335069444444444,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 17,
+      "n_train_samples": 1960,
+      "accuracy": 0.7083333333333334,
+      "ci_lower": 0.6814236111111112,
+      "ci_upper": 0.7335069444444444,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 21,
+      "n_train_samples": 2448,
+      "accuracy": 0.9409722222222222,
+      "ci_lower": 0.9270616319444445,
+      "ci_upper": 0.9539930555555556,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 26,
+      "n_train_samples": 2944,
+      "accuracy": 0.984375,
+      "ci_lower": 0.9774305555555556,
+      "ci_upper": 0.9913194444444444,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "batch_size",
+      "n_train_base_runs": 29,
+      "n_train_samples": 3424,
+      "accuracy": 0.9696180555555556,
+      "ci_lower": 0.9592013888888888,
+      "ci_upper": 0.9791666666666666,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 4,
+      "n_train_samples": 640,
+      "accuracy": 0.4225352112676056,
+      "ci_lower": 0.39436619718309857,
+      "ci_upper": 0.4489656690140845,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
       "n_train_base_runs": 9,
-      "n_train_samples": 72,
+      "n_train_samples": 1440,
+      "accuracy": 0.585387323943662,
+      "ci_lower": 0.5572183098591549,
+      "ci_upper": 0.613556338028169,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 13,
+      "n_train_samples": 1776,
+      "accuracy": 0.8028169014084507,
+      "ci_lower": 0.7799075704225352,
+      "ci_upper": 0.8248459507042254,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 18,
+      "n_train_samples": 2272,
+      "accuracy": 0.7121478873239436,
+      "ci_lower": 0.6865977112676056,
+      "ci_upper": 0.7385783450704225,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 22,
+      "n_train_samples": 2760,
+      "accuracy": 0.9454225352112676,
+      "ci_lower": 0.9313380281690141,
+      "ci_upper": 0.9586267605633803,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 27,
+      "n_train_samples": 3104,
+      "accuracy": 0.9929577464788732,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "seq_length",
+      "n_train_base_runs": 30,
+      "n_train_samples": 3440,
+      "accuracy": 0.9929577464788732,
+      "ci_lower": 0.9885343309859155,
+      "ci_upper": 0.9973591549295775,
+      "chance_accuracy": 0.25
+    },
+    {
+      "label_axis": "llm_phase",
+      "n_train_base_runs": 4,
+      "n_train_samples": 496,
+      "accuracy": 0.991869918699187,
+      "ci_lower": 0.9857723577235772,
+      "ci_upper": 0.9969512195121951,
+      "chance_accuracy": 0.3333333333333333
+    },
+    {
+      "label_axis": "llm_phase",
+      "n_train_base_runs": 9,
+      "n_train_samples": 1144,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
-      "chance_accuracy": 0.5
+      "chance_accuracy": 0.3333333333333333
     },
     {
-      "label_axis": "architecture_id",
-      "n_train_base_runs": 10,
-      "n_train_samples": 80,
+      "label_axis": "llm_phase",
+      "n_train_base_runs": 13,
+      "n_train_samples": 1632,
       "accuracy": 1.0,
       "ci_lower": 1.0,
       "ci_upper": 1.0,
-      "chance_accuracy": 0.5
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
-      "accuracy": 0.21875,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.375,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.25,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.40625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.21875,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.375,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 7,
-      "n_train_samples": 56,
-      "accuracy": 0.21875,
-      "ci_lower": 0.09375,
-      "ci_upper": 0.375,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "batch_size",
-      "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.4375,
-      "ci_lower": 0.28125,
-      "ci_upper": 0.625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.5,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.6875,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.5,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.6875,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
-      "accuracy": 0.53125,
-      "ci_lower": 0.375,
-      "ci_upper": 0.71875,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.5,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.65625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.53125,
-      "ci_lower": 0.34375,
-      "ci_upper": 0.71875,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 7,
-      "n_train_samples": 56,
-      "accuracy": 0.78125,
-      "ci_lower": 0.625,
-      "ci_upper": 0.90625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "seq_length",
-      "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.4375,
-      "ci_lower": 0.28046875000000004,
-      "ci_upper": 0.625,
-      "chance_accuracy": 0.25
-    },
-    {
-      "label_axis": "llm_phase",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.5,
-      "ci_lower": 0.3125,
-      "ci_upper": 0.65625,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "llm_phase",
-      "n_train_base_runs": 2,
-      "n_train_samples": 16,
-      "accuracy": 0.5,
-      "ci_lower": 0.3125,
-      "ci_upper": 0.65625,
+      "n_train_base_runs": 18,
+      "n_train_samples": 2280,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "llm_phase",
-      "n_train_base_runs": 3,
-      "n_train_samples": 24,
-      "accuracy": 0.34375,
-      "ci_lower": 0.1875,
-      "ci_upper": 0.5007812499999993,
+      "n_train_base_runs": 22,
+      "n_train_samples": 2616,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "llm_phase",
-      "n_train_base_runs": 4,
-      "n_train_samples": 32,
-      "accuracy": 0.71875,
-      "ci_lower": 0.5625,
-      "ci_upper": 0.875,
+      "n_train_base_runs": 27,
+      "n_train_samples": 3416,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "chance_accuracy": 0.3333333333333333
     },
     {
       "label_axis": "llm_phase",
-      "n_train_base_runs": 6,
-      "n_train_samples": 48,
-      "accuracy": 0.75,
-      "ci_lower": 0.59375,
-      "ci_upper": 0.90625,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "llm_phase",
-      "n_train_base_runs": 7,
-      "n_train_samples": 56,
-      "accuracy": 0.8125,
-      "ci_lower": 0.65625,
-      "ci_upper": 0.9375,
-      "chance_accuracy": 0.3333333333333333
-    },
-    {
-      "label_axis": "llm_phase",
-      "n_train_base_runs": 8,
-      "n_train_samples": 64,
-      "accuracy": 0.8125,
-      "ci_lower": 0.65625,
-      "ci_upper": 0.9375,
+      "n_train_base_runs": 30,
+      "n_train_samples": 3592,
+      "accuracy": 1.0,
+      "ci_lower": 1.0,
+      "ci_upper": 1.0,
       "chance_accuracy": 0.3333333333333333
     }
   ],
@@ -1849,22 +3240,22 @@
         "label_axis": "mode",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 1136,
         "n_classes": 2,
         "chance_accuracy": 0.5,
         "accuracy": 1.0,
-        "mi_bits": 0.636514168294813,
+        "mi_bits": 0.6831954572981658,
         "ci_lower": 1.0,
         "ci_upper": 1.0,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            16,
+            648,
             0
           ],
           [
             0,
-            8
+            488
           ]
         ],
         "class_names": [
@@ -1877,26 +3268,34 @@
         "label_axis": "model_class",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 16,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
-        "accuracy": 1.0,
-        "mi_bits": 0.6931471805599454,
-        "ci_lower": 1.0,
-        "ci_upper": 1.0,
+        "n_samples": 1136,
+        "n_classes": 3,
+        "chance_accuracy": 0.3333333333333333,
+        "accuracy": 0.5774647887323944,
+        "mi_bits": 0.6010127834051777,
+        "ci_lower": 0.5519146126760563,
+        "ci_upper": 0.6065140845070423,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            8,
+            488,
+            0,
+            0
+          ],
+          [
+            320,
+            0,
             0
           ],
           [
             0,
-            8
+            160,
+            168
           ]
         ],
         "class_names": [
           "large",
+          "medium",
           "small"
         ],
         "notes": ""
@@ -1905,27 +3304,197 @@
         "label_axis": "architecture_id",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 16,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
-        "accuracy": 1.0,
-        "mi_bits": 0.6931471805599454,
-        "ci_lower": 1.0,
-        "ci_upper": 1.0,
-        "pass_lower_ci_above_chance": true,
+        "n_samples": 1616,
+        "n_classes": 12,
+        "chance_accuracy": 0.08333333333333333,
+        "accuracy": 0.0,
+        "mi_bits": 2.1158652731368184,
+        "ci_lower": 0.0,
+        "ci_upper": 0.0,
+        "pass_lower_ci_above_chance": false,
         "confusion": [
           [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             8,
+            0,
+            0,
             0
           ],
           [
             0,
-            8
+            0,
+            0,
+            0,
+            7,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            107,
+            0,
+            0,
+            53,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            18,
+            0,
+            0,
+            142,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            159,
+            0
           ]
         ],
         "class_names": [
           "arch_legacy_large",
-          "arch_legacy_small"
+          "arch_legacy_small",
+          "arch_mlp_1024x8",
+          "arch_mlp_1280x8",
+          "arch_mlp_128x3",
+          "arch_mlp_1536x10",
+          "arch_mlp_1920x10",
+          "arch_mlp_2048x12",
+          "arch_mlp_256x4",
+          "arch_mlp_384x12",
+          "arch_mlp_512x6",
+          "arch_mlp_768x6"
         ],
         "notes": ""
       },
@@ -1933,38 +3502,38 @@
         "label_axis": "batch_size",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 1152,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.25,
-        "mi_bits": 0.04540657807824092,
-        "ci_lower": 0.125,
-        "ci_upper": 0.4375,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 0.9383680555555556,
+        "mi_bits": 0.7027073321994012,
+        "ci_lower": 0.9244791666666666,
+        "ci_upper": 0.9522569444444444,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            1,
-            0,
-            7,
-            0
-          ],
-          [
-            0,
-            0,
+            640,
             8,
-            0
-          ],
-          [
-            1,
             0,
-            7,
             0
           ],
           [
             0,
             0,
-            8,
-            0
+            0,
+            8
+          ],
+          [
+            2,
+            0,
+            433,
+            53
+          ],
+          [
+            0,
+            0,
+            0,
+            8
           ]
         ],
         "class_names": [
@@ -1979,38 +3548,38 @@
         "label_axis": "seq_length",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 1136,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.4375,
-        "mi_bits": 0.44866036146335353,
-        "ci_lower": 0.25,
-        "ci_upper": 0.625,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 0.8882042253521126,
+        "mi_bits": 0.29062702695292064,
+        "ci_lower": 0.8688380281690141,
+        "ci_upper": 0.9058318661971831,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            2,
             0,
-            3,
-            3
-          ],
-          [
             0,
             4,
-            0,
             4
           ],
           [
             0,
-            0,
-            0,
-            8
+            842,
+            118,
+            0
           ],
           [
             0,
             0,
+            160,
+            0
+          ],
+          [
             0,
-            8
+            0,
+            1,
+            7
           ]
         ],
         "class_names": [
@@ -2025,29 +3594,29 @@
         "label_axis": "llm_phase",
         "signal_set": "mitigation_size_padding",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 984,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
-        "accuracy": 0.71875,
-        "mi_bits": 0.6177414426432131,
-        "ci_lower": 0.56171875,
-        "ci_upper": 0.875,
+        "accuracy": 0.6951219512195121,
+        "mi_bits": 0.44136074445190854,
+        "ci_lower": 0.6676829268292683,
+        "ci_upper": 0.7225609756097561,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            7,
-            1,
-            0
-          ],
-          [
-            8,
+            0,
             8,
             0
           ],
           [
+            291,
+            524,
+            1
+          ],
+          [
             0,
             0,
-            8
+            160
           ]
         ],
         "class_names": [
@@ -2063,22 +3632,22 @@
         "label_axis": "mode",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 24,
+        "n_samples": 1136,
         "n_classes": 2,
         "chance_accuracy": 0.5,
         "accuracy": 1.0,
-        "mi_bits": 0.636514168294813,
+        "mi_bits": 0.6831954572981658,
         "ci_lower": 1.0,
         "ci_upper": 1.0,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            16,
+            648,
             0
           ],
           [
             0,
-            8
+            488
           ]
         ],
         "class_names": [
@@ -2091,26 +3660,34 @@
         "label_axis": "model_class",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 16,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
-        "accuracy": 1.0,
-        "mi_bits": 0.6931471805599454,
-        "ci_lower": 1.0,
-        "ci_upper": 1.0,
+        "n_samples": 1136,
+        "n_classes": 3,
+        "chance_accuracy": 0.3333333333333333,
+        "accuracy": 0.5677816901408451,
+        "mi_bits": 0.5761470438543704,
+        "ci_lower": 0.5413732394366197,
+        "ci_upper": 0.5977332746478873,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
+            480,
             8,
             0
           ],
           [
+            320,
             0,
-            8
+            0
+          ],
+          [
+            0,
+            163,
+            165
           ]
         ],
         "class_names": [
           "large",
+          "medium",
           "small"
         ],
         "notes": ""
@@ -2119,27 +3696,197 @@
         "label_axis": "architecture_id",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 16,
-        "n_classes": 2,
-        "chance_accuracy": 0.5,
-        "accuracy": 1.0,
-        "mi_bits": 0.6931471805599454,
-        "ci_lower": 1.0,
-        "ci_upper": 1.0,
-        "pass_lower_ci_above_chance": true,
+        "n_samples": 1616,
+        "n_classes": 12,
+        "chance_accuracy": 0.08333333333333333,
+        "accuracy": 0.0049504950495049506,
+        "mi_bits": 2.2933908930272824,
+        "ci_lower": 0.0018564356435643563,
+        "ci_upper": 0.008663366336633664,
+        "pass_lower_ci_above_chance": false,
         "confusion": [
           [
             8,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0,
+            2,
+            0,
+            0,
+            0,
+            5,
+            0,
+            0,
+            0
+          ],
+          [
+            159,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0
           ],
           [
             0,
-            8
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            159,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            159
+          ],
+          [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            160,
+            0
           ]
         ],
         "class_names": [
           "arch_legacy_large",
-          "arch_legacy_small"
+          "arch_legacy_small",
+          "arch_mlp_1024x8",
+          "arch_mlp_1280x8",
+          "arch_mlp_128x3",
+          "arch_mlp_1536x10",
+          "arch_mlp_1920x10",
+          "arch_mlp_2048x12",
+          "arch_mlp_256x4",
+          "arch_mlp_384x12",
+          "arch_mlp_512x6",
+          "arch_mlp_768x6"
         ],
         "notes": ""
       },
@@ -2147,38 +3894,38 @@
         "label_axis": "batch_size",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 1152,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.21875,
-        "mi_bits": 0.044868258140631515,
-        "ci_lower": 0.09375,
-        "ci_upper": 0.375,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 0.8602430555555556,
+        "mi_bits": 0.6862009109400143,
+        "ci_lower": 0.8385416666666666,
+        "ci_upper": 0.8802083333333334,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
+            648,
             0,
             0,
-            8,
             0
           ],
           [
             0,
             0,
-            8,
-            0
+            0,
+            8
           ],
           [
+            2,
+            0,
+            336,
+            150
+          ],
+          [
+            0,
+            0,
             1,
-            0,
-            7,
-            0
-          ],
-          [
-            0,
-            0,
-            8,
-            0
+            7
           ]
         ],
         "class_names": [
@@ -2193,14 +3940,14 @@
         "label_axis": "seq_length",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 1136,
         "n_classes": 4,
         "chance_accuracy": 0.25,
-        "accuracy": 0.25,
-        "mi_bits": 0.5623351446188083,
-        "ci_lower": 0.125,
-        "ci_upper": 0.40625,
-        "pass_lower_ci_above_chance": false,
+        "accuracy": 0.7095070422535211,
+        "mi_bits": 0.17123109860882502,
+        "ci_lower": 0.684837147887324,
+        "ci_upper": 0.7359375,
+        "pass_lower_ci_above_chance": true,
         "confusion": [
           [
             0,
@@ -2210,8 +3957,14 @@
           ],
           [
             0,
-            8,
+            640,
+            320,
+            0
+          ],
+          [
             0,
+            2,
+            158,
             0
           ],
           [
@@ -2219,12 +3972,6 @@
             0,
             0,
             8
-          ],
-          [
-            0,
-            8,
-            0,
-            0
           ]
         ],
         "class_names": [
@@ -2239,29 +3986,29 @@
         "label_axis": "llm_phase",
         "signal_set": "mitigation_constant_rpc",
         "backend": "local-gpu",
-        "n_samples": 32,
+        "n_samples": 984,
         "n_classes": 3,
         "chance_accuracy": 0.3333333333333333,
-        "accuracy": 0.75,
-        "mi_bits": 0.6931471805599454,
-        "ci_lower": 0.59375,
-        "ci_upper": 0.90625,
+        "accuracy": 0.6626016260162602,
+        "mi_bits": 0.42607741477709327,
+        "ci_lower": 0.633130081300813,
+        "ci_upper": 0.6910569105691057,
         "pass_lower_ci_above_chance": true,
         "confusion": [
           [
-            8,
             0,
-            0
-          ],
-          [
-            8,
             8,
             0
           ],
           [
+            320,
+            496,
+            0
+          ],
+          [
+            4,
             0,
-            0,
-            8
+            156
           ]
         ],
         "class_names": [
@@ -2275,6 +4022,6 @@
   },
   "observer_transform_doc": "pipeline/features/realistic_observer.py",
   "split_policy": "config stratified (inference); held_out_model uses architecture_id split",
-  "classifier_samples_mean_aggregation": 96,
-  "classifier_samples_single_draw": 96
+  "classifier_samples_mean_aggregation": 4576,
+  "classifier_samples_single_draw": 4576
 }

@@ -2,7 +2,7 @@
 
 Defensive research: **workload inference (D1)** and **policy-deviation detection (D2)** from **host-legitimate** staging-buffer transfer metadata under the GPU Confidential Computing threat model. Extends [arXiv:2507.02770](https://arxiv.org/abs/2507.02770); does **not** claim rediscovery of the CPU–GSP timing/size channel.
 
-**Status:** Phase 1 pipeline (see `PHASE_1_REPORT.md`).
+**Status:** Phase 1 + Phase 2 gates on branch `cursor/phase-2-detector-c1b3`. Start with **`docs/GATE_STATUS.md`**, then `PHASE_1_REPORT.md` / `PHASE_2_REPORT.md`. Phase 3 not approved.
 
 ## Requirements
 
@@ -28,12 +28,17 @@ Run from the **repository root**:
 python3 -m pipeline.cli collect --backend local-gpu \
   --out-dir data/traces --seeds 0,1,2,3,4,5,6,7
 
-# Evaluate — headline metrics from host_observer (b) only
+# Evaluate — headline = realistic single-draw (see PHASE_1_REPORT.md)
 python3 -m pipeline.cli evaluate --backend local-gpu \
-  --trace-dir data/traces --out-json report/phase1_results.json
+  --trace-dir data/traces --observations-per-base 40 \
+  --out-json report/phase1_results.json
 
-# Regenerate gate report
+# Phase 2 detector (hard suites are headline)
+python3 -m pipeline.cli detect --backend local-gpu --trace-dir data/traces
+
+# Regenerate gate reports
 python3 report/generate_phase1_report.py
+python3 report/generate_phase2_report.py
 
 # Plumbing smoke (NOT for publication numbers)
 python3 -m pipeline.cli smoke-simulate --seeds 0,1
@@ -47,8 +52,8 @@ python3 -m pytest tests/ -q
 | Path | Purpose |
 |------|---------|
 | `pipeline/` | Trace collection, (a)/(b) features, evaluation |
-| `detector/` | Phase 2 (stub) |
-| `mitigation/` | Phase 3 (stub) |
+| `detector/` | Phase 2 policy detector (D2 hard/trivial suites) |
+| `mitigation/` | Phase 3 (blocked) |
 | `report/` | Results JSON + report generator |
 | `docs/` | D4 overlay placeholder |
 | `data/traces/` | Collected `local-gpu` JSONL traces |

@@ -12,8 +12,8 @@
 
 | Item | Value |
 |------|--------|
-| Physical base captures | 96 |
-| Distinct `architecture_id` in traces | 2 |
+| Physical base captures | 4576 |
+| Distinct `architecture_id` in traces | 12 |
 | Target architectures (corpus spec) | 10 listed in JSON |
 | Min for fingerprint claim | 8 |
 
@@ -33,9 +33,9 @@
 
 | Suite | ROC AUC | n_test | TPR | FPR | Notes |
 |-------|---------|--------|-----|-----|-------|
-| hard_unauthorized_architecture **HEADLINE** | 0.000 | 0 | 0.000 | 0.000 | NEGATIVE: insufficient classes or samples for suite (attested_arch=arch_legacy_small) |
-| hard_covert_modulator **HEADLINE** | 0.000 | 3 | 0.000 | 0.000 | NEGATIVE: test fold lacks both classes |
-| trivial_mode_change (not headline) | 1.000 | 19 | 1.000 | 0.143 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| hard_unauthorized_architecture **HEADLINE** | 0.987 | 321 | 0.969 | 0.138 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| hard_covert_modulator **HEADLINE** | 1.000 | 64 | 1.000 | 0.069 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| trivial_mode_change (not headline) | 1.000 | 915 | 1.000 | 0.041 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
 
 
 ## 3. Phase 1 gating (unchanged)
