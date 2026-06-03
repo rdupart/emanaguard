@@ -12,7 +12,7 @@ def write_run(out_dir: Path, events, labels) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     safe_run_id = labels.run_id.replace("/", "_")
-    path = out_dir / f"{safe_run_id}.jsonl"
+    path = out_dir / f"{labels.run_id.replace('/', '_')}.jsonl"
 
     with path.open("w") as f:
         f.write(json.dumps({"type": "labels", **labels.to_dict()}) + "\n")
