@@ -1,4 +1,5 @@
 {
+  "methodology_version": "phase2.1",
   "preliminary": true,
   "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
   "backend": "local-gpu",
@@ -9,21 +10,81 @@
     "seq_length": 128
   },
   "distinct_architecture_ids_in_corpus": 12,
-  "target_architectures": [
-    "arch_mlp_128x3",
-    "arch_mlp_256x4",
-    "arch_mlp_384x12",
-    "arch_mlp_512x6",
-    "arch_mlp_768x6",
-    "arch_mlp_1024x8",
-    "arch_mlp_1280x8",
-    "arch_mlp_1536x10",
-    "arch_mlp_1920x10",
-    "arch_mlp_2048x12"
-  ],
-  "min_architectures_for_fingerprint": 8,
-  "headline_detector_metric": "hard_unauthorized_architecture + hard_covert_modulator",
-  "not_headline": "trivial_mode_change (volume/mode only)",
+  "modulation_presets": {
+    "light": {
+      "name": "light",
+      "cadence_ns": 80000,
+      "jitter_fraction": 0.08,
+      "description": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation"
+    },
+    "medium": {
+      "name": "medium",
+      "cadence_ns": 200000,
+      "jitter_fraction": 0.15,
+      "description": "Moderate cadence replacement"
+    },
+    "heavy": {
+      "name": "heavy",
+      "cadence_ns": 350000,
+      "jitter_fraction": 0.25,
+      "description": "Strong cadence quantization (legacy default) \u2014 easy to detect"
+    }
+  },
+  "headline_detector_metric": "hard_unauthorized_architecture (balanced acc) + hard_covert_modulator_adaptive",
+  "not_headline": "trivial_mode_change; heavy covert AUC alone",
+  "detector_inference_audit": {
+    "feature_distributions": {
+      "status": "ok",
+      "n_benign": 8,
+      "n_violation": 80,
+      "volume_matched_on_coarse_features": false,
+      "compute_volume_confound_at_matched_bs_seq": true,
+      "relative_gap_total_bytes": 0.9353193372345604,
+      "mean_feature_l2_normalized": 3.501424482016037,
+      "distributions": [
+        {
+          "name": "n_events",
+          "benign_mean": 45.0,
+          "benign_std": 1.7320508075688772,
+          "violation_mean": 93.25,
+          "violation_std": 34.09857035126253,
+          "ks_gap": 48.25
+        },
+        {
+          "name": "total_bytes",
+          "benign_mean": 34866421.0,
+          "benign_std": 945120.2886569519,
+          "violation_mean": 539054788.7,
+          "violation_std": 554655048.4172528,
+          "ks_gap": 504188367.70000005
+        },
+        {
+          "name": "bytes_per_sec",
+          "benign_mean": 148718224.73601586,
+          "benign_std": 12464191.133158,
+          "violation_mean": 378280873.97469926,
+          "violation_std": 161665395.24041903,
+          "ks_gap": 229562649.2386834
+        }
+      ],
+      "interpretation": "At fixed (mode, bs, seq), wrong-architecture rows still differ in total_bytes because model hidden/layers change transfer volume. Binary detector can separate attested vs other arch using this compute-volume proxy; 12-way inference fails under realistic noise. NOT a pure policy violation at identical byte volume.",
+      "headline_retraction_risk": "PARTIAL \u2014 hard_unauthorized_architecture tracks architecture-correlated transfer volume at matched knobs, not covert policy alone"
+    },
+    "explanation": {
+      "inference_task": "12-class architecture_id under realistic single-draw observer",
+      "detector_task": "2-class: attested arch vs other arch at identical train volume profile",
+      "why_binary_can_exceed_multiclass": "Logistic detector only needs a separating hyperplane between two clouds at matched volume; multiclass inference requires 12-way separation with heavy class overlap and label noise. MI and balanced accuracy on 12-way stay near floor.",
+      "leakage_checks": [
+        "config-grouped train/test split (no config in both folds)",
+        "covert benign/violation pairs share physical base_run_id for splitting"
+      ]
+    },
+    "leakage": {
+      "issue": "covert_modulator paired rows must share split_group_id",
+      "fix": "split_by_base_run uses base_run_id without ':covert' suffix",
+      "status": "fixed_in_eval"
+    }
+  },
   "suites": {
     "trivial_mode_change": {
       "suite": "trivial_mode_change",
@@ -31,51 +92,100 @@
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
       "roc_auc": 1.0,
-      "fpr_at_threshold": 0.02832244008714597,
+      "balanced_accuracy": 1.0,
+      "majority_baseline": 0.5047801147227533,
+      "fpr_at_threshold": 0.0457516339869281,
       "tpr_at_threshold": 1.0,
-      "threshold": 1.10165624807924e-109,
-      "false_positives": 13,
+      "threshold": 6.891666003896119e-70,
+      "false_positives": 21,
       "true_positives": 456,
       "false_negatives": 0,
-      "true_negatives": 446,
+      "true_negatives": 438,
       "n_test": 915,
       "headline": false,
-      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+      "modulation_strength": "",
+      "notes": ""
     },
     "hard_unauthorized_architecture": {
       "suite": "hard_unauthorized_architecture",
       "policy_name": "train_volume_matched_arch_mlp_256x4_only",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
-      "roc_auc": 0.9945677846008503,
-      "fpr_at_threshold": 0.0,
-      "tpr_at_threshold": 0.9315068493150684,
-      "threshold": 0.24372220231396505,
-      "false_positives": 0,
-      "true_positives": 272,
-      "false_negatives": 20,
-      "true_negatives": 29,
+      "roc_auc": 0.9872461029759093,
+      "balanced_accuracy": 0.9348134152102031,
+      "majority_baseline": 0.8982128982128982,
+      "fpr_at_threshold": 0.06896551724137931,
+      "tpr_at_threshold": 0.9657534246575342,
+      "threshold": 0.17838093594665985,
+      "false_positives": 2,
+      "true_positives": 282,
+      "false_negatives": 10,
+      "true_negatives": 27,
       "n_test": 321,
       "headline": true,
-      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+      "modulation_strength": "",
+      "notes": ""
     },
-    "hard_covert_modulator": {
+    "hard_covert_modulator_heavy": {
       "suite": "hard_covert_modulator",
       "policy_name": "train_volume_matched_arch_mlp_256x4_only",
       "signal_set": "host_observer_realistic_single_draw",
       "backend": "local-gpu",
       "roc_auc": 1.0,
-      "fpr_at_threshold": 0.034482758620689655,
+      "balanced_accuracy": 1.0,
+      "majority_baseline": 0.5,
+      "fpr_at_threshold": 0.09375,
       "tpr_at_threshold": 1.0,
-      "threshold": 3.3122001391483085e-12,
-      "false_positives": 1,
-      "true_positives": 35,
+      "threshold": 3.551436695255222e-12,
+      "false_positives": 3,
+      "true_positives": 32,
+      "false_negatives": 0,
+      "true_negatives": 29,
+      "n_test": 64,
+      "headline": false,
+      "modulation_strength": "heavy",
+      "notes": "Strong cadence quantization (legacy default) \u2014 easy to detect"
+    },
+    "hard_covert_modulator_light": {
+      "suite": "hard_covert_modulator_light",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "balanced_accuracy": 1.0,
+      "majority_baseline": 0.5,
+      "fpr_at_threshold": 0.125,
+      "tpr_at_threshold": 1.0,
+      "threshold": 4.07610329906813e-12,
+      "false_positives": 4,
+      "true_positives": 32,
       "false_negatives": 0,
       "true_negatives": 28,
       "n_test": 64,
+      "headline": false,
+      "modulation_strength": "light",
+      "notes": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation"
+    },
+    "hard_covert_modulator_adaptive": {
+      "suite": "hard_covert_modulator_adaptive",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "balanced_accuracy": 1.0,
+      "majority_baseline": 0.5,
+      "fpr_at_threshold": 0.0,
+      "tpr_at_threshold": 1.0,
+      "threshold": 3.84526222233692e-12,
+      "false_positives": 0,
+      "true_positives": 32,
+      "false_negatives": 0,
+      "true_negatives": 32,
+      "n_test": 64,
       "headline": true,
-      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+      "modulation_strength": "adaptive",
+      "notes": "Adaptive adversary: weakest preset that changes features; reports covert capacity below detector"
     }
   },
-  "tier_red_note": "covert_modulator.py implements measurement transform; not published as exploit"
+  "tier_red_note": "covert_modulator.py \u2014 measurement transforms only"
 }

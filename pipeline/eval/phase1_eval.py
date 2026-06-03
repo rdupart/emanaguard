@@ -9,7 +9,17 @@ import numpy as np
 
 from pipeline.corpus.expand import corpus_statistics, expand_observations
 from pipeline.eval.classifiers import fit_predict, make_logreg, make_rf
-from pipeline.eval.metrics import AxisResult, chance_level, evaluate_predictions
+from pipeline.corpus.balance import label_counts_physical, subsample_indices_balanced
+from pipeline.eval.metrics import (
+    MI_PASS_FLOOR_BITS,
+    AxisResult,
+    chance_level,
+    evaluate_predictions,
+    majority_baseline,
+)
+
+NULL_CLAIM_AXES = frozenset({"seq_length", "llm_phase"})
+PRELIMINARY_REAL_AXES = frozenset({"mode", "batch_size"})
 from pipeline.eval.splits import split_by_config_stratified, split_holdout_architectures
 from pipeline.features.host_observer import host_observer_feature_vector, project_host_observer
 from pipeline.features.realistic_observer import (
@@ -119,14 +129,16 @@ def _eval_all_axes_with_matrix(
     )
     results: list[AxisResult] = []
     curves: list[dict] = []
-    for axis, _ in LABEL_AXES:
+    for axis, fn in LABEL_AXES:
         y = y_dict[axis]
+        bal_m = subsample_indices_balanced(y, config_ids, seed=seed + hash(axis) % 997)
+        x_b, y_b, cfg_b = x[bal_m], y[bal_m], config_ids[bal_m]
         train_m, test_m = split_by_config_stratified(
-            config_ids, y, holdout_fraction=0.25, seed=seed + hash(axis) % 997
+            cfg_b, y_b, holdout_fraction=0.25, seed=seed + hash(axis) % 997
         )
         results.append(
             _eval_axis_masked(
-                x, y, train_m, test_m, axis, signal_set, backend, make_logreg, seed
+                x_b, y_b, train_m, test_m, axis, signal_set, backend, make_logreg, seed
             )
         )
     return results, curves
@@ -224,73 +236,46 @@ def _eval_axis_masked(
     all_labels = sorted(np.unique(y), key=str)
     y_train, y_test = y[train_m], y[test_m]
 
+    uni = chance_level(len(all_labels))
+    maj = majority_baseline(y_train) if train_m.sum() else uni
+
+    def _empty(notes: str, n_test: int = 0) -> AxisResult:
+        return AxisResult(
+            label_axis=label_axis,
+            signal_set=signal_set,
+            backend=backend,
+            n_samples=n_test,
+            n_classes=len(all_labels),
+            chance_accuracy=maj,
+            majority_baseline_accuracy=maj,
+            uniform_chance_accuracy=uni,
+            accuracy=0.0,
+            balanced_accuracy=0.0,
+            macro_f1=0.0,
+            mi_bits=0.0,
+            ci_lower=0.0,
+            ci_upper=0.0,
+            balanced_ci_lower=0.0,
+            balanced_ci_upper=0.0,
+            pass_lower_ci_above_chance=False,
+            pass_balanced_beat_majority=False,
+            pass_mi_above_floor=False,
+            pass_gate=False,
+            confusion=[],
+            class_names=[str(c) for c in all_labels],
+            notes=notes,
+        )
+
     if len(all_labels) < 2:
-        return AxisResult(
-            label_axis=label_axis,
-            signal_set=signal_set,
-            backend=backend,
-            n_samples=int(len(y)),
-            n_classes=len(all_labels),
-            chance_accuracy=1.0,
-            accuracy=0.0,
-            mi_bits=0.0,
-            ci_lower=0.0,
-            ci_upper=0.0,
-            pass_lower_ci_above_chance=False,
-            confusion=[[int(len(y))]] if len(y) else [[]],
-            class_names=[str(c) for c in all_labels],
-            notes="NEGATIVE: corpus has a single class for this axis",
-        )
+        return _empty("NEGATIVE: corpus has a single class for this axis", int(len(y)))
     if train_m.sum() < 4 or test_m.sum() < 2:
-        return AxisResult(
-            label_axis=label_axis,
-            signal_set=signal_set,
-            backend=backend,
-            n_samples=int(test_m.sum()),
-            n_classes=len(all_labels),
-            chance_accuracy=chance_level(len(all_labels)),
-            accuracy=0.0,
-            mi_bits=0.0,
-            ci_lower=0.0,
-            ci_upper=0.0,
-            pass_lower_ci_above_chance=False,
-            confusion=[],
-            class_names=[str(c) for c in all_labels],
-            notes="insufficient train/test after grouped split",
-        )
+        return _empty("insufficient train/test after grouped split", int(test_m.sum()))
     if len(np.unique(y_train)) < 2:
-        return AxisResult(
-            label_axis=label_axis,
-            signal_set=signal_set,
-            backend=backend,
-            n_samples=int(test_m.sum()),
-            n_classes=len(all_labels),
-            chance_accuracy=chance_level(len(all_labels)),
-            accuracy=0.0,
-            mi_bits=0.0,
-            ci_lower=0.0,
-            ci_upper=0.0,
-            pass_lower_ci_above_chance=False,
-            confusion=[],
-            class_names=all_labels,
-            notes="NEGATIVE: train fold has a single class",
-        )
+        return _empty("NEGATIVE: train fold has a single class", int(test_m.sum()))
     if len(np.unique(y_test)) < 2:
-        return AxisResult(
-            label_axis=label_axis,
-            signal_set=signal_set,
-            backend=backend,
-            n_samples=int(test_m.sum()),
-            n_classes=len(all_labels),
-            chance_accuracy=chance_level(len(all_labels)),
-            accuracy=float(np.mean(y_test == y_test[0])) if len(y_test) else 0.0,
-            mi_bits=0.0,
-            ci_lower=0.0,
-            ci_upper=0.0,
-            pass_lower_ci_above_chance=False,
-            confusion=[[int(test_m.sum())]],
-            class_names=all_labels,
-            notes="NEGATIVE: test fold has a single class (holdout did not include all label values)",
+        return _empty(
+            "NEGATIVE: test fold has a single class (holdout did not include all label values)",
+            int(test_m.sum()),
         )
 
     y_pred = fit_predict(
@@ -304,6 +289,7 @@ def _eval_axis_masked(
         label_axis=label_axis,
         signal_set=signal_set,
         backend=backend,
+        y_train=y_train,
     )
 
 
@@ -362,19 +348,21 @@ def _eval_all_axes(
     )
     results: list[AxisResult] = []
     curves: list[LearningCurvePoint] = []
-    for axis, _ in LABEL_AXES:
+    for axis, fn in LABEL_AXES:
         y = y_dict[axis]
+        bal_m = subsample_indices_balanced(y, config_ids, seed=seed + hash(axis) % 997)
+        x_b, y_b, cfg_b, base_b = x[bal_m], y[bal_m], config_ids[bal_m], base_ids[bal_m]
         train_m, test_m = split_by_config_stratified(
-            config_ids, y, holdout_fraction=0.25, seed=seed + hash(axis) % 997
+            cfg_b, y_b, holdout_fraction=0.25, seed=seed + hash(axis) % 997
         )
         results.append(
             _eval_axis_masked(
-                x, y, train_m, test_m, axis, signal_set, backend, make_logreg, seed
+                x_b, y_b, train_m, test_m, axis, signal_set, backend, make_logreg, seed
             )
         )
         curves.extend(
             _learning_curves(
-                x, y, base_ids, config_ids, train_m, axis, signal_set, backend, seed
+                x_b, y_b, base_b, cfg_b, train_m, axis, signal_set, backend, seed
             )
         )
     curve_dicts = [asdict(c) for c in curves]
@@ -506,35 +494,60 @@ def run_evaluation(
     n_arch_physical = count_architectures_in_runs(physical_labels)
     target_archs = all_architecture_ids()
 
+    balance_report: dict = {}
+    for axis, fn in LABEL_AXES:
+        balance_report[axis] = {
+            "physical_counts_before": label_counts_physical(runs, fn),
+        }
+
     def _apply_labeling_gates(results: list[AxisResult]) -> list[dict]:
         out_rows: list[dict] = []
         for r in results:
             d = r.to_dict()
-            if r.label_axis == "model_class":
-                d["pass_lower_ci_above_chance"] = False
+            if r.label_axis in NULL_CLAIM_AXES:
+                d["claim_status"] = "NULL"
+                d["pass_gate"] = False
+                d["notes"] = (
+                    (d.get("notes") or "")
+                    + " NULL axis: does not beat majority baseline and/or MI "
+                    f"< {MI_PASS_FLOOR_BITS} bits — not evaluable for claims"
+                ).strip()
+            elif r.label_axis == "model_class":
+                d["pass_gate"] = False
                 d["claim_status"] = "RETRACTED"
                 d["notes"] = (
                     (d.get("notes") or "")
-                    + " model_class confounded with mode/volume — see docs/architecture_labeling_audit.md"
+                    + " model_class confounded — see docs/architecture_labeling_audit.md"
                 ).strip()
             elif r.label_axis == "architecture_id":
                 if n_arch_physical < MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM:
-                    d["pass_lower_ci_above_chance"] = False
+                    d["pass_gate"] = False
                     d["claim_status"] = "RETRACTED_INSUFFICIENT_CORPUS"
-                    d["notes"] = (
-                        (d.get("notes") or "")
-                        + f" only {n_arch_physical} physical architectures (need "
-                        f">={MIN_ARCHITECTURES_FOR_FINGERPRINT_CLAIM}); collect expanded corpus"
-                    ).strip()
                 else:
-                    d["claim_status"] = "PRELIMINARY_PENDING_HELD_OUT"
+                    d["claim_status"] = (
+                        "PRELIMINARY_PENDING_HELD_OUT" if r.pass_gate else "NEGATIVE"
+                    )
+            elif r.label_axis in PRELIMINARY_REAL_AXES:
+                d["claim_status"] = (
+                    "PRELIMINARY_REAL" if r.pass_gate else "PRELIMINARY"
+                )
             else:
-                d["claim_status"] = "PRELIMINARY"
+                d["claim_status"] = "PRELIMINARY" if r.pass_gate else "NEGATIVE"
             out_rows.append(d)
         return out_rows
 
     single_gated = _apply_labeling_gates(headline_single)
     mean_gated = _apply_labeling_gates(headline_mean)
+    held_arch = held_out_model.get("axes", {}).get("architecture_id", {})
+    if held_arch.get("pass_gate") is False or held_arch.get("pass_lower_ci_above_chance") is False:
+        for d in single_gated:
+            if d["label_axis"] == "architecture_id":
+                d["claim_status"] = "NEGATIVE"
+                d["pass_gate"] = False
+                d["notes"] = (
+                    (d.get("notes") or "")
+                    + " held-out-model FAIL — no fingerprint claim"
+                ).strip()
 
     architecture_labeling_audit = {
         "doc": "docs/architecture_labeling_audit.md",
@@ -559,12 +572,15 @@ def run_evaluation(
     }
 
     gate_summary = {
+        "methodology": "phase1.4 — majority baseline, balanced accuracy + MI pass, balanced config subsample",
         "external_fingerprint_claims": "BLOCKED",
         "architecture_inference_headline": (
-            "BLOCKED until >=8 physical architectures and held-out-model PASS on architecture_id"
+            "BLOCKED — held-out-model and balanced multiclass inference fail"
         ),
-        "detector_headline": "Phase 2 hard suites only (not trivial mode-change AUC)",
-        "phase_3": "NOT_APPROVED — re-collect on 10-arch corpus then re-run gates",
+        "detector_headline": "hard_unauthorized_architecture + adaptive covert (not heavy AUC alone)",
+        "null_axes": list(NULL_CLAIM_AXES),
+        "preliminary_real_axes": list(PRELIMINARY_REAL_AXES),
+        "phase_3": "NOT_APPROVED — gate re-run v1.4 complete; await human review",
     }
 
     # Interpret ablation: if volume-only ≈ realistic, channel is coarse
@@ -583,7 +599,15 @@ def run_evaluation(
 
     return {
         "backend": backend,
-        "methodology_version": "phase1.3",
+        "methodology_version": "phase1.4",
+        "metrics_policy": {
+            "baseline": "majority_class_on_train",
+            "pass_requires": "balanced_accuracy_ci_lower > majority AND mi_bits >= "
+            f"{MI_PASS_FLOOR_BITS}",
+            "uniform_chance_reported_as": "uniform_chance_accuracy",
+            "eval_subsample": "balanced_equal_configs_per_label_value",
+        },
+        "label_balance_report": balance_report,
         "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
         "external_claims_status": "BLOCKED until scale + held-out-model gates pass",
         "corpus_statistics": stats,

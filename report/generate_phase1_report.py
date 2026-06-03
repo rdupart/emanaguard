@@ -17,16 +17,23 @@ def _fmt_axis_table(results: list[dict], title: str) -> str:
     lines = [
         f"### {title}",
         "",
-        "| Axis | Acc | Chance | MI | CI (lo–hi) | PASS | Claim |",
-        "|------|-----|--------|-----|------------|------|-------|",
+        "| Axis | Bal.Acc | Maj.Base | Macro-F1 | MI | Bal.CI | PASS | Claim |",
+        "|------|---------|----------|----------|-----|--------|------|-------|",
     ]
     for r in results:
         claim = r.get("claim_status", "PRELIMINARY")
+        maj = r.get("majority_baseline_accuracy", r.get("chance_accuracy", 0))
+        bal = r.get("balanced_accuracy", r.get("accuracy", 0))
+        bal_lo = r.get("balanced_ci_lower", r.get("ci_lower", 0))
+        bal_hi = r.get("balanced_ci_upper", r.get("ci_upper", 0))
+        passed = r.get("pass_gate", r.get("pass_lower_ci_above_chance", False))
         lines.append(
-            f"| {r['label_axis']} | {r['accuracy']:.3f} | {r['chance_accuracy']:.3f} | "
-            f"{r['mi_bits']:.3f} | {r['ci_lower']:.3f}–{r['ci_upper']:.3f} | "
-            f"{'YES' if r['pass_lower_ci_above_chance'] else 'NO'} | {claim} |"
+            f"| {r['label_axis']} | {bal:.3f} | {maj:.3f} | {r.get('macro_f1', 0):.3f} | "
+            f"{r['mi_bits']:.3f} | {bal_lo:.3f}–{bal_hi:.3f} | "
+            f"{'YES' if passed else 'NO'} | {claim} |"
         )
+        if r.get("per_class_recall"):
+            lines.append(f"\nPer-class recall: `{r['per_class_recall']}`\n")
         if r.get("notes"):
             lines.append(f"\n*{r['label_axis']}:* {r['notes']}")
         if r.get("confusion"):

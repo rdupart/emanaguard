@@ -91,27 +91,28 @@ def iter_corpus() -> Iterator[WorkloadSpec]:
         )
         idx += 1
 
-    # Extra batch/seq diversity on first 4 architectures only (fine-axis stress)
-    for arch_id, hidden, layers in ARCHITECTURE_SPECS[:4]:
+    # Balanced batch/seq grid on every architecture (future collects)
+    for arch_id, hidden, layers in ARCHITECTURE_SPECS:
         mclass = _model_class_for_hidden(hidden)
-        yield WorkloadSpec(
-            workload_id=f"w{idx:02d}_train_{mclass}_n_a",
-            mode="train",
-            model_class=mclass,
-            architecture_id=arch_id,
-            batch_size=8,
-            seq_length=256,
-            llm_phase="n/a",
-            steps=6,
-            hidden=hidden,
-            num_layers=layers,
-            vocab=32000,
-            volume_profile="standard",
-        )
-        idx += 1
+        for bs, sl in ((8, 128), (4, 256), (8, 256)):
+            yield WorkloadSpec(
+                workload_id=f"w{idx:02d}_train_{mclass}_bs{bs}_sl{sl}",
+                mode="train",
+                model_class=mclass,
+                architecture_id=arch_id,
+                batch_size=bs,
+                seq_length=sl,
+                llm_phase="n/a",
+                steps=6,
+                hidden=hidden,
+                num_layers=layers,
+                vocab=32000,
+                volume_profile="standard",
+            )
+            idx += 1
 
-    # LLM prefill/decode on two architectures
-    for arch_id, hidden, layers in ARCHITECTURE_SPECS[:2]:
+    # LLM prefill/decode on all architectures (balanced llm_phase axis)
+    for arch_id, hidden, layers in ARCHITECTURE_SPECS:
         mclass = _model_class_for_hidden(hidden)
         for phase, steps in [("prefill", 4), ("decode", 10)]:
             yield WorkloadSpec(

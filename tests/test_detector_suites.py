@@ -15,9 +15,10 @@ def test_detector_returns_three_suites():
     assert "suites" in out
     assert "trivial_mode_change" in out["suites"]
     assert "hard_unauthorized_architecture" in out["suites"]
-    assert "hard_covert_modulator" in out["suites"]
+    assert "hard_covert_modulator_adaptive" in out["suites"]
     assert out["suites"]["trivial_mode_change"]["headline"] is False
     assert out["suites"]["hard_unauthorized_architecture"]["headline"] is True
+    assert "detector_inference_audit" in out
 
 
 def test_hard_wrong_arch_labels_train_only():
@@ -55,5 +56,6 @@ def test_hard_wrong_arch_labels_train_only():
     from detector.policy import AttestedPolicy
 
     pol = AttestedPolicy("p", frozenset({"train"}), frozenset({"arch_mlp_256x4"}))
-    assert _suite_label(benign, ViolationSuite.HARD_WRONG_ARCH, pol) == 0
-    assert _suite_label(viol, ViolationSuite.HARD_WRONG_ARCH, pol) == 1
+    att = "arch_mlp_256x4"
+    assert _suite_label(benign, ViolationSuite.HARD_WRONG_ARCH, pol, attested=att) == 0
+    assert _suite_label(viol, ViolationSuite.HARD_WRONG_ARCH, pol, attested=att) == 1

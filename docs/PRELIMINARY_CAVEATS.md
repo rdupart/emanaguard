@@ -1,6 +1,6 @@
 # Preliminary results caveats (carry forward to all gates)
 
-**Status:** Phase 1 methodology v1.3 is acceptable; **Phase 3 is NOT approved** until corpus scale, labeling audit, held-out-model, and hard-case detector gates pass.
+**Status:** Phase 1 methodology **v1.4** (majority baseline, balanced accuracy + MI, balanced subsample); **Phase 3 is NOT approved**.
 
 **Do NOT use for:** external writeups, product/security claims, “model fingerprinting,” or Azure Phase 4 runs until the gating items below are satisfied.
 

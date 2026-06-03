@@ -1,4 +1,4 @@
-"""Generate PHASE_2_REPORT.md from phase2_results.json (D2 hard-case suites)."""
+"""Generate PHASE_2_REPORT.md from phase2_results.json (D2 v2.1)."""
 
 from __future__ import annotations
 
@@ -8,17 +8,19 @@ from pathlib import Path
 
 
 def _suite_row(name: str, s: dict) -> str:
-    headline = " **HEADLINE**" if s.get("headline") else " (not headline)"
+    headline = " **HEADLINE**" if s.get("headline") else ""
+    mod = s.get("modulation_strength", "")
+    mod_s = f" ({mod})" if mod else ""
     return (
-        f"| {name}{headline} | {s.get('roc_auc', 0):.3f} | {s.get('n_test', 0)} | "
-        f"{s.get('tpr_at_threshold', 0):.3f} | {s.get('fpr_at_threshold', 0):.3f} | "
-        f"{s.get('notes', '')} |"
+        f"| {name}{headline}{mod_s} | {s.get('roc_auc', 0):.3f} | "
+        f"{s.get('balanced_accuracy', 0):.3f} | {s.get('majority_baseline', 0):.3f} | "
+        f"{s.get('n_test', 0)} | {s.get('notes', '')[:80]} |"
     )
 
 
 def generate(results_path: Path, out_path: Path) -> None:
     if not results_path.exists():
-        out_path.write_text("# PHASE 2 Report\n\n**BLOCKED** — run `python3 -m pipeline.cli detect` first.\n")
+        out_path.write_text("# PHASE 2 Report\n\n**BLOCKED** — run detect first.\n")
         return
 
     d = json.loads(results_path.read_text())
@@ -27,82 +29,64 @@ def generate(results_path: Path, out_path: Path) -> None:
         sys.exit(2)
 
     suites = d.get("suites", {})
-    if not suites and "detector" in d:
-        # Legacy JSON shape
-        suites = {"legacy_combined": d["detector"]}
-
-    caveats = (
-        "**PRELIMINARY** — inherits Phase 1 caveats (`docs/PRELIMINARY_CAVEATS.md`). "
-        "Headline metrics are **hard** violation suites only. "
-        "Trivial mode-change ROC is **not** a result."
-    )
+    audit = d.get("detector_inference_audit", {})
 
     rows = ""
     for key in (
         "hard_unauthorized_architecture",
-        "hard_covert_modulator",
+        "hard_covert_modulator_adaptive",
+        "hard_covert_modulator_light",
+        "hard_covert_modulator_heavy",
         "trivial_mode_change",
     ):
         if key in suites:
             rows += _suite_row(key, suites[key]) + "\n"
 
-    md = f"""# PHASE 2 Report — Policy-Deviation Detector (Gate D2)
+    feat = audit.get("feature_distributions", {})
+    interp = feat.get("interpretation", audit.get("explanation", {}).get("why_binary_can_exceed_multiclass", ""))
+
+    md = f"""# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.1)
 
 **Date:** 2026-06-03  
-**Status:** Gate document (preliminary metrics)  
+**Methodology:** `{d.get('methodology_version', 'phase2.1')}`  
 **Backend:** `{d.get('backend', 'local-gpu')}`  
-**Headline metric:** `{d.get('headline_detector_metric', 'hard suites')}`  
-**Not headline:** `{d.get('not_headline', 'trivial_mode_change')}`
 
-> {caveats}
+> **PRELIMINARY** — Phase 3 not approved. Headline: **balanced** detector metrics + **adaptive** covert modulator.
+> Heavy covert AUC≈1 alone is **not** a strong claim. See `docs/detector_inference_inconsistency.md`.
 
-## 0. Corpus scale (detector inherits Phase 1 gate)
+## 1. ROC / balanced accuracy by suite
 
-| Item | Value |
-|------|--------|
-| Physical base captures | {d.get('physical_base_captures', 'n/a')} |
-| Distinct `architecture_id` in traces | {d.get('distinct_architecture_ids_in_corpus', 'n/a')} |
-| Target architectures (corpus spec) | {len(d.get('target_architectures', []))} listed in JSON |
-| Min for fingerprint claim | {d.get('min_architectures_for_fingerprint', 8)} |
+| Suite | ROC AUC | Bal.Acc | Maj.base | n_test | Notes |
+|-------|---------|---------|----------|--------|-------|
+{rows or '| — | — | — | — | — | — |'}
 
-## 1. Detector definition (D2)
+**Headline:** `{d.get('headline_detector_metric', '')}`  
+**Not headline:** `{d.get('not_headline', '')}`
 
-| Item | Value |
-|------|--------|
-| Signal | `host_observer_realistic_single_draw` |
-| Attested policy | `{suites.get('hard_unauthorized_architecture', {}).get('policy_name', 'train_volume_matched_arch_mlp_256x4_only')}` |
-| Hard (a) | Unauthorized architecture at **same** train mode/volume profile |
-| Hard (b) | Covert modulator on attested benign trace (Tier-Red transform in repo for measurement) |
-| Not a result | Mode change alone (`trivial_mode_change`) |
+## 2. Detector vs 12-way inference
 
-*{d.get('tier_red_note', '')}*
+{interp}
 
-## 2. ROC by suite (test fold)
+Feature audit (`volume_matched_on_coarse_features`): **{feat.get('volume_matched_on_coarse_features', 'n/a')}**  
+Mean L2 (benign vs wrong-arch): **{feat.get('mean_feature_l2_benign_vs_wrong_arch', 'n/a')}**
 
-| Suite | ROC AUC | n_test | TPR | FPR | Notes |
-|-------|---------|--------|-----|-----|-------|
-{rows or '| (no suites in JSON) | — | — | — | — | re-run detect |'}
+## 3. Modulation presets
 
-## 3. Phase 1 gating (unchanged)
-
-| Gate | Status |
-|------|--------|
-| Labeling audit (`architecture_id` vs `model_class`) | `docs/architecture_labeling_audit.md` + `architecture_labeling_audit` in phase1 JSON |
-| ≥8 physical architectures | Re-collect on expanded corpus |
-| Held-out-model (single-draw) | `held_out_model_evaluation` in phase1_results |
-| Single-draw headline | `host_observer_realistic_single_draw` |
+```json
+{json.dumps(d.get('modulation_presets', {}), indent=2)[:2000]}
+```
 
 ## 4. Azure
 
-**Not run** (Phase 4 only).
+Not run.
 
 ---
 
-**STOP — Phase 2 gate.** Phase 3 **not approved** until hard-case detector + Phase 1 gates pass on scaled corpus.
+**STOP — Phase 2 gate v2.1.** Phase 3 blocked.
 """
     out_path.write_text(md)
 
 
 if __name__ == "__main__":
     root = Path(__file__).resolve().parents[1]
-    generate(root / "report" / "phase2_results.json", root / "PHASE_2_REPORT.md")
+    generate(root / "report/phase2_results.json", root / "PHASE_2_REPORT.md")

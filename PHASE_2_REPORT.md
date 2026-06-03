@@ -1,56 +1,62 @@
-# PHASE 2 Report — Policy-Deviation Detector (Gate D2)
+# PHASE 2 Report — Policy-Deviation Detector (Gate D2 v2.1)
 
 **Date:** 2026-06-03  
-**Status:** Gate document (preliminary metrics)  
+**Methodology:** `phase2.1`  
 **Backend:** `local-gpu`  
-**Headline metric:** `hard_unauthorized_architecture + hard_covert_modulator`  
-**Not headline:** `trivial_mode_change (volume/mode only)`
 
-> **PRELIMINARY** — inherits Phase 1 caveats (`docs/PRELIMINARY_CAVEATS.md`). Headline metrics are **hard** violation suites only. Trivial mode-change ROC is **not** a result.
+> **PRELIMINARY** — Phase 3 not approved. Headline: **balanced** detector metrics + **adaptive** covert modulator.
+> Heavy covert AUC≈1 alone is **not** a strong claim. See `docs/detector_inference_inconsistency.md`.
 
-## 0. Corpus scale (detector inherits Phase 1 gate)
+## 1. ROC / balanced accuracy by suite
 
-| Item | Value |
-|------|--------|
-| Physical base captures | 4576 |
-| Distinct `architecture_id` in traces | 12 |
-| Target architectures (corpus spec) | 10 listed in JSON |
-| Min for fingerprint claim | 8 |
-
-## 1. Detector definition (D2)
-
-| Item | Value |
-|------|--------|
-| Signal | `host_observer_realistic_single_draw` |
-| Attested policy | `train_volume_matched_arch_mlp_256x4_only` |
-| Hard (a) | Unauthorized architecture at **same** train mode/volume profile |
-| Hard (b) | Covert modulator on attested benign trace (Tier-Red transform in repo for measurement) |
-| Not a result | Mode change alone (`trivial_mode_change`) |
-
-*covert_modulator.py implements measurement transform; not published as exploit*
-
-## 2. ROC by suite (test fold)
-
-| Suite | ROC AUC | n_test | TPR | FPR | Notes |
-|-------|---------|--------|-----|-----|-------|
-| hard_unauthorized_architecture **HEADLINE** | 0.995 | 321 | 0.932 | 0.000 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
-| hard_covert_modulator **HEADLINE** | 1.000 | 64 | 1.000 | 0.034 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
-| trivial_mode_change (not headline) | 1.000 | 915 | 1.000 | 0.028 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| Suite | ROC AUC | Bal.Acc | Maj.base | n_test | Notes |
+|-------|---------|---------|----------|--------|-------|
+| hard_unauthorized_architecture **HEADLINE** | 0.987 | 0.935 | 0.898 | 321 |  |
+| hard_covert_modulator_adaptive **HEADLINE** (adaptive) | 1.000 | 1.000 | 0.500 | 64 | Adaptive adversary: weakest preset that changes features; reports covert capacit |
+| hard_covert_modulator_light (light) | 1.000 | 1.000 | 0.500 | 64 | Low cadence shift (~8% jitter) — subtle timing perturbation |
+| hard_covert_modulator_heavy (heavy) | 1.000 | 1.000 | 0.500 | 64 | Strong cadence quantization (legacy default) — easy to detect |
+| trivial_mode_change | 1.000 | 1.000 | 0.505 | 915 |  |
 
 
-## 3. Phase 1 gating (unchanged)
+**Headline:** `hard_unauthorized_architecture (balanced acc) + hard_covert_modulator_adaptive`  
+**Not headline:** `trivial_mode_change; heavy covert AUC alone`
 
-| Gate | Status |
-|------|--------|
-| Labeling audit (`architecture_id` vs `model_class`) | `docs/architecture_labeling_audit.md` + `architecture_labeling_audit` in phase1 JSON |
-| ≥8 physical architectures | Re-collect on expanded corpus |
-| Held-out-model (single-draw) | `held_out_model_evaluation` in phase1_results |
-| Single-draw headline | `host_observer_realistic_single_draw` |
+## 2. Detector vs 12-way inference
+
+At fixed (mode, bs, seq), wrong-architecture rows still differ in total_bytes because model hidden/layers change transfer volume. Binary detector can separate attested vs other arch using this compute-volume proxy; 12-way inference fails under realistic noise. NOT a pure policy violation at identical byte volume.
+
+Feature audit (`volume_matched_on_coarse_features`): **False**  
+Mean L2 (benign vs wrong-arch): **n/a**
+
+## 3. Modulation presets
+
+```json
+{
+  "light": {
+    "name": "light",
+    "cadence_ns": 80000,
+    "jitter_fraction": 0.08,
+    "description": "Low cadence shift (~8% jitter) \u2014 subtle timing perturbation"
+  },
+  "medium": {
+    "name": "medium",
+    "cadence_ns": 200000,
+    "jitter_fraction": 0.15,
+    "description": "Moderate cadence replacement"
+  },
+  "heavy": {
+    "name": "heavy",
+    "cadence_ns": 350000,
+    "jitter_fraction": 0.25,
+    "description": "Strong cadence quantization (legacy default) \u2014 easy to detect"
+  }
+}
+```
 
 ## 4. Azure
 
-**Not run** (Phase 4 only).
+Not run.
 
 ---
 
-**STOP — Phase 2 gate.** Phase 3 **not approved** until hard-case detector + Phase 1 gates pass on scaled corpus.
+**STOP — Phase 2 gate v2.1.** Phase 3 blocked.
