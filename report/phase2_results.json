@@ -1,0 +1,81 @@
+{
+  "preliminary": true,
+  "preliminary_caveats_doc": "docs/PRELIMINARY_CAVEATS.md",
+  "backend": "local-gpu",
+  "physical_base_captures": 4576,
+  "attested_architecture_resolved": "arch_mlp_256x4",
+  "volume_matched_train_profile": {
+    "batch_size": 4,
+    "seq_length": 128
+  },
+  "distinct_architecture_ids_in_corpus": 12,
+  "target_architectures": [
+    "arch_mlp_128x3",
+    "arch_mlp_256x4",
+    "arch_mlp_384x12",
+    "arch_mlp_512x6",
+    "arch_mlp_768x6",
+    "arch_mlp_1024x8",
+    "arch_mlp_1280x8",
+    "arch_mlp_1536x10",
+    "arch_mlp_1920x10",
+    "arch_mlp_2048x12"
+  ],
+  "min_architectures_for_fingerprint": 8,
+  "headline_detector_metric": "hard_unauthorized_architecture + hard_covert_modulator",
+  "not_headline": "trivial_mode_change (volume/mode only)",
+  "suites": {
+    "trivial_mode_change": {
+      "suite": "trivial_mode_change",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "fpr_at_threshold": 0.04139433551198257,
+      "tpr_at_threshold": 1.0,
+      "threshold": 2.294374874779526e-123,
+      "false_positives": 19,
+      "true_positives": 456,
+      "false_negatives": 0,
+      "true_negatives": 440,
+      "n_test": 915,
+      "headline": false,
+      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+    },
+    "hard_unauthorized_architecture": {
+      "suite": "hard_unauthorized_architecture",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 0.9870099196976854,
+      "fpr_at_threshold": 0.13793103448275862,
+      "tpr_at_threshold": 0.9691780821917808,
+      "threshold": 0.19698590595039267,
+      "false_positives": 4,
+      "true_positives": 283,
+      "false_negatives": 9,
+      "true_negatives": 25,
+      "n_test": 321,
+      "headline": true,
+      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+    },
+    "hard_covert_modulator": {
+      "suite": "hard_covert_modulator",
+      "policy_name": "train_volume_matched_arch_mlp_256x4_only",
+      "signal_set": "host_observer_realistic_single_draw",
+      "backend": "local-gpu",
+      "roc_auc": 1.0,
+      "fpr_at_threshold": 0.06896551724137931,
+      "tpr_at_threshold": 1.0,
+      "threshold": 2.6560088395247498e-12,
+      "false_positives": 2,
+      "true_positives": 35,
+      "false_negatives": 0,
+      "true_negatives": 27,
+      "n_test": 64,
+      "headline": true,
+      "notes": "PRELIMINARY \u2014 not for external claims until >=8 physical architectures collected"
+    }
+  },
+  "tier_red_note": "covert_modulator.py implements measurement transform; not published as exploit"
+}
