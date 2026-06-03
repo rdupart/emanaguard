@@ -33,9 +33,9 @@
 
 | Suite | ROC AUC | n_test | TPR | FPR | Notes |
 |-------|---------|--------|-----|-----|-------|
-| hard_unauthorized_architecture **HEADLINE** | 0.987 | 321 | 0.969 | 0.138 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
-| hard_covert_modulator **HEADLINE** | 1.000 | 64 | 1.000 | 0.069 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
-| trivial_mode_change (not headline) | 1.000 | 915 | 1.000 | 0.041 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| hard_unauthorized_architecture **HEADLINE** | 0.995 | 321 | 0.932 | 0.000 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| hard_covert_modulator **HEADLINE** | 1.000 | 64 | 1.000 | 0.034 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
+| trivial_mode_change (not headline) | 1.000 | 915 | 1.000 | 0.028 | PRELIMINARY — not for external claims until >=8 physical architectures collected |
 
 
 ## 3. Phase 1 gating (unchanged)
