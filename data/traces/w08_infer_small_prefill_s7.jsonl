@@ -1,0 +1,6 @@
+{"type": "labels", "workload_id": "w08_infer_small_prefill", "mode": "infer", "model_class": "small", "batch_size": 1, "seq_length": 512, "llm_phase": "prefill", "seed": 7, "run_id": "w08_infer_small_prefill_s7"}
+{"type": "event", "t_ns": 2981666023142, "size_bytes": 8388608, "direction": "H2D", "duration_ns": 1861903, "op_name": "load_embedding", "stream_id": 0, "phase": "prefill", "run_id": "w08_infer_small_prefill_s7"}
+{"type": "event", "t_ns": 2981668452090, "size_bytes": 262144, "direction": "H2D", "duration_ns": 144045, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w08_infer_small_prefill_s7"}
+{"type": "event", "t_ns": 2981669113539, "size_bytes": 262144, "direction": "H2D", "duration_ns": 142855, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w08_infer_small_prefill_s7"}
+{"type": "event", "t_ns": 2981669735183, "size_bytes": 262144, "direction": "H2D", "duration_ns": 135477, "op_name": "load_attn", "stream_id": 0, "phase": "prefill", "run_id": "w08_infer_small_prefill_s7"}
+{"type": "event", "t_ns": 2981669949754, "size_bytes": 524288, "direction": "D2H", "duration_ns": 205793, "op_name": "prefill_out", "stream_id": 0, "phase": "prefill", "run_id": "w08_infer_small_prefill_s7"}
