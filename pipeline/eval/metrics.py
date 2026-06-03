@@ -80,19 +80,48 @@ def evaluate_predictions(
     n_bootstrap: int = 1000,
     seed: int = 42,
     notes: str = "",
+    all_labels: list[str] | None = None,
 ) -> AxisResult:
-    labels = np.unique(y_true)
-    n_classes = len(labels)
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    corpus_labels = sorted(
+        set(class_names) | set(all_labels or []) | set(y_true) | set(y_pred),
+        key=str,
+    )
+    present = np.unique(y_true)
+    n_present = len(present)
+    n_corpus = max(len(corpus_labels), n_present)
+
+    if n_present < 2:
+        extra = notes or "NEGATIVE: test fold has a single class — axis not evaluable"
+        return AxisResult(
+            label_axis=label_axis,
+            signal_set=signal_set,
+            backend=backend,
+            n_samples=int(len(y_true)),
+            n_classes=n_present,
+            chance_accuracy=chance_level(n_corpus),
+            accuracy=float(np.mean(y_true == y_pred)) if len(y_true) else 0.0,
+            mi_bits=0.0,
+            ci_lower=0.0,
+            ci_upper=0.0,
+            pass_lower_ci_above_chance=False,
+            confusion=[[int(len(y_true))]] if len(y_true) else [[]],
+            class_names=[str(c) for c in present],
+            notes=extra,
+        )
+
+    label_order = corpus_labels if corpus_labels else [str(c) for c in present]
     acc, lo, hi = bootstrap_accuracy_ci(y_true, y_pred, n_bootstrap, seed)
     mi = float(mutual_info_score(y_true, y_pred))
-    cm = confusion_matrix(y_true, y_pred, labels=labels)
-    ch = chance_level(n_classes)
+    cm = confusion_matrix(y_true, y_pred, labels=label_order)
+    ch = chance_level(len(label_order))
     return AxisResult(
         label_axis=label_axis,
         signal_set=signal_set,
         backend=backend,
         n_samples=int(len(y_true)),
-        n_classes=n_classes,
+        n_classes=len(label_order),
         chance_accuracy=ch,
         accuracy=acc,
         mi_bits=mi,
@@ -100,6 +129,6 @@ def evaluate_predictions(
         ci_upper=hi,
         pass_lower_ci_above_chance=(lo > ch),
         confusion=cm.tolist(),
-        class_names=[str(c) for c in labels],
+        class_names=label_order,
         notes=notes,
     )

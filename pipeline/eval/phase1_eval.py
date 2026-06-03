@@ -9,8 +9,8 @@ import numpy as np
 
 from pipeline.corpus.expand import corpus_statistics, expand_observations
 from pipeline.eval.classifiers import fit_predict, make_logreg, make_rf
-from pipeline.eval.metrics import AxisResult, evaluate_predictions
-from pipeline.eval.splits import split_by_base_run, split_by_config
+from pipeline.eval.metrics import AxisResult, chance_level, evaluate_predictions
+from pipeline.eval.splits import split_by_config_stratified
 from pipeline.features.host_observer import host_observer_feature_vector, project_host_observer
 from pipeline.features.realistic_observer import (
     apply_realistic_observer,
@@ -90,14 +90,17 @@ def _eval_axis_masked(
     clf_factory,
     seed: int,
 ) -> AxisResult:
-    classes = np.unique(y)
-    if len(classes) < 2:
+    y = np.asarray(y)
+    all_labels = sorted(np.unique(y), key=str)
+    y_train, y_test = y[train_m], y[test_m]
+
+    if len(all_labels) < 2:
         return AxisResult(
             label_axis=label_axis,
             signal_set=signal_set,
             backend=backend,
             n_samples=int(len(y)),
-            n_classes=len(classes),
+            n_classes=len(all_labels),
             chance_accuracy=1.0,
             accuracy=0.0,
             mi_bits=0.0,
@@ -105,33 +108,69 @@ def _eval_axis_masked(
             ci_upper=0.0,
             pass_lower_ci_above_chance=False,
             confusion=[[int(len(y))]] if len(y) else [[]],
-            class_names=[str(c) for c in classes],
-            notes="NEGATIVE: single class",
+            class_names=[str(c) for c in all_labels],
+            notes="NEGATIVE: corpus has a single class for this axis",
         )
     if train_m.sum() < 4 or test_m.sum() < 2:
         return AxisResult(
             label_axis=label_axis,
             signal_set=signal_set,
             backend=backend,
-            n_samples=int(len(y)),
-            n_classes=len(classes),
-            chance_accuracy=1.0 / len(classes),
+            n_samples=int(test_m.sum()),
+            n_classes=len(all_labels),
+            chance_accuracy=chance_level(len(all_labels)),
             accuracy=0.0,
             mi_bits=0.0,
             ci_lower=0.0,
             ci_upper=0.0,
             pass_lower_ci_above_chance=False,
             confusion=[],
-            class_names=[str(c) for c in classes],
+            class_names=[str(c) for c in all_labels],
             notes="insufficient train/test after grouped split",
         )
+    if len(np.unique(y_train)) < 2:
+        return AxisResult(
+            label_axis=label_axis,
+            signal_set=signal_set,
+            backend=backend,
+            n_samples=int(test_m.sum()),
+            n_classes=len(all_labels),
+            chance_accuracy=chance_level(len(all_labels)),
+            accuracy=0.0,
+            mi_bits=0.0,
+            ci_lower=0.0,
+            ci_upper=0.0,
+            pass_lower_ci_above_chance=False,
+            confusion=[],
+            class_names=all_labels,
+            notes="NEGATIVE: train fold has a single class",
+        )
+    if len(np.unique(y_test)) < 2:
+        return AxisResult(
+            label_axis=label_axis,
+            signal_set=signal_set,
+            backend=backend,
+            n_samples=int(test_m.sum()),
+            n_classes=len(all_labels),
+            chance_accuracy=chance_level(len(all_labels)),
+            accuracy=float(np.mean(y_test == y_test[0])) if len(y_test) else 0.0,
+            mi_bits=0.0,
+            ci_lower=0.0,
+            ci_upper=0.0,
+            pass_lower_ci_above_chance=False,
+            confusion=[[int(test_m.sum())]],
+            class_names=all_labels,
+            notes="NEGATIVE: test fold has a single class (holdout did not include all label values)",
+        )
+
     y_pred = fit_predict(
-        clf_factory(seed), x[train_m], y[train_m], x[test_m]
+        clf_factory(seed), x[train_m], y_train, x[test_m]
     )
     return evaluate_predictions(
-        y[test_m],
+        y_test,
         y_pred,
-        class_names=[str(c) for c in classes],
+        class_names=all_labels,
+        all_labels=all_labels,
         label_axis=label_axis,
         signal_set=signal_set,
         backend=backend,
@@ -189,11 +228,13 @@ def _eval_all_axes(
     seed: int,
 ) -> tuple[list[AxisResult], list[dict], list[LearningCurvePoint]]:
     x, base_ids, config_ids, y_dict = _build_matrix(runs, feature_fn)
-    train_m, test_m = split_by_config(config_ids, holdout_fraction=0.25, seed=seed)
     results: list[AxisResult] = []
     curves: list[LearningCurvePoint] = []
     for axis, _ in LABEL_AXES:
         y = y_dict[axis]
+        train_m, test_m = split_by_config_stratified(
+            config_ids, y, holdout_fraction=0.25, seed=seed + hash(axis) % 997
+        )
         results.append(
             _eval_axis_masked(
                 x, y, train_m, test_m, axis, signal_set, backend, make_logreg, seed
@@ -284,9 +325,14 @@ def run_evaluation(
         ax: np.array([fn(lb_map[b]) for b in vm_buckets])
         for ax, fn in LABEL_AXES
     }
-    train_m, test_m = split_by_config(np.array(config_vm), holdout_fraction=0.25, seed=eval_seed)
     vm_results = []
     for axis, _ in LABEL_AXES:
+        train_m, test_m = split_by_config_stratified(
+            np.array(config_vm),
+            y_vm[axis],
+            holdout_fraction=0.25,
+            seed=eval_seed + hash(axis) % 997,
+        )
         vm_results.append(
             _eval_axis_masked(
                 x_vm,
@@ -331,7 +377,7 @@ def run_evaluation(
         "learning_curves": learning_curves,
         "mitigation_preview_d3": mitigation,
         "observer_transform_doc": "pipeline/features/realistic_observer.py",
-        "split_policy": "hold out 25% of config_id groups; ML uses one mean feature vector per base capture (40 obs averaged)",
+        "split_policy": "hold out 25% of config_id groups (stratified per label axis); ML uses one mean feature vector per base capture (40 obs averaged)",
         "classifier_samples": stats.get("unique_base_captures", 0),
     }
 

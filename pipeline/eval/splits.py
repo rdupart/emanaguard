@@ -44,6 +44,41 @@ def split_by_config(
     return train_m, test_m
 
 
+def split_by_config_stratified(
+    config_ids: np.ndarray,
+    y: np.ndarray,
+    holdout_fraction: float = 0.25,
+    seed: int = 42,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Hold out whole configs but keep ≥1 config per label value in test when possible.
+    Avoids degenerate test folds (e.g. llm_phase test set only 'n/a').
+    """
+    from collections import defaultdict
+
+    config_ids = np.asarray(config_ids)
+    y = np.asarray(y)
+    config_label: dict[str, str] = {}
+    for cid, lab in zip(config_ids, y):
+        config_label[str(cid)] = str(lab)
+
+    by_label: dict[str, list[str]] = defaultdict(list)
+    for cid, lab in config_label.items():
+        by_label[lab].append(cid)
+
+    rng = np.random.default_rng(seed)
+    test_configs: set[str] = set()
+    for lab, configs in by_label.items():
+        configs = list(configs)
+        rng.shuffle(configs)
+        n_test = max(1, int(len(configs) * holdout_fraction))
+        test_configs.update(configs[:n_test])
+
+    train_m = np.array([str(c) not in test_configs for c in config_ids])
+    test_m = ~train_m
+    return train_m, test_m
+
+
 def split_by_base_run(
     base_run_ids: Sequence[str],
     holdout_fraction: float = 0.2,
