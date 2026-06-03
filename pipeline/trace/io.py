@@ -8,20 +8,17 @@ from pathlib import Path
 from pipeline.trace.events import RunLabels, TransferEvent
 
 
-def write_run(
-    out_dir: Path,
-    events: list[TransferEvent],
-    labels: RunLabels,
-) -> Path:
+def write_run(out_dir: Path, events, labels) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
+
     safe_run_id = labels.run_id.replace("/", "_")
     path = out_dir / f"{safe_run_id}.jsonl"
-    # create any intermediate directories
-    path.parent.mkdir(parents=True, exist_ok=True)
+
     with path.open("w") as f:
         f.write(json.dumps({"type": "labels", **labels.to_dict()}) + "\n")
         for e in events:
             f.write(json.dumps({"type": "event", **e.to_dict()}) + "\n")
+
     return path
 
 
