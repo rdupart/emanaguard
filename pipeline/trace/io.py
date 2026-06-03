@@ -25,6 +25,7 @@ def write_run(
 def read_run(path: Path) -> tuple[list[TransferEvent], RunLabels]:
     events: list[TransferEvent] = []
     labels: RunLabels | None = None
+    path.parent.mkdir(parents=True, exist_ok=True)
     with path.open() as f:
         for line in f:
             row = json.loads(line)
